@@ -1,4 +1,4 @@
-import { onRequestGet, onRequestPost } from './api/projects.js';
+import projectsApi from './api/projects.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -7,13 +7,16 @@ export default {
     // Route API requests to the projects handler
     if (url.pathname === '/api/projects') {
       if (request.method === 'GET') {
-        return onRequestGet({ env });
+        return await projectsApi.onRequestGet({ env });
       } else if (request.method === 'POST') {
-        return onRequestPost({ env, request });
+        return await projectsApi.onRequestPost({ env, request });
       }
     }
 
-    // Serve static files or return 404
-    return new Response('Not Found', { status: 404 });
+    // Return 404 for unknown routes
+    return new Response(JSON.stringify({ error: 'Not Found' }), { 
+      status: 404,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
