@@ -24,6 +24,7 @@ export async function onRequestGet(context) {
             }
         });
     } catch (err) {
+        console.error('DB Error:', err);
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
 }
@@ -33,8 +34,7 @@ export async function onRequestPost(context) {
         const projects = await context.request.json();
 
         for (const row of projects) {
-            // Use rowId from frontend, fallback to index-based calculation
-            const rowIndex = row.rowId || (projects.indexOf(row) + 1);
+            const rowId = row.rowId || (projects.indexOf(row) + 1);
 
             await context.env.DB.prepare(`
                 INSERT INTO projects (
@@ -58,7 +58,7 @@ export async function onRequestPost(context) {
                     teaser_status = excluded.teaser_status,
                     updated_at = CURRENT_TIMESTAMP
             `).bind(
-                rowIndex,
+                rowId,
                 row.coupleName || "",
                 row.status || "IN PROGRESS",
                 row.type || "UPBEAT CINEMATIC",
@@ -79,6 +79,12 @@ export async function onRequestPost(context) {
             headers: { "Content-Type": "application/json" }
         });
     } catch (err) {
+        console.error('DB Error:', err);
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
 }
+
+export default {
+  onRequestGet,
+  onRequestPost
+};
