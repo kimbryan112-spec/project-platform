@@ -3,7 +3,10 @@ export async function onRequestGet(context) {
     try {
         const data = await context.env.PROJECTS_KV.get('projects_data');
         return new Response(data || '[]', {
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
+            }
         });
     } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
