@@ -5,8 +5,4 @@ compatibility_date = "2026-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "wedding-db"
-<<<<<<< HEAD
 database_id = "78cd1cea-5376-4ce6-bb51-e56c678bf658"
-=======
-database_id = "d1f2e3c4-b5a6-47d8-9e1f-2c3b4a5d6e7f"
->>>>>>> 90692a360214ebee342b5f9a03f3ec36c9626e70
