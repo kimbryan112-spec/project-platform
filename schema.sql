@@ -17,5 +17,4 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seed initial 5 rows if empty
 INSERT OR IGNORE INTO projects (row_index) VALUES (1), (2), (3), (4), (5);
