@@ -38,6 +38,12 @@ function collectRowData(row) {
         const cells = row.querySelectorAll('td');
         if (!cells || cells.length === 0) return null;
 
+        const rowId = row.getAttribute('data-row-id');
+        if (!rowId) {
+            console.warn("Row missing data-row-id:", row);
+            return null;
+        }
+
         const getSongData = (cellIndex) => {
             const cell = cells[cellIndex];
             if (!cell) return { link: "", status: "" };
@@ -49,6 +55,7 @@ function collectRowData(row) {
         };
 
         return {
+            rowId: parseInt(rowId, 10),
             coupleName: cells[0]?.innerText?.trim() || "",
             status: cells[1]?.querySelector('.status-select')?.value || "",
             type: cells[2]?.querySelector('.type-select')?.value || "",
@@ -98,10 +105,14 @@ async function loadProjects() {
         if (response.ok) {
             const projectsData = await response.json();
             const rows = document.querySelectorAll('.project-table tbody tr');
+            
             if (Array.isArray(projectsData) && projectsData.length > 0) {
-                rows.forEach((row, index) => {
-                    if (projectsData[index]) {
-                        populateRow(row, projectsData[index]);
+                // Match data by rowId instead of index
+                rows.forEach((row) => {
+                    const rowId = parseInt(row.getAttribute('data-row-id'), 10);
+                    const data = projectsData.find(d => d.rowId === rowId);
+                    if (data) {
+                        populateRow(row, data);
                     }
                 });
             }
