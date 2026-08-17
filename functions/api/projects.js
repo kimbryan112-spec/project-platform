@@ -4,11 +4,10 @@ export async function onRequestGet(context) {
             "SELECT * FROM projects ORDER BY row_index ASC"
         ).all();
 
-        // I-format ang data para tumugma sa script.js structure
         const formattedData = results.map(row => ({
             coupleName: row.couple_name || "",
             status: row.status || "IN PROGRESS",
-            type: row.type || "NOT SET",
+            type: row.type || "UPBEAT CINEMATIC",
             rawFiles: row.raw_files || "",
             drone: row.drone || "",
             song1: { link: row.song1_link || "", status: row.song1_status || "" },
@@ -18,7 +17,10 @@ export async function onRequestGet(context) {
         }));
 
         return new Response(JSON.stringify(formattedData), {
-            headers: { "Content-Type": "application/json" }
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-cache, no-store, must-revalidate"
+            }
         });
     } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
@@ -58,7 +60,7 @@ export async function onRequestPost(context) {
                 rowIndex,
                 row.coupleName || "",
                 row.status || "IN PROGRESS",
-                row.type || "NOT SET",
+                row.type || "UPBEAT CINEMATIC",
                 row.rawFiles || "",
                 row.drone || "",
                 row.song1?.link || "",
