@@ -1,4 +1,4 @@
-import projectsApi from './api/projects.js';
+import projectsApi from '../functions/api/projects.js';
 
 export default {
   async fetch(request, env, ctx) {
