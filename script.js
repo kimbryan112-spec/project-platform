@@ -5,14 +5,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProjects();
 
     const tableBody = document.querySelector('.project-table tbody');
+    console.log("DOM Selection - tableBody:", tableBody);
 
     // 2. Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)
     tableBody.addEventListener('input', () => {
+        console.log("Input detected");
         saveProjects();
     });
 
     // 3. Auto-save kapag may pinili sa dropdowns
     tableBody.addEventListener('change', (e) => {
+        console.log("Change detected on:", e.target);
         saveProjects();
         
         // I-update ang UI colors nang hindi binabago ang layout
@@ -34,44 +37,56 @@ document.addEventListener('DOMContentLoaded', () => {
 ================================== */
 
 function collectRowData(row) {
-    const cells = row.querySelectorAll('td');
-    
-    // Helper para sa song objects (link at status)
-    const getSongData = (cellIndex) => {
-        const cell = cells[cellIndex];
-        return {
-            link: cell.querySelector('.song-link')?.value || "",
-            status: cell.querySelector('.song-status')?.value || ""
-        };
-    };
+    try {
+        const cells = row.querySelectorAll('td');
+        
+        // Safety check: Skip this row if it doesn't have any cells
+        if (!cells || cells.length === 0) return null;
 
-    return {
-        coupleName: cells[0].innerText.trim(),
-        status: cells[1].querySelector('.status-select')?.value || "",
-        type: cells[2].querySelector('.type-select')?.value || "",
-        rawFiles: cells[3].querySelector('.raw-input')?.value || "",
-        drone: cells[4].innerText.trim(),
-        song1: getSongData(5),
-        song2: getSongData(6),
-        song3: getSongData(7),
-        teaserSong: getSongData(8)
-    };
+        // Helper para sa song objects (link at status)
+        const getSongData = (cellIndex) => {
+            const cell = cells[cellIndex];
+            if (!cell) return { link: "", status: "" };
+
+            return {
+                link: cell.querySelector('.song-link')?.value || "",
+                status: cell.querySelector('.song-status')?.value || ""
+            };
+        };
+
+        // Ginamitan ng Optional Chaining (?.) para hindi mag-crash kung undefined
+        return {
+            coupleName: cells[0]?.innerText?.trim() || "",
+            status: cells[1]?.querySelector('.status-select')?.value || "",
+            type: cells[2]?.querySelector('.type-select')?.value || "",
+            rawFiles: cells[3]?.querySelector('.raw-input')?.value || "",
+            drone: cells[4]?.innerText?.trim() || "",
+            song1: getSongData(5),
+            song2: getSongData(6),
+            song3: getSongData(7),
+            teaserSong: getSongData(8)
+        };
+    } catch (err) {
+        console.error("Error collecting row data for row:", row, err);
+        return null;
+    }
 }
 
 function populateRow(row, data) {
     const cells = row.querySelectorAll('td');
     
     // Ilagay ang text/values pabalik sa HTML
-    cells[0].innerText = data.coupleName || "";
-    if (cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
-    if (cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
-    if (cells[3].querySelector('.raw-input')) cells[3].querySelector('.raw-input').value = data.rawFiles || "";
-    cells[4].innerText = data.drone || "";
+    if (cells[0]) cells[0].innerText = data.coupleName || "";
+    if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
+    if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
+    if (cells[3] && cells[3].querySelector('.raw-input')) cells[3].querySelector('.raw-input').value = data.rawFiles || "";
+    if (cells[4]) cells[4].innerText = data.drone || "";
     
     // Helper para ibalik ang data ng kanta
     const setSongData = (cellIndex, songData) => {
         if (!songData) return;
         const cell = cells[cellIndex];
+        if (!cell) return;
         if (cell.querySelector('.song-link')) cell.querySelector('.song-link').value = songData.link || "";
         if (cell.querySelector('.song-status')) cell.querySelector('.song-status').value = songData.status || "";
     };
@@ -83,15 +98,24 @@ function populateRow(row, data) {
 }
 
 function saveProjects() {
+    console.log("saveProjects() called");
+
     const rows = document.querySelectorAll('.project-table tbody tr');
     const projectsData = [];
 
     rows.forEach(row => {
-        projectsData.push(collectRowData(row));
+        const rowData = collectRowData(row);
+        if (rowData) {
+            projectsData.push(rowData);
+        }
     });
+
+    console.log("Collected Data Before Save:", projectsData);
 
     // I-save ang array of objects sa Browser Local Storage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(projectsData));
+    
+    console.log("Verified localStorage Write:", localStorage.getItem(STORAGE_KEY));
 }
 
 function loadProjects() {
