@@ -1,0 +1,82 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. I-load ang Data mula sa projects.json
+    fetch('projects.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Successfully loaded projects.json:', data);
+            // Pwede mong gamitin ang data dito para mag-render ng dynamic rows
+        })
+        .catch(error => console.error('Error loading projects.json:', error));
+
+    // 2. Color Indicator para sa Project Status
+    const statusSelects = document.querySelectorAll('.status-select');
+    statusSelects.forEach(select => {
+        updateStatusColor(select);
+        select.addEventListener('change', (e) => updateStatusColor(e.target));
+    });
+
+    function updateStatusColor(select) {
+        const value = select.value;
+        switch (value) {
+            case 'APPROVED PROJ':
+            case 'DELIVERED':
+                select.style.borderLeft = '5px solid #22c55e'; // Green
+                break;
+            case 'FOR REVIEW':
+            case "YONG'S FEEDBACK":
+                select.style.borderLeft = '5px solid #f59e0b'; // Orange
+                break;
+            case 'IN PROGRESS':
+                select.style.borderLeft = '5px solid #3b82f6'; // Blue
+                break;
+            default:
+                select.style.borderLeft = '1px solid #cfcfcf';
+        }
+    }
+
+    // 3. Color Indicator para sa Song Status
+    const songStatuses = document.querySelectorAll('.song-status');
+    songStatuses.forEach(status => {
+        updateSongStatusColor(status);
+        status.addEventListener('change', (e) => updateSongStatusColor(e.target));
+    });
+
+    function updateSongStatusColor(select) {
+        const value = select.value;
+        if (value === 'APPROVED') {
+            select.style.backgroundColor = '#dcfce7'; // Light green
+            select.style.color = '#15803d';
+        } else if (value === 'REJECT') {
+            select.style.backgroundColor = '#fee2e2'; // Light red
+            select.style.color = '#b91c1c';
+        } else if (value === 'RESERVED') {
+            select.style.backgroundColor = '#fef3c7'; // Light yellow
+            select.style.color = '#b45309';
+        } else {
+            select.style.backgroundColor = '#ffffff';
+            select.style.color = 'inherit';
+        }
+    }
+
+    // 4. Generate Button Click Event
+    const generateBtns = document.querySelectorAll('.generate-btn');
+    generateBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const card = e.target.closest('.song-card');
+            const songLink = card.querySelector('.song-link').value;
+            const songStatus = card.querySelector('.song-status').value;
+
+            if (!songLink) {
+                alert('Paki-lagay muna ang song link!');
+                return;
+            }
+
+            alert(`Generating waveform/preview for:\nLink: ${songLink}\nStatus: ${songStatus || 'None'}`);
+        });
+    });
+});
