@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. I-load ang data mula sa Cloudflare backend pagkabukas ng page
+    console.log('[INIT] Page loaded, starting data load...');
     loadProjects();
 
     const tableBody = document.querySelector('.project-table tbody');
 
     if (tableBody) {
-        // 2. Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)
+        // Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)
         tableBody.addEventListener('input', () => {
             saveProjects();
         });
 
-        // 3. Auto-save kapag may pinili sa dropdowns
+        // Auto-save kapag may pinili sa dropdowns
         tableBody.addEventListener('change', (e) => {
             saveProjects();
             
@@ -75,6 +75,8 @@ function collectRowData(row) {
 function populateRow(row, data) {
     const cells = row.querySelectorAll('td');
     
+    console.log(`[POPULATE] Populating row ${data.rowId}:`, data);
+    
     if (cells[0]) cells[0].innerText = data.coupleName || "";
     if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
     if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
@@ -93,32 +95,55 @@ function populateRow(row, data) {
     setSongData(6, data.song2);
     setSongData(7, data.song3);
     setSongData(8, data.teaserSong);
+
+    // Apply colors after populating
+    updateStatusColor(cells[1]?.querySelector('.status-select'));
+    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);
 }
 
 // ONLINE LOAD FUNCTION (MAY ANTI-CACHE PARAMETER)
 async function loadProjects() {
     try {
+        console.log('[LOAD] Fetching projects from /api/projects...');
         const response = await fetch(`/api/projects?t=${Date.now()}`, {
             cache: 'no-store',
             headers: { 'Cache-Control': 'no-cache' }
         });
-        if (response.ok) {
-            const projectsData = await response.json();
-            const rows = document.querySelectorAll('.project-table tbody tr');
-            
-            if (Array.isArray(projectsData) && projectsData.length > 0) {
-                // Match data by rowId instead of index
-                rows.forEach((row) => {
-                    const rowId = parseInt(row.getAttribute('data-row-id'), 10);
-                    const data = projectsData.find(d => d.rowId === rowId);
-                    if (data) {
-                        populateRow(row, data);
-                    }
-                });
-            }
+        
+        if (!response.ok) {
+            console.error('[LOAD] API returned error:', response.status);
+            return;
+        }
+
+        const projectsData = await response.json();
+        console.log('[LOAD] API Response:', projectsData);
+        console.log('[LOAD] Total records from DB:', projectsData.length);
+
+        const rows = document.querySelectorAll('.project-table tbody tr');
+        console.log('[LOAD] Total rows in HTML:', rows.length);
+        
+        if (Array.isArray(projectsData) && projectsData.length > 0) {
+            let matchedCount = 0;
+            // Match data by rowId instead of index
+            rows.forEach((row) => {
+                const rowId = parseInt(row.getAttribute('data-row-id'), 10);
+                console.log(`[LOAD] Processing row with data-row-id: ${rowId}`);
+                
+                const data = projectsData.find(d => d.rowId === rowId);
+                if (data) {
+                    console.log(`[LOAD] Found matching data for rowId ${rowId}`);
+                    populateRow(row, data);
+                    matchedCount++;
+                } else {
+                    console.warn(`[LOAD] No matching data for rowId ${rowId}`);
+                }
+            });
+            console.log(`[LOAD] Successfully matched ${matchedCount} rows with database data`);
+        } else {
+            console.log('[LOAD] No data returned from API');
         }
     } catch (e) {
-        console.error('Error loading projects from Cloudflare backend:', e);
+        console.error('[LOAD] Error loading projects from Cloudflare backend:', e);
     }
 
     document.querySelectorAll('.status-select').forEach(updateStatusColor);
@@ -138,15 +163,22 @@ function saveProjects() {
             if (rowData) projectsData.push(rowData);
         });
 
+        console.log('[SAVE] Saving to API:', projectsData);
+
         try {
-            await fetch('/api/projects', {
+            const response = await fetch('/api/projects', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(projectsData)
             });
-            console.log("Successfully synced to Cloudflare backend!");
+
+            if (response.ok) {
+                console.log("[SAVE] Successfully synced to Cloudflare backend!");
+            } else {
+                console.error('[SAVE] API error:', response.status);
+            }
         } catch (e) {
-            console.error('Error saving projects to Cloudflare backend:', e);
+            console.error('[SAVE] Error saving projects to Cloudflare backend:', e);
         }
     }, 500);
 }
