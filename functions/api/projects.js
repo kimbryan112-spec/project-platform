@@ -5,6 +5,7 @@ export async function onRequestGet(context) {
         ).all();
 
         const formattedData = results.map(row => ({
+            rowId: row.row_index,
             coupleName: row.couple_name || "",
             status: row.status || "IN PROGRESS",
             type: row.type || "UPBEAT CINEMATIC",
@@ -31,9 +32,9 @@ export async function onRequestPost(context) {
     try {
         const projects = await context.request.json();
 
-        for (let i = 0; i < projects.length; i++) {
-            const row = projects[i];
-            const rowIndex = i + 1;
+        for (const row of projects) {
+            // Use rowId from frontend, fallback to index-based calculation
+            const rowIndex = row.rowId || (projects.indexOf(row) + 1);
 
             await context.env.DB.prepare(`
                 INSERT INTO projects (
