@@ -1,4 +1,3 @@
-```javascript
 document.addEventListener('DOMContentLoaded', () => {
     // 1. I-load ang data mula sa Cloudflare backend pagkabukas ng page
     loadProjects();
@@ -89,10 +88,13 @@ function populateRow(row, data) {
     setSongData(8, data.teaserSong);
 }
 
-// ONLINE LOAD FUNCTION
+// ONLINE LOAD FUNCTION (MAY ANTI-CACHE PARAMETER)
 async function loadProjects() {
     try {
-        const response = await fetch('/api/projects');
+        const response = await fetch(`/api/projects?t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        });
         if (response.ok) {
             const projectsData = await response.json();
             const rows = document.querySelectorAll('.project-table tbody tr');
@@ -179,5 +181,3 @@ function updateSongStatusColor(select) {
         select.style.color = 'inherit';
     }
 }
-
-```
