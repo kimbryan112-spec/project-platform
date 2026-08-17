@@ -1,180 +1,183 @@
+```javascript
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. I-load ang data mula sa Cloudflare backend pagkabukas ng page[cite: 9]
-    loadProjects();[cite: 9]
+    // 1. I-load ang data mula sa Cloudflare backend pagkabukas ng page
+    loadProjects();
 
-    const tableBody = document.querySelector('.project-table tbody');[cite: 9]
+    const tableBody = document.querySelector('.project-table tbody');
 
-    if (tableBody) {[cite: 9]
-        // 2. Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)[cite: 9]
-        tableBody.addEventListener('input', () => {[cite: 9]
-            saveProjects();[cite: 9]
-        });[cite: 9]
+    if (tableBody) {
+        // 2. Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)
+        tableBody.addEventListener('input', () => {
+            saveProjects();
+        });
 
-        // 3. Auto-save kapag may pinili sa dropdowns[cite: 9]
-        tableBody.addEventListener('change', (e) => {[cite: 9]
-            saveProjects();[cite: 9]
+        // 3. Auto-save kapag may pinili sa dropdowns
+        tableBody.addEventListener('change', (e) => {
+            saveProjects();
             
-            // I-update ang UI colors[cite: 9]
-            if (e.target.classList.contains('status-select')) {[cite: 9]
-                updateStatusColor(e.target);[cite: 9]
-            }[cite: 9]
-            if (e.target.classList.contains('song-status')) {[cite: 9]
-                updateSongStatusColor(e.target);[cite: 9]
-            }[cite: 9]
-        });[cite: 9]
-    }[cite: 9]
+            // I-update ang UI colors
+            if (e.target.classList.contains('status-select')) {
+                updateStatusColor(e.target);
+            }
+            if (e.target.classList.contains('song-status')) {
+                updateSongStatusColor(e.target);
+            }
+        });
+    }
 
-    // I-set ang initial colors sa pag-load[cite: 9]
-    document.querySelectorAll('.status-select').forEach(updateStatusColor);[cite: 9]
-    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);[cite: 9]
-});[cite: 9]
+    // I-set ang initial colors sa pag-load
+    document.querySelectorAll('.status-select').forEach(updateStatusColor);
+    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);
+});
 
 /* ==================================
    CORE LOGIC: SAVE & LOAD (REST API)
 ================================== */
 
-function collectRowData(row) {[cite: 9]
-    try {[cite: 9]
-        const cells = row.querySelectorAll('td');[cite: 9]
-        if (!cells || cells.length === 0) return null;[cite: 9]
+function collectRowData(row) {
+    try {
+        const cells = row.querySelectorAll('td');
+        if (!cells || cells.length === 0) return null;
 
-        const getSongData = (cellIndex) => {[cite: 9]
-            const cell = cells[cellIndex];[cite: 9]
-            if (!cell) return { link: "", status: "" };[cite: 9]
+        const getSongData = (cellIndex) => {
+            const cell = cells[cellIndex];
+            if (!cell) return { link: "", status: "" };
 
-            return {[cite: 9]
-                link: cell.querySelector('.song-link')?.value || "",[cite: 9]
-                status: cell.querySelector('.song-status')?.value || ""[cite: 9]
-            };[cite: 9]
-        };[cite: 9]
+            return {
+                link: cell.querySelector('.song-link')?.value || "",
+                status: cell.querySelector('.song-status')?.value || ""
+            };
+        };
 
-        return {[cite: 9]
-            coupleName: cells[0]?.innerText?.trim() || "",[cite: 9]
-            status: cells[1]?.querySelector('.status-select')?.value || "",[cite: 9]
-            type: cells[2]?.querySelector('.type-select')?.value || "",[cite: 9]
-            rawFiles: cells[3]?.querySelector('.raw-input')?.value || "",[cite: 9]
-            drone: cells[4]?.innerText?.trim() || "",[cite: 9]
-            song1: getSongData(5),[cite: 9]
-            song2: getSongData(6),[cite: 9]
-            song3: getSongData(7),[cite: 9]
-            teaserSong: getSongData(8)[cite: 9]
-        };[cite: 9]
-    } catch (err) {[cite: 9]
-        console.error("Error collecting row data for row:", row, err);[cite: 9]
-        return null;[cite: 9]
-    }[cite: 9]
-}[cite: 9]
+        return {
+            coupleName: cells[0]?.innerText?.trim() || "",
+            status: cells[1]?.querySelector('.status-select')?.value || "",
+            type: cells[2]?.querySelector('.type-select')?.value || "",
+            rawFiles: cells[3]?.querySelector('.raw-input')?.value || "",
+            drone: cells[4]?.innerText?.trim() || "",
+            song1: getSongData(5),
+            song2: getSongData(6),
+            song3: getSongData(7),
+            teaserSong: getSongData(8)
+        };
+    } catch (err) {
+        console.error("Error collecting row data for row:", row, err);
+        return null;
+    }
+}
 
-function populateRow(row, data) {[cite: 9]
-    const cells = row.querySelectorAll('td');[cite: 9]
+function populateRow(row, data) {
+    const cells = row.querySelectorAll('td');
     
-    if (cells[0]) cells[0].innerText = data.coupleName || "";[cite: 9]
-    if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";[cite: 9]
-    if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";[cite: 9]
-    if (cells[3] && cells[3].querySelector('.raw-input')) cells[3].querySelector('.raw-input').value = data.rawFiles || "";[cite: 9]
-    if (cells[4]) cells[4].innerText = data.drone || "";[cite: 9]
+    if (cells[0]) cells[0].innerText = data.coupleName || "";
+    if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
+    if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
+    if (cells[3] && cells[3].querySelector('.raw-input')) cells[3].querySelector('.raw-input').value = data.rawFiles || "";
+    if (cells[4]) cells[4].innerText = data.drone || "";
     
-    const setSongData = (cellIndex, songData) => {[cite: 9]
-        if (!songData) return;[cite: 9]
-        const cell = cells[cellIndex];[cite: 9]
-        if (!cell) return;[cite: 9]
-        if (cell.querySelector('.song-link')) cell.querySelector('.song-link').value = songData.link || "";[cite: 9]
-        if (cell.querySelector('.song-status')) cell.querySelector('.song-status').value = songData.status || "";[cite: 9]
-    };[cite: 9]
+    const setSongData = (cellIndex, songData) => {
+        if (!songData) return;
+        const cell = cells[cellIndex];
+        if (!cell) return;
+        if (cell.querySelector('.song-link')) cell.querySelector('.song-link').value = songData.link || "";
+        if (cell.querySelector('.song-status')) cell.querySelector('.song-status').value = songData.status || "";
+    };
 
-    setSongData(5, data.song1);[cite: 9]
-    setSongData(6, data.song2);[cite: 9]
-    setSongData(7, data.song3);[cite: 9]
-    setSongData(8, data.teaserSong);[cite: 9]
-}[cite: 9]
+    setSongData(5, data.song1);
+    setSongData(6, data.song2);
+    setSongData(7, data.song3);
+    setSongData(8, data.teaserSong);
+}
 
 // ONLINE LOAD FUNCTION
-async function loadProjects() {[cite: 9]
-    try {[cite: 9]
-        const response = await fetch('/api/projects');[cite: 9]
-        if (response.ok) {[cite: 9]
-            const projectsData = await response.json();[cite: 9]
-            const rows = document.querySelectorAll('.project-table tbody tr');[cite: 9]
-            if (Array.isArray(projectsData) && projectsData.length > 0) {[cite: 9]
-                rows.forEach((row, index) => {[cite: 9]
-                    if (projectsData[index]) {[cite: 9]
-                        populateRow(row, projectsData[index]);[cite: 9]
-                    }[cite: 9]
-                });[cite: 9]
-            }[cite: 9]
-        }[cite: 9]
-    } catch (e) {[cite: 9]
+async function loadProjects() {
+    try {
+        const response = await fetch('/api/projects');
+        if (response.ok) {
+            const projectsData = await response.json();
+            const rows = document.querySelectorAll('.project-table tbody tr');
+            if (Array.isArray(projectsData) && projectsData.length > 0) {
+                rows.forEach((row, index) => {
+                    if (projectsData[index]) {
+                        populateRow(row, projectsData[index]);
+                    }
+                });
+            }
+        }
+    } catch (e) {
         console.error('Error loading projects from Cloudflare backend:', e);
-    }[cite: 9]
+    }
 
-    document.querySelectorAll('.status-select').forEach(updateStatusColor);[cite: 9]
-    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);[cite: 9]
-}[cite: 9]
+    document.querySelectorAll('.status-select').forEach(updateStatusColor);
+    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);
+}
 
 // ONLINE SAVE FUNCTION
-let saveTimeout;[cite: 9]
-function saveProjects() {[cite: 9]
-    clearTimeout(saveTimeout);[cite: 9]
-    saveTimeout = setTimeout(async () => {[cite: 9]
-        const rows = document.querySelectorAll('.project-table tbody tr');[cite: 9]
-        const projectsData = [];[cite: 9]
+let saveTimeout;
+function saveProjects() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(async () => {
+        const rows = document.querySelectorAll('.project-table tbody tr');
+        const projectsData = [];
 
-        rows.forEach(row => {[cite: 9]
-            const rowData = collectRowData(row);[cite: 9]
-            if (rowData) projectsData.push(rowData);[cite: 9]
-        });[cite: 9]
+        rows.forEach(row => {
+            const rowData = collectRowData(row);
+            if (rowData) projectsData.push(rowData);
+        });
 
-        try {[cite: 9]
-            await fetch('/api/projects', {[cite: 9]
-                method: 'POST',[cite: 9]
-                headers: { 'Content-Type': 'application/json' },[cite: 9]
-                body: JSON.stringify(projectsData)[cite: 9]
-            });[cite: 9]
+        try {
+            await fetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(projectsData)
+            });
             console.log("Successfully synced to Cloudflare backend!");
-        } catch (e) {[cite: 9]
+        } catch (e) {
             console.error('Error saving projects to Cloudflare backend:', e);
-        }[cite: 9]
-    }, 500);[cite: 9]
-}[cite: 9]
+        }
+    }, 500);
+}
 
 /* ==================================
    UI HELPERS
 ================================== */
 
-function updateStatusColor(select) {[cite: 9]
-    if (!select) return;[cite: 9]
-    const value = select.value;[cite: 9]
-    switch (value) {[cite: 9]
-        case 'APPROVED PROJ':[cite: 9]
-        case 'DELIVERED':[cite: 9]
-            select.style.borderLeft = '5px solid #22c55e';[cite: 9]
-            break;[cite: 9]
-        case 'FOR REVIEW':[cite: 9]
-        case "YONG'S FEEDBACK":[cite: 9]
-            select.style.borderLeft = '5px solid #f59e0b';[cite: 9]
-            break;[cite: 9]
-        case 'IN PROGRESS':[cite: 9]
-            select.style.borderLeft = '5px solid #3b82f6';[cite: 9]
-            break;[cite: 9]
-        default:[cite: 9]
-            select.style.borderLeft = '1px solid #cfcfcf';[cite: 9]
-    }[cite: 9]
-}[cite: 9]
+function updateStatusColor(select) {
+    if (!select) return;
+    const value = select.value;
+    switch (value) {
+        case 'APPROVED PROJ':
+        case 'DELIVERED':
+            select.style.borderLeft = '5px solid #22c55e';
+            break;
+        case 'FOR REVIEW':
+        case "YONG'S FEEDBACK":
+            select.style.borderLeft = '5px solid #f59e0b';
+            break;
+        case 'IN PROGRESS':
+            select.style.borderLeft = '5px solid #3b82f6';
+            break;
+        default:
+            select.style.borderLeft = '1px solid #cfcfcf';
+    }
+}
 
-function updateSongStatusColor(select) {[cite: 9]
-    if (!select) return;[cite: 9]
-    const value = select.value;[cite: 9]
-    if (value === 'APPROVED') {[cite: 9]
-        select.style.backgroundColor = '#dcfce7';[cite: 9]
-        select.style.color = '#15803d';[cite: 9]
-    } else if (value === 'REJECT') {[cite: 9]
-        select.style.backgroundColor = '#fee2e2';[cite: 9]
-        select.style.color = '#b91c1c';[cite: 9]
-    } else if (value === 'RESERVED') {[cite: 9]
-        select.style.backgroundColor = '#fef3c7';[cite: 9]
-        select.style.color = '#b45309';[cite: 9]
-    } else {[cite: 9]
-        select.style.backgroundColor = '#ffffff';[cite: 9]
-        select.style.color = 'inherit';[cite: 9]
-    }[cite: 9]
-}[cite: 9]
+function updateSongStatusColor(select) {
+    if (!select) return;
+    const value = select.value;
+    if (value === 'APPROVED') {
+        select.style.backgroundColor = '#dcfce7';
+        select.style.color = '#15803d';
+    } else if (value === 'REJECT') {
+        select.style.backgroundColor = '#fee2e2';
+        select.style.color = '#b91c1c';
+    } else if (value === 'RESERVED') {
+        select.style.backgroundColor = '#fef3c7';
+        select.style.color = '#b45309';
+    } else {
+        select.style.backgroundColor = '#ffffff';
+        select.style.color = 'inherit';
+    }
+}
+
+```
