@@ -1,8 +1,12 @@
 export async function onRequestGet(context) {
     try {
+        console.log('[API-GET] Fetching projects from D1 database...');
         const { results } = await context.env.DB.prepare(
             "SELECT * FROM projects ORDER BY row_index ASC"
         ).all();
+
+        console.log('[API-GET] Database results:', results);
+        console.log('[API-GET] Total records:', results.length);
 
         const formattedData = results.map(row => ({
             rowId: row.row_index,
@@ -17,6 +21,8 @@ export async function onRequestGet(context) {
             teaserSong: { link: row.teaser_link || "", status: row.teaser_status || "" }
         }));
 
+        console.log('[API-GET] Formatted response:', formattedData);
+
         return new Response(JSON.stringify(formattedData), {
             headers: {
                 "Content-Type": "application/json",
@@ -24,17 +30,20 @@ export async function onRequestGet(context) {
             }
         });
     } catch (err) {
-        console.error('DB Error:', err);
+        console.error('[API-GET] Database error:', err);
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
 }
 
 export async function onRequestPost(context) {
     try {
+        console.log('[API-POST] Receiving save request...');
         const projects = await context.request.json();
+        console.log('[API-POST] Data to save:', projects);
 
         for (const row of projects) {
             const rowId = row.rowId || (projects.indexOf(row) + 1);
+            console.log(`[API-POST] Saving row ${rowId}:`, row);
 
             await context.env.DB.prepare(`
                 INSERT INTO projects (
@@ -75,11 +84,12 @@ export async function onRequestPost(context) {
             ).run();
         }
 
+        console.log('[API-POST] Save successful');
         return new Response(JSON.stringify({ success: true }), {
             headers: { "Content-Type": "application/json" }
         });
     } catch (err) {
-        console.error('DB Error:', err);
+        console.error('[API-POST] Database error:', err);
         return new Response(JSON.stringify({ error: err.message }), { status: 500 });
     }
 }
