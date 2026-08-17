@@ -1,31 +1,28 @@
-const STORAGE_KEY = 'kbhfilms_projects_data';
-
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. I-load ang data pagkabukas ng page
+    // 1. I-load ang data mula sa Cloudflare KV pagkabukas ng page
     loadProjects();
 
     const tableBody = document.querySelector('.project-table tbody');
-    console.log("DOM Selection - tableBody:", tableBody);
 
-    // 2. Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)
-    tableBody.addEventListener('input', () => {
-        console.log("Input detected");
-        saveProjects();
-    });
+    if (tableBody) {
+        // 2. Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)
+        tableBody.addEventListener('input', () => {
+            saveProjects();
+        });
 
-    // 3. Auto-save kapag may pinili sa dropdowns
-    tableBody.addEventListener('change', (e) => {
-        console.log("Change detected on:", e.target);
-        saveProjects();
-        
-        // I-update ang UI colors nang hindi binabago ang layout
-        if (e.target.classList.contains('status-select')) {
-            updateStatusColor(e.target);
-        }
-        if (e.target.classList.contains('song-status')) {
-            updateSongStatusColor(e.target);
-        }
-    });
+        // 3. Auto-save kapag may pinili sa dropdowns
+        tableBody.addEventListener('change', (e) => {
+            saveProjects();
+            
+            // I-update ang UI colors
+            if (e.target.classList.contains('status-select')) {
+                updateStatusColor(e.target);
+            }
+            if (e.target.classList.contains('song-status')) {
+                updateSongStatusColor(e.target);
+            }
+        });
+    }
 
     // I-set ang initial colors sa pag-load
     document.querySelectorAll('.status-select').forEach(updateStatusColor);
@@ -33,17 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==================================
-   CORE LOGIC: SAVE & LOAD
+   CORE LOGIC: SAVE & LOAD (CLOUDFLARE KV)
 ================================== */
 
 function collectRowData(row) {
     try {
         const cells = row.querySelectorAll('td');
-        
-        // Safety check: Skip this row if it doesn't have any cells
         if (!cells || cells.length === 0) return null;
 
-        // Helper para sa song objects (link at status)
         const getSongData = (cellIndex) => {
             const cell = cells[cellIndex];
             if (!cell) return { link: "", status: "" };
@@ -54,7 +48,6 @@ function collectRowData(row) {
             };
         };
 
-        // Ginamitan ng Optional Chaining (?.) para hindi mag-crash kung undefined
         return {
             coupleName: cells[0]?.innerText?.trim() || "",
             status: cells[1]?.querySelector('.status-select')?.value || "",
@@ -75,14 +68,12 @@ function collectRowData(row) {
 function populateRow(row, data) {
     const cells = row.querySelectorAll('td');
     
-    // Ilagay ang text/values pabalik sa HTML
     if (cells[0]) cells[0].innerText = data.coupleName || "";
     if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
     if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
     if (cells[3] && cells[3].querySelector('.raw-input')) cells[3].querySelector('.raw-input').value = data.rawFiles || "";
     if (cells[4]) cells[4].innerText = data.drone || "";
     
-    // Helper para ibalik ang data ng kanta
     const setSongData = (cellIndex, songData) => {
         if (!songData) return;
         const cell = cells[cellIndex];
@@ -97,54 +88,61 @@ function populateRow(row, data) {
     setSongData(8, data.teaserSong);
 }
 
-function saveProjects() {
-    console.log("saveProjects() called");
-
-    const rows = document.querySelectorAll('.project-table tbody tr');
-    const projectsData = [];
-
-    rows.forEach(row => {
-        const rowData = collectRowData(row);
-        if (rowData) {
-            projectsData.push(rowData);
+// ONLINE LOAD FUNCTION (Cloudflare KV)
+async function loadProjects() {
+    try {
+        const response = await fetch('/api/projects');
+        if (response.ok) {
+            const projectsData = await response.json();
+            const rows = document.querySelectorAll('.project-table tbody tr');
+            if (Array.isArray(projectsData) && projectsData.length > 0) {
+                rows.forEach((row, index) => {
+                    if (projectsData[index]) {
+                        populateRow(row, projectsData[index]);
+                    }
+                });
+            }
         }
-    });
+    } catch (e) {
+        console.error('Error loading projects from Cloudflare KV:', e);
+    }
 
-    console.log("Collected Data Before Save:", projectsData);
-
-    // I-save ang array of objects sa Browser Local Storage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(projectsData));
-    
-    console.log("Verified localStorage Write:", localStorage.getItem(STORAGE_KEY));
+    document.querySelectorAll('.status-select').forEach(updateStatusColor);
+    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);
 }
 
-function loadProjects() {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    const rows = document.querySelectorAll('.project-table tbody tr');
+// ONLINE SAVE FUNCTION (Cloudflare KV)
+let saveTimeout;
+function saveProjects() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(async () => {
+        const rows = document.querySelectorAll('.project-table tbody tr');
+        const projectsData = [];
 
-    if (savedData) {
+        rows.forEach(row => {
+            const rowData = collectRowData(row);
+            if (rowData) projectsData.push(rowData);
+        });
+
         try {
-            const projectsData = JSON.parse(savedData);
-            rows.forEach((row, index) => {
-                // Populate lamang kung may saved data sa index na ito
-                if (projectsData[index]) {
-                    populateRow(row, projectsData[index]);
-                }
+            await fetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(projectsData)
             });
+            console.log("Successfully synced to Cloudflare KV!");
         } catch (e) {
-            console.error('Error parsing saved projects data:', e);
+            console.error('Error saving projects to Cloudflare KV:', e);
         }
-    } else {
-        // Kapag first time load at walang laman ang storage, i-save ang default HTML state
-        saveProjects();
-    }
+    }, 500);
 }
 
 /* ==================================
-   UI HELPERS (Walang binagong design)
+   UI HELPERS
 ================================== */
 
 function updateStatusColor(select) {
+    if (!select) return;
     const value = select.value;
     switch (value) {
         case 'APPROVED PROJ':
@@ -164,6 +162,7 @@ function updateStatusColor(select) {
 }
 
 function updateSongStatusColor(select) {
+    if (!select) return;
     const value = select.value;
     if (value === 'APPROVED') {
         select.style.backgroundColor = '#dcfce7';
