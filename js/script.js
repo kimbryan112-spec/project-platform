@@ -5,25 +5,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.querySelector('.project-table tbody');
 
     if (tableBody) {
-        // Auto-save kapag may nag-type o nag-edit (inputs & contenteditable)
+
         tableBody.addEventListener('input', () => {
             saveProjects();
         });
 
-        // Auto-save kapag may pinili sa dropdowns
         tableBody.addEventListener('change', (e) => {
             saveProjects();
-            
-            // I-update ang UI colors
+
             if (e.target.classList.contains('status-select')) {
                 updateStatusColor(e.target);
             }
-            if (e.target.classList.contains('dashboard-song-status')) {
-    updateSongStatusColor(e.target);
-}
 
-document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
-    document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
+            if (e.target.classList.contains('dashboard-song-status')) {
+                updateSongStatusColor(e.target);
+            }
+
+            document.querySelectorAll('.dashboard-song-status')
+                .forEach(updateSongStatusColor);
+        });
+
+    }
+
 });
 
 /* ==================================
@@ -52,10 +55,10 @@ function collectRowData(row) {
     }
 
     return {
-        link: cell.querySelector('.song-link')?.value || "",
-        status: cell.querySelector('.dashboard-song-status')?.value || "",
-        notes: cell.querySelector('.song-notes')?.value || ""
-    };
+    link: cell.querySelector('.song-link')?.value || "",
+    status: cell.querySelector('.dashboard-song-status')?.value || "",
+    notes: cell.querySelector('.song-notes')?.value || ""
+};
 };
 
         return {
@@ -93,14 +96,11 @@ function populateRow(row, data) {
 
     const link = cell.querySelector('.song-link');
     const status = cell.querySelector('.dashboard-song-status');
-    const notes = cell.querySelector('.song-notes');
-
     if (link) link.value = songData.link || "";
-    if (status) {
-        status.value = songData.status || "";
-        updateSongStatusColor(status);
-    }
-    if (notes) notes.value = songData.notes || "";
+if (status) {
+    status.value = songData.status || "";
+    updateSongStatusColor(status);
+}
 };
 
     setSongData(5, data.song1);
