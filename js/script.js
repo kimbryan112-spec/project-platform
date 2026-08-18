@@ -18,15 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.classList.contains('status-select')) {
                 updateStatusColor(e.target);
             }
-            if (e.target.classList.contains('song-status')) {
-                updateSongStatusColor(e.target);
-            }
-        });
-    }
+            if (e.target.classList.contains('dashboard-song-status')) {
+    updateSongStatusColor(e.target);
+}
 
-    // I-set ang initial colors sa pag-load
-    document.querySelectorAll('.status-select').forEach(updateStatusColor);
-    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);
+document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
+    document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
 });
 
 /* ==================================
@@ -45,21 +42,28 @@ function collectRowData(row) {
         }
 
         const getSongData = (cellIndex) => {
-            const cell = cells[cellIndex];
-            if (!cell) return { link: "", status: "" };
-
-            return {
-                link: cell.querySelector('.song-link')?.value || "",
-                status: cell.querySelector('.song-status')?.value || ""
-            };
+    const cell = cells[cellIndex];
+    if (!cell) {
+        return {
+            link: "",
+            status: "",
+            notes: ""
         };
+    }
+
+    return {
+        link: cell.querySelector('.song-link')?.value || "",
+        status: cell.querySelector('.dashboard-song-status')?.value || "",
+        notes: cell.querySelector('.song-notes')?.value || ""
+    };
+};
 
         return {
             rowId: parseInt(rowId, 10),
             coupleName: cells[0]?.innerText?.trim() || "",
             status: cells[1]?.querySelector('.status-select')?.value || "",
             type: cells[2]?.querySelector('.type-select')?.value || "",
-            rawFiles: cells[3]?.querySelector('.raw-input')?.value || "",
+            rawFiles: cells[3]?.querySelector('.dashboard-raw-input')?.value || "",
             drone: cells[4]?.innerText?.trim() || "",
             song1: getSongData(5),
             song2: getSongData(6),
@@ -80,16 +84,24 @@ function populateRow(row, data) {
     if (cells[0]) cells[0].innerText = data.coupleName || "";
     if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
     if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
-    if (cells[3] && cells[3].querySelector('.raw-input')) cells[3].querySelector('.raw-input').value = data.rawFiles || "";
+    if (cells[3] && cells[3].querySelector('.dashboard-raw-input')) cells[3].querySelector('.dashboard-raw-input').value = data.rawFiles || "";
     if (cells[4]) cells[4].innerText = data.drone || "";
     
-    const setSongData = (cellIndex, songData) => {
-        if (!songData) return;
-        const cell = cells[cellIndex];
-        if (!cell) return;
-        if (cell.querySelector('.song-link')) cell.querySelector('.song-link').value = songData.link || "";
-        if (cell.querySelector('.song-status')) cell.querySelector('.song-status').value = songData.status || "";
-    };
+    const setSongData = (cellIndex, songData = {}) => {
+    const cell = cells[cellIndex];
+    if (!cell) return;
+
+    const link = cell.querySelector('.song-link');
+    const status = cell.querySelector('.dashboard-song-status');
+    const notes = cell.querySelector('.song-notes');
+
+    if (link) link.value = songData.link || "";
+    if (status) {
+        status.value = songData.status || "";
+        updateSongStatusColor(status);
+    }
+    if (notes) notes.value = songData.notes || "";
+};
 
     setSongData(5, data.song1);
     setSongData(6, data.song2);
@@ -98,7 +110,7 @@ function populateRow(row, data) {
 
     // Apply colors after populating
     updateStatusColor(cells[1]?.querySelector('.status-select'));
-    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);
+    document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
 }
 
 // ONLINE LOAD FUNCTION (MAY ANTI-CACHE PARAMETER)
@@ -147,7 +159,7 @@ async function loadProjects() {
     }
 
     document.querySelectorAll('.status-select').forEach(updateStatusColor);
-    document.querySelectorAll('.song-status').forEach(updateSongStatusColor);
+    document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
 }
 
 // ONLINE SAVE FUNCTION
