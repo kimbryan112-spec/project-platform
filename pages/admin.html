@@ -9,7 +9,7 @@
 
     <title>Project Platform - Admin Dashboard</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
 
 </head>
 
@@ -21,27 +21,49 @@
 
     <aside class="sidebar">
 
-        <div class="logo">
+    <div class="logo">
 
-            <h2>PROJECT PLATFORM</h2>
+        <h2>PROJECT PLATFORM</h2>
 
-            <p>KBHFILMS</p>
+        <p>KBHFILMS</p>
+
+    </div>
+
+    <nav>
+
+        <a href="#" class="active">
+            📊 Admin Dashboard
+        </a>
+
+        <a href="dashboard.html">
+            📋 Dashboard
+        </a>
+
+    </nav>
+
+    <!-- Sidebar Footer -->
+
+    <div class="sidebar-footer">
+
+        <div class="user-info">
+
+            <div class="user-name">
+                Kim Bryan Hernandez
+            </div>
+
+            <div class="user-role">
+                Administrator
+            </div>
 
         </div>
 
-        <nav>
+        <button id="logoutBtn" class="logout-btn">
+            🚪 Logout
+        </button>
 
-    <a href="#" class="active">
-        📊 Admin Dashboard
-    </a>
+    </div>
 
-    <a href="dashboard.html">
-        📋 Dashboard
-    </a>
-
-</nav>
-
-    </aside>
+</aside>
 
     <!-- Main -->
 
@@ -116,7 +138,18 @@
                 <option>NOT SET</option>
             </select>
         </td>
-        <td><input class="raw-input" type="url"></td>
+        <td>
+    <div class="raw-files-actions">
+        <input class="raw-input" type="url" placeholder="Link here">
+
+        <button
+            type="button"
+            class="raw-check-btn"
+            onclick="window.open(this.previousElementSibling.value, '_blank')">
+            Check
+        </button>
+    </div>
+</td>
         <td contenteditable="true"></td>
         <td class="song-cell">
             <div class="song-card">
@@ -251,7 +284,7 @@
 
 </div>
 
-<script src="script.js"></script>
+<script src="../js/script.js"></script>
 
 </body>
 </html>

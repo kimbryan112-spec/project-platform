@@ -44,10 +44,18 @@ select{
 ================================== */
 
 .sidebar{
+
     width:240px;
+
     background:#1f2937;
+
     color:#fff;
+
     padding:20px;
+
+    display:flex;
+    flex-direction:column;
+
 }
 
 .logo{
@@ -304,6 +312,40 @@ select{
 }
 
 /* ==================================
+   DASHBOARD ONLY
+================================== */
+
+.dashboard-song-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.dashboard-song-status{
+    width:120px;
+    min-width:95px;
+    height:30px;
+    border:1px solid #d1d5db;
+    border-radius:4px;
+    font-size:15px;
+    background:#ffffff;
+}
+
+.song-notes{
+   width:50%;
+    height:30px;
+    padding:0 15px;
+    border:1px solid #d1d5db;
+    border-radius:4px;
+    font-size:11px;
+    color:#d1008f;
+}
+
+.song-notes::placeholder{
+    color:#d1008f;
+}
+
+/* ==================================
    LINKS
 ================================== */
 
@@ -314,4 +356,110 @@ select{
 
 .project-table a:hover{
     text-decoration:underline;
+}/* ==================================
+   SIDEBAR FOOTER
+================================== */
+
+.sidebar-footer{
+
+    margin-top:auto;
+
+    padding-top:20px;
+
+    border-top:1px solid rgba(255,255,255,.15);
+
+}
+
+.user-info{
+
+    margin-bottom:15px;
+
+}
+
+.user-name{
+
+    font-size:15px;
+
+    font-weight:600;
+
+    color:#fff;
+
+}
+
+.user-role{
+
+    margin-top:4px;
+
+    font-size:13px;
+
+    color:rgba(255,255,255,.7);
+
+}
+
+.logout-btn{
+    width:72px;
+    height:28px;
+
+    background:#7a0202;
+    color:#fff;
+
+    border:none;
+    border-radius:5px;
+
+    font-size:12px;
+    font-weight:600;
+
+    cursor:pointer;
+}
+
+.logout-btn:hover{
+    background:#620202;
+}.raw-files-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.raw-input{
+    flex:1;
+}
+
+.raw-check-btn{
+    height:30px;
+    padding:0 12px;
+    border:none;
+    border-radius:4px;
+    background:#2563eb;
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.raw-check-btn:hover{
+    background:#1d4ed8;
+}.dashboard-raw-files-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.dashboard-raw-input{
+    flex:1;
+}
+
+.dashboard-raw-check-btn{
+    height:30px;
+    padding:0 12px;
+    border:none;
+    border-radius:4px;
+    background:#2563eb;
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.dashboard-raw-check-btn:hover{
+    background:#1d4ed8;
 }
