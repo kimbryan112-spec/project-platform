@@ -42,6 +42,8 @@ raw_files = excluded.raw_files,
 drone = excluded.drone,
 instruction = excluded.instruction,
 
+instruction = excluded.instruction,
+
 song1_link = excluded.song1_link,
 song1_status = excluded.song1_status,
 song1_notes = excluded.song1_notes,
