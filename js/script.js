@@ -65,7 +65,7 @@ function collectRowData(row) {
     rowId: parseInt(rowId, 10),
 
     coupleName:
-        cells[0]?.querySelector(".couple-name")?.innerText.trim() || "",
+    cells[0]?.querySelector(".couple-name")?.textContent.trim() || "",
 
     status:
         cells[1]?.querySelector(".status-select")?.value || "",
@@ -103,14 +103,21 @@ function populateRow(row, data) {
     const coupleName = cells[0].querySelector(".couple-name");
 
     if (coupleName) {
-        coupleName.innerText = data.coupleName || "";
-    }
+    coupleName.textContent = data.coupleName || "";
+}
 
     const instructionBtn = cells[0].querySelector(".instruction-btn");
 
-    if (instructionBtn) {
-        instructionBtn.dataset.notes = data.instruction || "";
+if (instructionBtn) {
+    instructionBtn.dataset.notes = data.instruction || "";
+
+    // Optional: may visual indicator kapag may notes
+    if (data.instruction?.trim()) {
+        instructionBtn.style.background = "#f59e0b";
+    } else {
+        instructionBtn.style.background = "";
     }
+}
 
 }
     if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
@@ -376,10 +383,15 @@ instructionTextarea.addEventListener("input", () => {
     const instructionBtn =
         activeCoupleRow.querySelector(".instruction-btn");
 
-    instructionBtn.dataset.notes =
-        instructionTextarea.value;
+    instructionBtn.dataset.notes = instructionTextarea.value;
 
-    saveProjects();
+if (instructionTextarea.value.trim()) {
+    instructionBtn.style.background = "#22c55e"; // green kapag may notes
+} else {
+    instructionBtn.style.background = "#ff7a1a"; // orange kapag wala
+}
+
+saveProjects();
 
 });
 
