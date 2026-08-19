@@ -51,9 +51,20 @@ export async function onRequestGet(context) {
             }
         });
     } catch (err) {
-        console.error('[API-GET] Database error:', err);
-        return new Response(JSON.stringify({ error: err.message }), { status: 500 });
-    }
+    console.error(err);
+
+    return new Response(
+        JSON.stringify({
+            error: err.message,
+            stack: err.stack
+        }),
+        {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
 }
 
 export async function onRequestPost(context) {
