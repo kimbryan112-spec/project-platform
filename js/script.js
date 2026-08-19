@@ -236,3 +236,61 @@ function updateSongStatusColor(select) {
         select.style.color = 'inherit';
     }
 }
+/* ==================================
+   MONTH RIGHT-CLICK MENU (ADMIN)
+================================== */
+
+const monthContextMenu = document.getElementById("monthContextMenu");
+
+document.querySelectorAll(".month-btn").forEach(button => {
+
+    button.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+
+        monthContextMenu.style.display = "block";
+        monthContextMenu.style.left = `${e.pageX}px`;
+        monthContextMenu.style.top = `${e.pageY}px`;
+
+        monthContextMenu.dataset.month = button.dataset.month;
+    });
+
+});
+
+document.addEventListener("click", () => {
+    if (monthContextMenu) {
+        monthContextMenu.style.display = "none";
+    }
+});
+
+document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
+
+    const month = monthContextMenu.dataset.month;
+
+    const button = document.querySelector(`.month-btn[data-month="${month}"]`);
+
+    if (button) {
+    button.classList.add("locked");
+    console.log(button.className);
+}
+
+    console.log("LOCK:", month);
+
+    monthContextMenu.style.display = "none";
+
+});
+
+document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
+
+    const month = monthContextMenu.dataset.month;
+
+    const button = document.querySelector(`.month-btn[data-month="${month}"]`);
+
+    if (button) {
+        button.classList.remove("locked");
+    }
+
+    console.log("UNLOCK:", month);
+
+    monthContextMenu.style.display = "none";
+
+});
