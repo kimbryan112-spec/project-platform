@@ -1,3 +1,4 @@
+await context.env.DB.prepare(`
 INSERT INTO projects (
     row_index,
     couple_name,
@@ -26,13 +27,15 @@ INSERT INTO projects (
     updated_at
 )
 VALUES (
-    ?, ?, ?, ?, ?, ?, ?,
-    ?, ?, ?,
-    ?, ?, ?,
-    ?, ?, ?,
-    ?, ?, ?,
+    ?,?,?,?,?,?,
+    ?,
+    ?,?,?,
+    ?,?,?,
+    ?,?,?,
+    ?,?,?,
     CURRENT_TIMESTAMP
 )
+
 ON CONFLICT(row_index) DO UPDATE SET
 
 couple_name = excluded.couple_name,
@@ -40,7 +43,6 @@ status = excluded.status,
 type = excluded.type,
 raw_files = excluded.raw_files,
 drone = excluded.drone,
-instruction = excluded.instruction,
 
 instruction = excluded.instruction,
 
@@ -61,3 +63,30 @@ teaser_status = excluded.teaser_status,
 teaser_notes = excluded.teaser_notes,
 
 updated_at = CURRENT_TIMESTAMP
+`)
+.bind(
+    rowId,
+    row.coupleName || "",
+    row.status || "IN PROGRESS",
+    row.type || "UPBEAT CINEMATIC",
+    row.rawFiles || "",
+    row.drone || "",
+    row.instruction || "",
+
+    row.song1?.link || "",
+    row.song1?.status || "",
+    row.song1?.notes || "",
+
+    row.song2?.link || "",
+    row.song2?.status || "",
+    row.song2?.notes || "",
+
+    row.song3?.link || "",
+    row.song3?.status || "",
+    row.song3?.notes || "",
+
+    row.teaserSong?.link || "",
+    row.teaserSong?.status || "",
+    row.teaserSong?.notes || ""
+)
+.run();
