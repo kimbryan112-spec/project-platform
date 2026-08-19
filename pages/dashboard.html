@@ -71,25 +71,75 @@
 
         <header class="topbar">
 
-            <div>
+    <div class="topbar-left">
 
-                <h1>Dashboard</h1>
+        <h1>Admin Dashboard</h1>
+        <p>Wedding Project Overview</p>
 
-                <p>Wedding Project Overview</p>
+    </div>
 
-            </div>
+    <div class="topbar-right">
 
-            <div class="profile">
+        <select id="yearSelect">
+            <option>2023</option>
+            <option>2024</option>
+            <option>2025</option>
+            <option selected>2026</option>
+            <option>2027</option>
+            <option>2028</option>
+        </select>
 
-                KB
+        <button class="next-year-btn">
+            + Next Year
+        </button>
 
-            </div>
+        <div class="profile">
+            KB
+        </div>
 
-        </header>
+    </div>
 
-        <!-- Table -->
+</header>
 
-        <div class="table-wrapper">
+<!-- YEAR + MONTH NAVIGATION -->
+
+<div class="year-month-panel">
+
+    <div class="year-header">
+
+        <h2>
+            📅 <span id="currentYearTitle">2026</span> Wedding Highlights
+        </h2>
+
+    </div>
+
+    <div class="month-buttons">
+
+        <button class="month-btn has-data">Jan ✓</button>
+        <button class="month-btn has-data">Feb ✓</button>
+        <button class="month-btn has-data">Mar ✓</button>
+        <button class="month-btn has-data">Apr ✓</button>
+        <button class="month-btn has-data">May ✓</button>
+        <button class="month-btn has-data">Jun ✓</button>
+        <button class="month-btn has-data">July ✓</button>
+        <button class="month-btn has-data">Aug ✓</button>
+        <button class="month-btn active">Sep</button>
+        <button class="month-btn">Oct</button>
+        <button class="month-btn">Nov</button>
+        <button class="month-btn">Dec</button>
+
+    </div>
+
+    <div class="month-legend">
+        <span>🔵 No data yet</span>
+        <span>🟢 Has data</span>
+    </div>
+
+</div>
+
+<!-- Table -->
+
+<div class="table-wrapper">
 
             <table class="project-table">
 
@@ -102,10 +152,10 @@
                         <th>TYPE</th>
                         <th>RAW FILES</th>
                         <th>DRONE</th>
+                        <th>TEASER SONG</th>
                         <th>1ST SONG</th>
                         <th>2ND SONG</th>
                         <th>3RD SONG</th>
-                        <th>TEASER SONG</th>
 
                     </tr>
 

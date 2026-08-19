@@ -1,0 +1,14 @@
+|COUPLE'S | STATUS | TYPE | RAW FILES | DRONE |1ST SONG | 2ND SONG | 3RD SONG |TEASER SONG | 
+
+
+│ 1ST SONG            │
+├─────────────────────┤
+│ [Paste Song Link]   │
+├─────────────────────┤
+│ ▼ APPROVED          │
+│   REJECT            │
+│   RESERVED          │
+├─────────────────────┤
+│ [ GENERATE ]        │
+
+
