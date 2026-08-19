@@ -129,12 +129,19 @@ if (instructionBtn) {
     const cell = cells[cellIndex];
     if (!cell) return;
 
-    const link = cell.querySelector('.song-link');
-    const status = cell.querySelector('.dashboard-song-status');
-    if (link) link.value = songData.link || "";
+    const link = cell.querySelector(".song-link");
+const status = cell.querySelector(".dashboard-song-status");
+const notes = cell.querySelector(".song-notes");
+
+if (link) link.value = songData.link || "";
+
 if (status) {
     status.value = songData.status || "";
     updateSongStatusColor(status);
+}
+
+if (notes) {
+    notes.value = songData.notes || "";
 }
 };
 

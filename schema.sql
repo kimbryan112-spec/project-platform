@@ -1,46 +1,61 @@
-CREATE TABLE IF NOT EXISTS projects (
+INSERT INTO projects (
+    row_index,
+    couple_name,
+    status,
+    type,
+    raw_files,
+    drone,
+    instruction,
 
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    song1_link,
+    song1_status,
+    song1_notes,
 
-    row_index INTEGER NOT NULL UNIQUE,
+    song2_link,
+    song2_status,
+    song2_notes,
 
-    couple_name TEXT DEFAULT '',
+    song3_link,
+    song3_status,
+    song3_notes,
 
-    status TEXT DEFAULT 'IN PROGRESS',
+    teaser_link,
+    teaser_status,
+    teaser_notes,
 
-    type TEXT DEFAULT 'UPBEAT CINEMATIC',
+    updated_at
+)
+VALUES (
+    ?, ?, ?, ?, ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?,
+    CURRENT_TIMESTAMP
+)
+ON CONFLICT(row_index) DO UPDATE SET
 
-    raw_files TEXT DEFAULT '',
+couple_name = excluded.couple_name,
+status = excluded.status,
+type = excluded.type,
+raw_files = excluded.raw_files,
+drone = excluded.drone,
+instruction = excluded.instruction,
 
-    drone TEXT DEFAULT '',
+song1_link = excluded.song1_link,
+song1_status = excluded.song1_status,
+song1_notes = excluded.song1_notes,
 
-    instruction TEXT DEFAULT '',
+song2_link = excluded.song2_link,
+song2_status = excluded.song2_status,
+song2_notes = excluded.song2_notes,
 
-    song1_link TEXT DEFAULT '',
-    song1_status TEXT DEFAULT '',
-    song1_notes TEXT DEFAULT '',
+song3_link = excluded.song3_link,
+song3_status = excluded.song3_status,
+song3_notes = excluded.song3_notes,
 
-    song2_link TEXT DEFAULT '',
-    song2_status TEXT DEFAULT '',
-    song2_notes TEXT DEFAULT '',
+teaser_link = excluded.teaser_link,
+teaser_status = excluded.teaser_status,
+teaser_notes = excluded.teaser_notes,
 
-    song3_link TEXT DEFAULT '',
-    song3_status TEXT DEFAULT '',
-    song3_notes TEXT DEFAULT '',
-
-    teaser_link TEXT DEFAULT '',
-    teaser_status TEXT DEFAULT '',
-    teaser_notes TEXT DEFAULT '',
-
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-
-);
-
-INSERT OR IGNORE INTO projects (row_index)
-VALUES
-(1),
-(2),
-(3),
-(4),
-(5),
-(6);
+updated_at = CURRENT_TIMESTAMP
