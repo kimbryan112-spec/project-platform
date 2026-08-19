@@ -1,6 +1,7 @@
 export async function onRequestGet(context) {
     try {
         console.log('[API-GET] Fetching projects from D1 database...');
+
         const { results } = await context.env.DB.prepare(
             "SELECT * FROM projects ORDER BY row_index ASC"
         ).all();
@@ -9,39 +10,68 @@ export async function onRequestGet(context) {
         console.log('[API-GET] Total records:', results.length);
 
         const formattedData = results.map(row => ({
-    rowId: row.row_index,
-    coupleName: row.couple_name || "",
-    status: row.status || "IN PROGRESS",
-    type: row.type || "UPBEAT CINEMATIC",
-    rawFiles: row.raw_files || "",
-    drone: row.drone || "",
-    instruction: row.instruction || "",
+            rowId: row.row_index,
+            coupleName: row.couple_name || "",
+            status: row.status || "IN PROGRESS",
+            type: row.type || "UPBEAT CINEMATIC",
+            rawFiles: row.raw_files || "",
+            drone: row.drone || "",
+            instruction: row.instruction || "",
 
-    song1: {
-        link: row.song1_link || "",
-        status: row.song1_status || "",
-        notes: row.song1_notes || ""
-    },
+            song1: {
+                link: row.song1_link || "",
+                status: row.song1_status || "",
+                notes: row.song1_notes || ""
+            },
 
-    song2: {
-        link: row.song2_link || "",
-        status: row.song2_status || "",
-        notes: row.song2_notes || ""
-    },
+            song2: {
+                link: row.song2_link || "",
+                status: row.song2_status || "",
+                notes: row.song2_notes || ""
+            },
 
-    song3: {
-        link: row.song3_link || "",
-        status: row.song3_status || "",
-        notes: row.song3_notes || ""
-    },
+            song3: {
+                link: row.song3_link || "",
+                status: row.song3_status || "",
+                notes: row.song3_notes || ""
+            },
 
-    teaserSong: {
-        link: row.teaser_link || "",
-        status: row.teaser_status || "",
-        notes: row.teaser_notes || ""
+            teaserSong: {
+                link: row.teaser_link || "",
+                status: row.teaser_status || "",
+                notes: row.teaser_notes || ""
+            }
+        }));
+
+        console.log('[API-GET] Formatted response:', formattedData);
+
+        return new Response(
+            JSON.stringify(formattedData),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-cache, no-store, must-revalidate"
+                }
+            }
+        );
+
+    } catch (err) {
+        console.error('[API-GET] Database error:', err);
+
+        return new Response(
+            JSON.stringify({
+                error: err.message,
+                stack: err.stack
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
     }
-}));
-
+}
         console.log('[API-GET] Formatted response:', formattedData);
 
         return new Response(JSON.stringify(formattedData), {
