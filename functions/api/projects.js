@@ -9,17 +9,38 @@ export async function onRequestGet(context) {
         console.log('[API-GET] Total records:', results.length);
 
         const formattedData = results.map(row => ({
-            rowId: row.row_index,
-            coupleName: row.couple_name || "",
-            status: row.status || "IN PROGRESS",
-            type: row.type || "UPBEAT CINEMATIC",
-            rawFiles: row.raw_files || "",
-            drone: row.drone || "",
-            song1: { link: row.song1_link || "", status: row.song1_status || "" },
-            song2: { link: row.song2_link || "", status: row.song2_status || "" },
-            song3: { link: row.song3_link || "", status: row.song3_status || "" },
-            teaserSong: { link: row.teaser_link || "", status: row.teaser_status || "" }
-        }));
+    rowId: row.row_index,
+    coupleName: row.couple_name || "",
+    status: row.status || "IN PROGRESS",
+    type: row.type || "UPBEAT CINEMATIC",
+    rawFiles: row.raw_files || "",
+    drone: row.drone || "",
+    instruction: row.instruction || "",
+
+    song1: {
+        link: row.song1_link || "",
+        status: row.song1_status || "",
+        notes: row.song1_notes || ""
+    },
+
+    song2: {
+        link: row.song2_link || "",
+        status: row.song2_status || "",
+        notes: row.song2_notes || ""
+    },
+
+    song3: {
+        link: row.song3_link || "",
+        status: row.song3_status || "",
+        notes: row.song3_notes || ""
+    },
+
+    teaserSong: {
+        link: row.teaser_link || "",
+        status: row.teaser_status || "",
+        notes: row.teaser_notes || ""
+    }
+}));
 
         console.log('[API-GET] Formatted response:', formattedData);
 
@@ -67,21 +88,30 @@ export async function onRequestPost(context) {
                     teaser_status = excluded.teaser_status,
                     updated_at = CURRENT_TIMESTAMP
             `).bind(
-                rowId,
-                row.coupleName || "",
-                row.status || "IN PROGRESS",
-                row.type || "UPBEAT CINEMATIC",
-                row.rawFiles || "",
-                row.drone || "",
-                row.song1?.link || "",
-                row.song1?.status || "",
-                row.song2?.link || "",
-                row.song2?.status || "",
-                row.song3?.link || "",
-                row.song3?.status || "",
-                row.teaserSong?.link || "",
-                row.teaserSong?.status || ""
-            ).run();
+    rowId,
+    row.coupleName || "",
+    row.status || "IN PROGRESS",
+    row.type || "UPBEAT CINEMATIC",
+    row.rawFiles || "",
+    row.drone || "",
+    row.instruction || "",
+
+    row.song1?.link || "",
+    row.song1?.status || "",
+    row.song1?.notes || "",
+
+    row.song2?.link || "",
+    row.song2?.status || "",
+    row.song2?.notes || "",
+
+    row.song3?.link || "",
+    row.song3?.status || "",
+    row.song3?.notes || "",
+
+    row.teaserSong?.link || "",
+    row.teaserSong?.status || "",
+    row.teaserSong?.notes || ""
+).run();
         }
 
         console.log('[API-POST] Save successful');
