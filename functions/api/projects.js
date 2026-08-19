@@ -72,30 +72,7 @@ export async function onRequestGet(context) {
         );
     }
 }
-        console.log('[API-GET] Formatted response:', formattedData);
-
-        return new Response(JSON.stringify(formattedData), {
-            headers: {
-                "Content-Type": "application/json",
-                "Cache-Control": "no-cache, no-store, must-revalidate"
-            }
-        });
-    } catch (err) {
-    console.error(err);
-
-    return new Response(
-        JSON.stringify({
-            error: err.message,
-            stack: err.stack
-        }),
-        {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }
-    );
-}
+        
 
 export async function onRequestPost(context) {
     try {
