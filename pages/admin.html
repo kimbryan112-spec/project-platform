@@ -166,7 +166,23 @@
                 <tbody>
     <!-- ROW 1 -->
     <tr data-row-id="1">
-        <td contenteditable="true"></td>
+        <td class="couple-cell">
+
+    <div class="couple-name" contenteditable="true"></div>
+
+    <div class="couple-actions">
+
+        <button class="instruction-btn">
+            📝 Special Instructions
+        </button>
+
+        <button class="watch-btn">
+            ▶ Watch
+        </button>
+
+    </div>
+
+</td>
         <td>
             <select class="status-select">
                 <option>PLANNED</option>
@@ -393,10 +409,22 @@
     <button id="lockMonthBtn">🔒 Lock Month</button>
     <button id="unlockMonthBtn">🔓 Unlock Month</button>
 </div>
+<!-- Special Instructions Modal -->
+
+<div id="instructionModal" class="modal">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h3>Special Instructions</h3>
+            <button id="closeInstructionModal">&times;</button>
+        </div>
+
+        <textarea id="instructionTextarea"></textarea>
+
+    </div>
+</div>
 
 <script src="../js/script.js"></script>
-</body>
-</html>
 
 </body>
 </html>

@@ -596,3 +596,182 @@ select{
     position: relative;
     box-shadow: inset 0 0 0 3px #b8860b; /* Dark Yellow inner border */
 }
+/* ==========================
+   COUPLE CELL
+========================== */
+
+.couple-cell{
+    min-width:220px;
+    padding:10px;
+    vertical-align:top;
+}
+
+.couple-name{
+    min-height:38px;
+    padding:8px 10px;
+    border:2px solid #3b82f6;
+    border-radius:8px;
+    background:#fff;
+    font-size:16px;
+    font-weight:600;
+    outline:none;
+    margin-bottom:8px;
+}
+
+.couple-name:empty::before{
+    content:"Enter couple name...";
+    color:#b8b8b8;
+    font-weight:400;
+}
+
+.couple-actions{
+    display:flex;
+    gap:8px;
+}
+
+.instruction-btn,
+.watch-btn{
+
+    flex:1;
+
+    height:34px;
+
+    border:none;
+
+    border-radius:8px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.instruction-btn{
+
+    background:#ff7a1a;
+
+    color:#fff;
+}
+
+.instruction-btn:hover{
+
+    background:#ef6c00;
+}
+
+.watch-btn{
+
+    background:#00a8ff;
+
+    color:#fff;
+}
+
+.watch-btn:hover{
+
+    background:#0090dd;
+}
+/*==============================
+        MODAL
+==============================*/
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+}
+
+.modal-box{
+
+    width:700px;
+
+    max-width:90%;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+}
+
+.modal-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:16px 20px;
+
+    border-bottom:1px solid #eee;
+}
+
+.modal-header h3{
+
+    margin:0;
+
+    font-size:20px;
+}
+
+.close-modal{
+
+    width:36px;
+
+    height:36px;
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    font-size:24px;
+}
+
+#instructionText{
+
+    width:100%;
+
+    height:420px;
+
+    border:none;
+
+    resize:none;
+
+    outline:none;
+
+    padding:20px;
+
+    font-size:16px;
+
+    line-height:1.7;
+}
+
+.watch-box{
+
+    width:900px;
+}
+
+#watchFrame{
+
+    width:100%;
+
+    height:500px;
+
+    border:none;
+}

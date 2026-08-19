@@ -62,17 +62,31 @@ function collectRowData(row) {
 };
 
         return {
-            rowId: parseInt(rowId, 10),
-            coupleName: cells[0]?.innerText?.trim() || "",
-            status: cells[1]?.querySelector('.status-select')?.value || "",
-            type: cells[2]?.querySelector('.type-select')?.value || "",
-            rawFiles: cells[3]?.querySelector('.dashboard-raw-input')?.value || "",
-            drone: cells[4]?.innerText?.trim() || "",
-            song1: getSongData(5),
-            song2: getSongData(6),
-            song3: getSongData(7),
-            teaserSong: getSongData(8)
-        };
+    rowId: parseInt(rowId, 10),
+
+    coupleName:
+        cells[0]?.querySelector(".couple-name")?.innerText.trim() || "",
+
+    status:
+        cells[1]?.querySelector(".status-select")?.value || "",
+
+    type:
+        cells[2]?.querySelector(".type-select")?.value || "",
+
+    rawFiles:
+        cells[3]?.querySelector(".dashboard-raw-input")?.value || "",
+
+    drone:
+        cells[4]?.innerText?.trim() || "",
+
+    instruction:
+        cells[0]?.querySelector(".instruction-btn")?.dataset.notes || "",
+
+    song1: getSongData(5),
+    song2: getSongData(6),
+    song3: getSongData(7),
+    teaserSong: getSongData(8)
+};
     } catch (err) {
         console.error("Error collecting row data for row:", row, err);
         return null;
@@ -84,7 +98,21 @@ function populateRow(row, data) {
     
     console.log(`[POPULATE] Populating row ${data.rowId}:`, data);
     
-    if (cells[0]) cells[0].innerText = data.coupleName || "";
+    if (cells[0]) {
+
+    const coupleName = cells[0].querySelector(".couple-name");
+
+    if (coupleName) {
+        coupleName.innerText = data.coupleName || "";
+    }
+
+    const instructionBtn = cells[0].querySelector(".instruction-btn");
+
+    if (instructionBtn) {
+        instructionBtn.dataset.notes = data.instruction || "";
+    }
+
+}
     if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
     if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
     if (cells[3] && cells[3].querySelector('.dashboard-raw-input')) cells[3].querySelector('.dashboard-raw-input').value = data.rawFiles || "";
@@ -292,5 +320,65 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
     console.log("UNLOCK:", month);
 
     monthContextMenu.style.display = "none";
+
+});// ===============================
+// SPECIAL INSTRUCTIONS MODAL
+// ===============================
+
+let activeCoupleRow = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const instructionButtons = document.querySelectorAll(".instruction-btn");
+    const instructionModal = document.getElementById("instructionModal");
+    const instructionTextarea = document.getElementById("instructionTextarea");
+    const closeInstructionModal = document.getElementById("closeInstructionModal");
+
+    console.log("Buttons:", instructionButtons.length);
+    console.log("Modal:", instructionModal);
+
+    instructionButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+    console.log("Instruction button clicked");
+
+    activeCoupleRow = button.closest("tr");
+
+    const instructionBtn =
+        activeCoupleRow.querySelector(".instruction-btn");
+
+    instructionTextarea.value =
+        instructionBtn.dataset.notes || "";
+
+    instructionModal.classList.add("show");
+
+    instructionTextarea.focus();
+
+});
+
+});
+
+    closeInstructionModal.addEventListener("click", () => {
+        instructionModal.classList.remove("show");
+    });
+
+    instructionModal.addEventListener("click", (e) => {
+    if (e.target === instructionModal) {
+        instructionModal.classList.remove("show");
+    }
+});
+
+instructionTextarea.addEventListener("input", () => {
+
+    if (!activeCoupleRow) return;
+
+    const instructionBtn =
+        activeCoupleRow.querySelector(".instruction-btn");
+
+    instructionBtn.dataset.notes =
+        instructionTextarea.value;
+
+    saveProjects();
 
 });
