@@ -491,6 +491,41 @@ select{
     color:#1f2937;
 }
 
+/* ==================================
+   LIVE CALENDAR
+================================== */
+
+.live-calendar{
+    width:60px;
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 3px 10px rgba(0,0,0,.12);
+    margin-right:16px;
+    flex-shrink:0;
+}
+
+.calendar-month{
+    background:#f24636;
+    color:#fff;
+    text-align:center;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:1px;
+    padding:6px 0;
+    text-transform:uppercase;
+}
+
+.calendar-day{
+    background:#f8f8fc;
+    color:#222;
+    text-align:center;
+    font-size:30px;
+    font-weight:700;
+    line-height:1;
+    padding:10px 0;
+}
+
 #yearSelect{
     width:120px;
     height:40px;
@@ -1024,32 +1059,11 @@ border-bottom: 1px solid #e7d8b4;
 
     background:#1d4ed8;
 }
-.watch-box{
-
-    position:absolute;
-
-    top:60px;
-    left:80px;
-
-    width:900px;
-    max-width:90vw;
-
-    cursor:default;
-
-}
 
 #watchDragHandle{
 
     cursor:move;
     user-select:none;
-
-}
-
-.watch-controls{
-
-    display:flex;
-    gap:8px;
-    margin-left:auto;
 
 }
 

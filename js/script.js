@@ -4,9 +4,12 @@
 // false = Cloudflare API
 // =========================
 const LOCAL_MODE = true;
+let currentMonth = "sep";
 
 document.addEventListener('DOMContentLoaded', () => {
+
     console.log('[INIT] Page loaded, starting data load...');
+
     loadProjects();
 
     const tableBody = document.querySelector('.project-table tbody');
@@ -18,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         tableBody.addEventListener('change', (e) => {
+
             saveProjects();
 
             if (e.target.classList.contains('status-select')) {
@@ -30,7 +34,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.querySelectorAll('.dashboard-song-status')
                 .forEach(updateSongStatusColor);
+
         });
+
+    }
+
+    // =======================
+    // RESTORE WATCH PLAYER
+    // =======================
+
+    const savedPlayer = JSON.parse(
+        localStorage.getItem("watchPlayerState")
+    );
+
+    if (savedPlayer?.open) {
+
+        watchFrame.src = savedPlayer.link;
+
+        watchModal.classList.add("show");
+
+        if (savedPlayer.minimized) {
+
+            watchPlayer.classList.add("mini-player");
+
+            watchPlayer.style.left = "auto";
+            watchPlayer.style.top = "auto";
+            watchPlayer.style.right = "30px";
+            watchPlayer.style.bottom = "30px";
+            watchPlayer.style.transform = "none";
+
+            watchModal.style.background = "transparent";
+            watchModal.style.pointerEvents = "none";
+            watchPlayer.style.pointerEvents = "auto";
+
+            minimizeWatch.style.display = "none";
+            maximizeWatch.style.display = "inline-flex";
+
+        }
 
     }
 
@@ -522,8 +562,19 @@ else {
 }
 
 watchFrame.src = "";
+
 watchFrame.src = link;
+
 watchModal.classList.add("show");
+
+// Save player state
+localStorage.setItem("watchPlayerState", JSON.stringify({
+
+    open: true,
+    minimized: false,
+    link: link
+
+}));
 
 });
 
@@ -572,6 +623,9 @@ document.getElementById("closeWatchModal")?.addEventListener("click", () => {
 
     watchFrame.src = "";
 
+// Forget player state
+localStorage.removeItem("watchPlayerState");
+
 });
 
 watchModal.addEventListener("mousedown", (e) => {
@@ -582,6 +636,20 @@ watchModal.addEventListener("mousedown", (e) => {
 
     minimizeWatch.style.display = "none";
     maximizeWatch.style.display = "inline-flex";
+
+    // Update player state
+const playerState = JSON.parse(localStorage.getItem("watchPlayerState"));
+
+if (playerState) {
+
+    playerState.minimized = true;
+
+    localStorage.setItem(
+        "watchPlayerState",
+        JSON.stringify(playerState)
+    );
+
+}
 
 });
 
@@ -789,30 +857,35 @@ document.addEventListener("mouseup", () => {
 });
 
     // =======================
-    // MINIMIZE
-    // =======================
+// MINIMIZE
+// =======================
 
-    minimizeWatch.addEventListener("click", () => {
+minimizeWatch.addEventListener("click", () => {
 
-        if (watchPlayer.classList.contains("mini-player")) return;
+    if (watchPlayer.classList.contains("mini-player")) return;
 
-        normalWidth = watchPlayer.style.width;
-        normalHeight = watchPlayer.style.height;
-        normalLeft = watchPlayer.style.left;
-        normalTop = watchPlayer.style.top;
+    normalWidth = watchPlayer.style.width;
+    normalHeight = watchPlayer.style.height;
+    normalLeft = watchPlayer.style.left;
+    normalTop = watchPlayer.style.top;
 
-        watchPlayer.classList.add("mini-player");
+    watchPlayer.classList.add("mini-player");
 
-watchPlayer.style.left = "auto";
-watchPlayer.style.top = "auto";
-watchPlayer.style.right = "30px";
-watchPlayer.style.bottom = "30px";
-watchPlayer.style.transform = "none";
+    watchPlayer.style.left = "auto";
+    watchPlayer.style.top = "auto";
+    watchPlayer.style.right = "30px";
+    watchPlayer.style.bottom = "30px";
+    watchPlayer.style.transform = "none";
 
-        minimizeWatch.style.display = "none";
-        maximizeWatch.style.display = "inline-flex";
+    // ADD THESE
+    watchModal.style.background = "transparent";
+    watchModal.style.pointerEvents = "none";
+    watchPlayer.style.pointerEvents = "auto";
 
-    });
+    minimizeWatch.style.display = "none";
+    maximizeWatch.style.display = "inline-flex";
+
+});
 
     // =======================
 // RESTORE TO CENTER
@@ -835,6 +908,20 @@ maximizeWatch.addEventListener("click", () => {
 
     maximizeWatch.style.display = "none";
     minimizeWatch.style.display = "inline-flex";
+
+// Update player state
+const playerState = JSON.parse(localStorage.getItem("watchPlayerState"));
+
+if (playerState) {
+
+    playerState.minimized = false;
+
+    localStorage.setItem(
+        "watchPlayerState",
+        JSON.stringify(playerState)
+    );
+
+}
 
 });
 
