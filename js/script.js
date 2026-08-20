@@ -4,6 +4,10 @@
 // false = Cloudflare API
 // =========================
 const LOCAL_MODE = true;
+
+let currentYear =
+    document.getElementById("yearSelect")?.value || "2026";
+
 let currentMonth =
     document.querySelector(".month-btn.active")?.dataset.month || "sep";
 
@@ -11,12 +15,66 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('[INIT] Page loaded, starting data load...');
 
+    currentYear =
+        document.getElementById("yearSelect")?.value || "2026";
+
     currentMonth =
         document.querySelector(".month-btn.active")?.dataset.month || "sep";
 
     loadProjectsLocal();
 
-    const tableBody = document.querySelector('.project-table tbody');
+    const yearSelect = document.getElementById("yearSelect");
+
+    if (yearSelect) {
+
+        yearSelect.addEventListener("change", () => {
+
+            currentYear = yearSelect.value;
+
+            document.getElementById("currentYearTitle").textContent = currentYear;
+
+            loadProjectsLocal();
+
+        });
+
+}
+
+const nextYearBtn = document.querySelector(".next-year-btn");
+
+if (nextYearBtn) {
+
+    nextYearBtn.addEventListener("click", () => {
+
+        const nextYear = String(Number(currentYear) + 1);
+
+        const exists = [...yearSelect.options].some(
+            option => option.value === nextYear
+        );
+
+        if (!exists) {
+
+            const option = document.createElement("option");
+
+            option.value = nextYear;
+            option.textContent = nextYear;
+
+            yearSelect.appendChild(option);
+
+        }
+
+        currentYear = nextYear;
+
+        yearSelect.value = currentYear;
+
+        document.getElementById("currentYearTitle").textContent = currentYear;
+
+        loadProjectsLocal();
+
+    });
+
+}
+
+const tableBody = document.querySelector('.project-table tbody');
 
     if (tableBody) {
 
@@ -133,10 +191,12 @@ function collectRowData(row) {
 instruction:
     cells[0]?.querySelector(".instruction-btn")?.dataset.notes || "",
 
-locked: document.querySelectorAll(".month-btn.locked")
-    ? Array.from(document.querySelectorAll(".month-btn.locked"))
-        .map(btn => btn.dataset.month)
-    : [],
+locked: [
+    ...new Set(
+        Array.from(document.querySelectorAll(".month-btn.locked"))
+            .map(btn => `${currentYear}_${btn.dataset.month}`)
+    )
+],
 
     song1: getSongData(5),
 song2: getSongData(6),
@@ -232,14 +292,6 @@ function populateRow(row, data) {
         watchBtn.dataset.watchLink = data.watchLink || "";
     }
 
-    if (Array.isArray(data.locked)) {
-        data.locked.forEach(month => {
-            document
-                .querySelector(`.month-btn[data-month="${month}"]`)
-                ?.classList.add("locked");
-        });
-    }
-
    // Apply colors
 updateStatusColor(cells[1]?.querySelector('.status-select'));
 document.querySelectorAll('.dashboard-song-status')
@@ -325,14 +377,20 @@ function loadProjectsLocal() {
     // Clear muna ang table bago mag-load ng selected month
     clearProjectTable();
 
-    let savedData = localStorage.getItem(`projects_${currentMonth}`);
+    let savedData = localStorage.getItem(`projects_${currentYear}_${currentMonth}`);
 
     // Backward compatibility
-    // Kung September ang current month at wala pang projects_sep,
-    // gamitin muna ang lumang "projects"
+// Habang wala pang year-based storage,
+// gamitin muna ang lumang storage key.
+if (!savedData && currentYear === "2026") {
+
+    savedData = localStorage.getItem(`projects_${currentMonth}`);
+
     if (!savedData && currentMonth === "sep") {
         savedData = localStorage.getItem("projects");
     }
+
+}
 
     if (!savedData) {
         console.log("[LOCAL LOAD] No saved data.");
@@ -341,19 +399,44 @@ function loadProjectsLocal() {
 
     const projectsData = JSON.parse(savedData);
 
-    const rows = document.querySelectorAll(".project-table tbody tr");
+const rows = document.querySelectorAll(".project-table tbody tr");
 
-    rows.forEach((row) => {
+// Clear lahat ng existing locks bago mag-restore
+document.querySelectorAll(".month-btn")
+    .forEach(btn => btn.classList.remove("locked"));
 
-        const rowId = parseInt(row.dataset.rowId);
+rows.forEach((row) => {
 
-        const data = projectsData.find(item => item.rowId === rowId);
+    const rowId = parseInt(row.dataset.rowId);
 
-        if (data) {
-            populateRow(row, data);
+    const data = projectsData.find(item => item.rowId === rowId);
+
+    if (data) {
+        populateRow(row, data);
+    }
+
+});
+
+// Restore locked months (isang beses lang)
+const firstRow = projectsData[0];
+
+if (firstRow?.locked) {
+
+    firstRow.locked.forEach(key => {
+
+        const [year, month] = key.split("_");
+
+        if (year === currentYear) {
+
+            document
+                .querySelector(`.month-btn[data-month="${month}"]`)
+                ?.classList.add("locked");
+
         }
 
     });
+
+}
 
     document.querySelectorAll(".status-select")
         .forEach(updateStatusColor);
@@ -473,22 +556,23 @@ function saveProjectsLocal() {
 
         // Save to the selected month
 localStorage.setItem(
-    `projects_${currentMonth}`,
+    `projects_${currentYear}_${currentMonth}`,
     JSON.stringify(projectsData)
 );
 
-// Save per month
-localStorage.setItem(
-    `projects_${currentMonth}`,
-    JSON.stringify(projectsData)
-);
+// Backward compatibility
+if (currentYear === "2026" && currentMonth === "sep") {
 
-// Keep legacy key for September only
-if (currentMonth === "sep") {
+    localStorage.setItem(
+        "projects_sep",
+        JSON.stringify(projectsData)
+    );
+
     localStorage.setItem(
         "projects",
         JSON.stringify(projectsData)
     );
+
 }
 
 console.log("[LOCAL SAVE] Saved to localStorage.");
@@ -616,9 +700,11 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
     const button = document.querySelector(`.month-btn[data-month="${month}"]`);
 
     if (button) {
+
     button.classList.add("locked");
-saveProjects();
-console.log(button.className);
+
+    saveProjects();
+
 }
 
     console.log("LOCK:", month);
@@ -634,9 +720,12 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
     const button = document.querySelector(`.month-btn[data-month="${month}"]`);
 
     if (button) {
-        button.classList.remove("locked");
-        saveProjects();
-    }
+
+    button.classList.remove("locked");
+
+    saveProjects();
+
+}
 
     console.log("UNLOCK:", month);
 
