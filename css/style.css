@@ -686,15 +686,14 @@ select{
 
     display:none;
 
-    justify-content:center;
-
-    align-items:center;
-
     z-index:9999;
+
 }
 
 .modal.show{
-    display:flex;
+
+    display:block;
+
 }
 
 .modal-content{
@@ -710,6 +709,7 @@ select{
     overflow:hidden;
 
     box-shadow:0 20px 50px rgba(0,0,0,.25);
+
 }
 
 .modal-header{
@@ -723,6 +723,7 @@ select{
     padding:16px 20px;
 
     border-bottom:1px solid #eee;
+
 }
 
 .modal-header h3{
@@ -730,6 +731,7 @@ select{
     margin:0;
 
     font-size:20px;
+
 }
 
 .close-modal{
@@ -745,6 +747,7 @@ select{
     cursor:pointer;
 
     font-size:24px;
+
 }
 
 #instructionTextarea{
@@ -765,20 +768,299 @@ select{
 
     line-height:1.7;
 
-    background:#fffbe6;   /* light warm yellow */
+    background:#fffbe6;
+
     color:#333;
+
 }
+
+/*==================================
+        WATCH PLAYER
+==================================*/
 
 .watch-box{
 
-    width:900px;
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 900px;
+    max-width: 90vw;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow: 0 20px 50px rgba(0,0,0,.30);
+
+    transition:
+        width .25s ease,
+        height .25s ease;
+
+    z-index: 10000;
+
+}
+
+#watchHeader{
+
+    display: flex;
+    align-items: center;
+
+    padding: 8px 14px;
+
+    min-height: 3px;
+
+    cursor: move;
+    user-select: none;
+
+    border-bottom: 1px solid #ececec;
+
+    background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fdf8ef 35%,
+    #f7ecd6 70%,
+    #efe0bb 100%
+);
+
+border-bottom: 1px solid #e7d8b4;
+
+}
+.watch-controls{
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-left: auto;
+
+}
+
+.watch-controls button{
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #f5f5f7;
+    color: #444;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    transition:
+        background .18s ease,
+        color .18s ease,
+        transform .15s ease,
+        box-shadow .18s ease;
+
+}
+
+.watch-controls button:hover{
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+
+}
+
+.watch-controls button:active{
+
+    transform: scale(.92);
+
+}
+
+/* Minimize */
+
+#minimizeWatchBtn:hover{
+
+    background: #3b82f6;
+    color: #fff;
+
+}
+
+/* Maximize */
+
+#maximizeWatchBtn:hover{
+
+    background: #22c55e;
+    color: #fff;
+
+}
+
+/* Close */
+
+.watch-controls button:last-child:hover{
+
+    background:#ef4444;
+    color:#fff;
+
 }
 
 #watchFrame{
 
+    width: 100%;
+    height: 520px;
+
+    border: none;
+
+    display: block;
+
+    background: #000;
+
+}
+
+/*==================================
+        MINI PLAYER
+==================================*/
+
+.watch-box.mini-player{
+
+    width:340px;
+    height:220px;
+
+}
+
+.watch-box.mini-player #watchFrame{
+
+    height:170px;
+
+}
+
+/* ==================================
+   WATCH CONTEXT MENU
+================================== */
+
+#watchContextMenu{
+    position:fixed;
+    display:none;
+    min-width:210px;
+    background:#fff;
+    border:1px solid #dcdcdc;
+    border-radius:10px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+    overflow:hidden;
+    z-index:99999;
+}
+
+#watchContextMenu button{
+    width:100%;
+    border:none;
+    background:transparent;
+    padding:12px 16px;
+    text-align:left;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    transition:.2s;
+}
+
+#watchContextMenu button:hover{
+    background:#f3f4f6;
+}
+
+/* ==================================
+   WATCH LINK MODAL
+================================== */
+
+#watchLinkInput{
+
+    width:100%;
+    height:42px;
+
+    padding:0 12px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    font-size:14px;
+
+    outline:none;
+}
+
+#watchLinkInput:focus{
+
+    border-color:#2563eb;
+}
+
+#saveWatchLinkBtn{
+
     width:100%;
 
-    height:500px;
+    height:40px;
+
+    margin-top:15px;
 
     border:none;
+
+    border-radius:8px;
+
+    background:#2563eb;
+
+    color:#fff;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+#saveWatchLinkBtn:hover{
+
+    background:#1d4ed8;
+}
+.watch-box{
+
+    position:absolute;
+
+    top:60px;
+    left:80px;
+
+    width:900px;
+    max-width:90vw;
+
+    cursor:default;
+
+}
+
+#watchDragHandle{
+
+    cursor:move;
+    user-select:none;
+
+}
+
+.watch-controls{
+
+    display:flex;
+    gap:8px;
+    margin-left:auto;
+
+}
+
+.watch-controls button{
+
+    width:34px;
+    height:34px;
+
+    border:none;
+    border-radius:6px;
+
+    cursor:pointer;
+
 }

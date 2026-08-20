@@ -176,7 +176,7 @@
             📝 Special Instructions
         </button>
 
-        <button class="watch-btn" data-link="">
+        <button class="watch-btn" data-watch-link="">
     ▶ Watch
 </button>
 
@@ -287,9 +287,9 @@
             📝 Special Instructions
         </button>
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+        <button class="watch-btn" data-watch-link="">
+    ▶ Watch
+</button>
 
     </div>
 
@@ -327,9 +327,9 @@
             📝 Special Instructions
         </button>
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+        <button class="watch-btn" data-watch-link="">
+    ▶ Watch
+</button>
 
     </div>
 
@@ -367,9 +367,9 @@
             📝 Special Instructions
         </button>
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+        <button class="watch-btn" data-watch-link="">
+    ▶ Watch
+</button>
 
     </div>
 
@@ -407,9 +407,9 @@
             📝 Special Instructions
         </button>
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+        <button class="watch-btn" data-watch-link="">
+    ▶ Watch
+</button>
 
     </div>
 
@@ -447,9 +447,9 @@
             📝 Special Instructions
         </button>
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+        <button class="watch-btn" data-watch-link="">
+    ▶ Watch
+</button>
 
     </div>
 
@@ -502,6 +502,81 @@
         <textarea id="instructionTextarea"></textarea>
 
     </div>
+</div>
+
+<!-- WATCH MODAL -->
+
+<div id="watchModal" class="modal">
+
+    <div id="watchBox" class="modal-content watch-box">
+
+        <div id="watchHeader" class="modal-header">
+
+            <h3>KBHFILMS</h3>
+
+            <div class="watch-controls">
+
+                <button id="minimizeWatchBtn">➖</button>
+
+                <button id="maximizeWatchBtn" style="display:none;">🗖</button>
+
+                <button id="closeWatchModal">&times;</button>
+
+            </div>
+
+        </div>
+
+        <iframe
+            id="watchFrame"
+            src=""
+            allow="autoplay; fullscreen"
+            allowfullscreen>
+        </iframe>
+
+    </div>
+
+</div>
+
+<!-- WATCH CONTEXT MENU -->
+
+<div id="watchContextMenu" class="month-context-menu">
+
+    <button id="attachWatchLinkBtn">
+        📎 Attach Watch Link
+    </button>
+
+</div>
+
+<!-- WATCH LINK MODAL -->
+
+<div id="watchLinkModal" class="modal">
+
+    <div class="modal-content" style="max-width:600px;">
+
+        <div class="modal-header">
+
+            <h3>Attach Watch Link</h3>
+
+            <button id="closeWatchLinkModal">&times;</button>
+
+        </div>
+
+        <div style="padding:20px;">
+
+            <input
+                id="watchLinkInput"
+                type="url"
+                placeholder="Paste Vimeo / Frame.io / YouTube link..."
+                style="width:100%;height:40px;padding:10px;">
+
+            <p style="margin-top:10px;font-size:13px;color:#666;">
+                Changes are saved automatically.
+            </p>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script src="../js/script.js"></script>

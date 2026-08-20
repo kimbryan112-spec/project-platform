@@ -95,9 +95,12 @@ locked: document.querySelectorAll(".month-btn.locked")
     : [],
 
     song1: getSongData(5),
-    song2: getSongData(6),
-    song3: getSongData(7),
-    teaserSong: getSongData(8)
+song2: getSongData(6),
+song3: getSongData(7),
+teaserSong: getSongData(8),
+
+watchLink:
+    cells[0]?.querySelector(".watch-btn")?.dataset.watchLink || ""
 };
     } catch (err) {
         console.error("Error collecting row data for row:", row, err);
@@ -160,6 +163,11 @@ if (notes) {
     setSongData(6, data.song2);
     setSongData(7, data.song3);
     setSongData(8, data.teaserSong);
+    const watchBtn = cells[0]?.querySelector(".watch-btn");
+
+if (watchBtn) {
+    watchBtn.dataset.watchLink = data.watchLink || "";
+}
 
 if (Array.isArray(data.locked)) {
     data.locked.forEach(month => {
@@ -402,6 +410,7 @@ document.querySelectorAll(".month-btn").forEach(button => {
         monthContextMenu.dataset.month = button.dataset.month;
     });
 
+    
 });
 
 document.addEventListener("click", () => {
@@ -436,14 +445,188 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 
     if (button) {
         button.classList.remove("locked");
-saveProjects();
+        saveProjects();
     }
 
     console.log("UNLOCK:", month);
 
     monthContextMenu.style.display = "none";
 
-});// ===============================
+});
+/* ==================================
+   WATCH BUTTON EVENTS
+================================== */
+
+let activeWatchButton = null;
+
+const watchModal = document.getElementById("watchModal");
+const watchFrame = document.getElementById("watchFrame");
+
+const watchContextMenu = document.getElementById("watchContextMenu");
+
+const watchLinkModal = document.getElementById("watchLinkModal");
+const watchLinkInput = document.getElementById("watchLinkInput");
+const closeWatchLinkModal = document.getElementById("closeWatchLinkModal");
+
+document.querySelectorAll(".watch-btn").forEach(button => {
+
+    // LEFT CLICK
+    button.addEventListener("click", () => {
+
+        let link = button.dataset.watchLink;
+
+if (!link) {
+    alert("No Watch Link attached.");
+    return;
+}
+
+// Convert supported links to embeddable format
+
+if (link.includes("youtube.com/watch?v=")) {
+
+    const videoId = new URL(link).searchParams.get("v");
+    link = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+
+}
+
+else if (link.includes("youtu.be/")) {
+
+    const videoId = link.split("youtu.be/")[1].split("?")[0];
+    link = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+
+}
+
+else if (link.includes("drive.google.com/file/d/")) {
+
+    const match = link.match(/\/d\/([^/]+)/);
+
+    if (match) {
+        link = `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+
+}
+
+else if (link.includes("vimeo.com/")) {
+
+    const videoId = link.split("/").pop().split("?")[0];
+    link = `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+
+}
+
+// For unsupported websites, open in a new tab
+else {
+
+    window.open(link, "_blank");
+    return;
+
+}
+
+watchFrame.src = "";
+watchFrame.src = link;
+watchModal.classList.add("show");
+
+});
+
+
+// RIGHT CLICK
+button.addEventListener("contextmenu", (e) => {
+
+    console.log("RIGHT CLICK WORKING");
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    activeWatchButton = button;
+
+    watchContextMenu.style.display = "block";
+    watchContextMenu.style.left = `${e.pageX}px`;
+    watchContextMenu.style.top = `${e.pageY}px`;
+
+});
+
+});
+
+// Hide menu kapag nag-click sa labas
+document.addEventListener("click", (e) => {
+
+    if (!e.target.closest("#watchContextMenu")) {
+        watchContextMenu.style.display = "none";
+    }
+
+});
+
+document.getElementById("closeWatchModal")?.addEventListener("click", () => {
+
+    watchModal.classList.remove("show");
+
+    watchPlayer.classList.remove("mini-player");
+
+    watchPlayer.style.left = "50%";
+    watchPlayer.style.top = "50%";
+    watchPlayer.style.right = "auto";
+    watchPlayer.style.bottom = "auto";
+    watchPlayer.style.transform = "translate(-50%, -50%)";
+
+    minimizeWatch.style.display = "inline-flex";
+    maximizeWatch.style.display = "none";
+
+    watchFrame.src = "";
+
+});
+
+watchModal.addEventListener("mousedown", (e) => {
+
+    if (watchPlayer.contains(e.target)) return;
+
+    watchPlayer.classList.add("mini-player");
+
+    minimizeWatch.style.display = "none";
+    maximizeWatch.style.display = "inline-flex";
+
+});
+
+document.getElementById("attachWatchLinkBtn")?.addEventListener("click", () => {
+
+    if (!activeWatchButton) return;
+
+    watchContextMenu.style.display = "none";
+
+    watchLinkInput.value =
+        activeWatchButton.dataset.watchLink || "";
+
+    watchLinkModal.classList.add("show");
+    watchLinkInput.focus();
+
+});
+
+watchLinkInput?.addEventListener("input", () => {
+
+    if (!activeWatchButton) return;
+
+    activeWatchButton.dataset.watchLink =
+        watchLinkInput.value.trim();
+
+    saveProjects();
+
+});
+
+closeWatchLinkModal?.addEventListener("click", () => {
+
+    watchLinkModal.classList.remove("show");
+
+});
+
+watchLinkModal?.addEventListener("click", (e) => {
+
+    if (e.target === watchLinkModal) {
+
+        watchLinkModal.classList.remove("show");
+
+    }
+
+});
+
+;// ===============================
 // SPECIAL INSTRUCTIONS MODAL
 // ===============================
 
@@ -500,14 +683,219 @@ instructionTextarea.addEventListener("input", () => {
 
     instructionBtn.dataset.notes = instructionTextarea.value;
 
-if (instructionTextarea.value.trim()) {
-    instructionBtn.style.background = "#22c55e"; // green kapag may notes
-} else {
-    instructionBtn.style.background = "#ff7a1a"; // orange kapag wala
+    if (instructionTextarea.value.trim()) {
+        instructionBtn.style.background = "#22c55e";
+    } else {
+        instructionBtn.style.background = "#ff7a1a";
+    }
+
+    saveProjects();
+
+});
+
+});
+/* ==================================
+   WATCH PLAYER WINDOW
+================================== */
+
+const watchPlayer = document.getElementById("watchBox");
+const watchHeader = document.getElementById("watchHeader");
+
+const minimizeWatch = document.getElementById("minimizeWatchBtn");
+const maximizeWatch = document.getElementById("maximizeWatchBtn");
+
+let watchDragging = false;
+let watchOffsetX = 0;
+let watchOffsetY = 0;
+
+let normalWidth = "";
+let normalHeight = "";
+let normalLeft = "";
+let normalTop = "";
+
+if (
+    watchPlayer &&
+    watchHeader &&
+    watchFrame &&
+    minimizeWatch &&
+    maximizeWatch
+) {
+
+    // Initial position
+    watchPlayer.style.position = "fixed";
+    watchPlayer.style.left = "50%";
+    watchPlayer.style.top = "50%";
+    watchPlayer.style.transform = "translate(-50%, -50%)";
+
+    // =======================
+// DRAG
+// =======================
+
+let dragRAF = null;
+let dragX = 0;
+let dragY = 0;
+
+watchHeader.addEventListener("mousedown", (e) => {
+
+    e.preventDefault();
+
+    watchDragging = true;
+
+    watchPlayer.classList.add("dragging");
+    document.body.style.userSelect = "none";
+
+    const rect = watchPlayer.getBoundingClientRect();
+
+    watchPlayer.style.left = rect.left + "px";
+    watchPlayer.style.top = rect.top + "px";
+
+    watchPlayer.style.right = "auto";
+    watchPlayer.style.bottom = "auto";
+
+    watchPlayer.style.transform = "none";
+
+    watchOffsetX = e.clientX - rect.left;
+    watchOffsetY = e.clientY - rect.top;
+
+});
+
+document.addEventListener("mousemove", (e) => {
+
+    if (!watchDragging) return;
+
+    dragX = e.clientX - watchOffsetX;
+    dragY = e.clientY - watchOffsetY;
+
+    if (dragRAF) return;
+
+    dragRAF = requestAnimationFrame(() => {
+
+        watchPlayer.style.left = dragX + "px";
+        watchPlayer.style.top = dragY + "px";
+
+        dragRAF = null;
+
+    });
+
+});
+
+document.addEventListener("mouseup", () => {
+
+    watchDragging = false;
+
+    watchPlayer.classList.remove("dragging");
+    document.body.style.userSelect = "";
+
+});
+
+    // =======================
+    // MINIMIZE
+    // =======================
+
+    minimizeWatch.addEventListener("click", () => {
+
+        if (watchPlayer.classList.contains("mini-player")) return;
+
+        normalWidth = watchPlayer.style.width;
+        normalHeight = watchPlayer.style.height;
+        normalLeft = watchPlayer.style.left;
+        normalTop = watchPlayer.style.top;
+
+        watchPlayer.classList.add("mini-player");
+
+watchPlayer.style.left = "auto";
+watchPlayer.style.top = "auto";
+watchPlayer.style.right = "30px";
+watchPlayer.style.bottom = "30px";
+watchPlayer.style.transform = "none";
+
+        minimizeWatch.style.display = "none";
+        maximizeWatch.style.display = "inline-flex";
+
+    });
+
+    // =======================
+// RESTORE TO CENTER
+// =======================
+
+maximizeWatch.addEventListener("click", () => {
+
+    watchPlayer.classList.remove("mini-player");
+
+    watchPlayer.style.width = "";
+    watchPlayer.style.height = "";
+
+    watchPlayer.style.left = "50%";
+    watchPlayer.style.top = "50%";
+
+    watchPlayer.style.right = "auto";
+    watchPlayer.style.bottom = "auto";
+
+    watchPlayer.style.transform = "translate(-50%, -50%)";
+
+    maximizeWatch.style.display = "none";
+    minimizeWatch.style.display = "inline-flex";
+
+});
+
+    // Hide restore button initially
+    maximizeWatch.style.display = "none";
+
+    // =======================
+    // AUTO PAUSE
+    // =======================
+
+    document.addEventListener("click", (e) => {
+
+        if (
+            watchPlayer.classList.contains("mini-player") &&
+            !watchPlayer.contains(e.target)
+        ) {
+
+            if (watchFrame.src.includes("youtube")) {
+
+                watchFrame.contentWindow.postMessage(
+                    '{"event":"command","func":"pauseVideo","args":""}',
+                    "*"
+                );
+
+            } else if (watchFrame.src.includes("vimeo")) {
+
+                watchFrame.contentWindow.postMessage(
+                    { method: "pause" },
+                    "*"
+                );
+
+            }
+
+        }
+
+    });
+
+    // =======================
+    // RESUME
+    // =======================
+
+    watchPlayer.addEventListener("click", () => {
+
+        if (!watchPlayer.classList.contains("mini-player")) return;
+
+        if (watchFrame.src.includes("youtube")) {
+
+            watchFrame.contentWindow.postMessage(
+                '{"event":"command","func":"playVideo","args":""}',
+                "*"
+            );
+
+        } else if (watchFrame.src.includes("vimeo")) {
+
+            watchFrame.contentWindow.postMessage(
+                { method: "play" },
+                "*"
+            );
+
+        }
+
+    });
+
 }
-
-saveProjects();
-
-});
-
-});
