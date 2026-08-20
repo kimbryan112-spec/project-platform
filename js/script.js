@@ -4,13 +4,17 @@
 // false = Cloudflare API
 // =========================
 const LOCAL_MODE = true;
-let currentMonth = "sep";
+let currentMonth =
+    document.querySelector(".month-btn.active")?.dataset.month || "sep";
 
 document.addEventListener('DOMContentLoaded', () => {
 
     console.log('[INIT] Page loaded, starting data load...');
 
-    loadProjects();
+    currentMonth =
+        document.querySelector(".month-btn.active")?.dataset.month || "sep";
+
+    loadProjectsLocal();
 
     const tableBody = document.querySelector('.project-table tbody');
 
@@ -149,81 +153,186 @@ watchLink:
 }
 
 function populateRow(row, data) {
+
     const cells = row.querySelectorAll('td');
-    
+
     console.log(`[POPULATE] Populating row ${data.rowId}:`, data);
-    
+
     if (cells[0]) {
 
-    const coupleName = cells[0].querySelector(".couple-name");
+        const coupleName = cells[0].querySelector(".couple-name");
 
-    if (coupleName) {
-    coupleName.textContent = data.coupleName || "";
-}
+        if (coupleName) {
+            coupleName.textContent = data.coupleName || "";
+        }
 
-    const instructionBtn = cells[0].querySelector(".instruction-btn");
+        const instructionBtn = cells[0].querySelector(".instruction-btn");
 
-if (instructionBtn) {
-    instructionBtn.dataset.notes = data.instruction || "";
+        if (instructionBtn) {
+            instructionBtn.dataset.notes = data.instruction || "";
 
-    if (data.instruction?.trim()) {
-        instructionBtn.style.background = "#22c55e";
-    } else {
-        instructionBtn.style.background = "#ff7a1a";
+            if (data.instruction?.trim()) {
+                instructionBtn.style.background = "#22c55e";
+            } else {
+                instructionBtn.style.background = "#ff7a1a";
+            }
+        }
+
     }
-}
 
-}
-    if (cells[1] && cells[1].querySelector('.status-select')) cells[1].querySelector('.status-select').value = data.status || "IN PROGRESS";
-    if (cells[2] && cells[2].querySelector('.type-select')) cells[2].querySelector('.type-select').value = data.type || "NOT SET";
-    if (cells[3] && cells[3].querySelector('.dashboard-raw-input')) cells[3].querySelector('.dashboard-raw-input').value = data.rawFiles || "";
-    if (cells[4]) cells[4].innerText = data.drone || "";
-    
+    if (cells[1] && cells[1].querySelector('.status-select')) {
+        cells[1].querySelector('.status-select').value =
+            data.status || "IN PROGRESS";
+    }
+
+    if (cells[2] && cells[2].querySelector('.type-select')) {
+        cells[2].querySelector('.type-select').value =
+            data.type || "NOT SET";
+    }
+
+    if (cells[3] && cells[3].querySelector('.dashboard-raw-input')) {
+        cells[3].querySelector('.dashboard-raw-input').value =
+            data.rawFiles || "";
+    }
+
+    if (cells[4]) {
+        cells[4].innerText = data.drone || "";
+    }
+
     const setSongData = (cellIndex, songData = {}) => {
-    const cell = cells[cellIndex];
-    if (!cell) return;
 
-    const link = cell.querySelector(".song-link");
-const status = cell.querySelector(".dashboard-song-status");
-const notes = cell.querySelector(".song-notes");
+        const cell = cells[cellIndex];
+        if (!cell) return;
 
-if (link) link.value = songData.link || "";
+        const link = cell.querySelector(".song-link");
+        const status = cell.querySelector(".dashboard-song-status");
+        const notes = cell.querySelector(".song-notes");
 
-if (status) {
-    status.value = songData.status || "";
-    updateSongStatusColor(status);
-}
+        if (link) link.value = songData.link || "";
 
-if (notes) {
-    notes.value = songData.notes || "";
-}
-};
+        if (status) {
+            status.value = songData.status || "";
+            updateSongStatusColor(status);
+        }
+
+        if (notes) {
+            notes.value = songData.notes || "";
+        }
+
+    };
 
     setSongData(5, data.song1);
     setSongData(6, data.song2);
     setSongData(7, data.song3);
     setSongData(8, data.teaserSong);
+
     const watchBtn = cells[0]?.querySelector(".watch-btn");
 
-if (watchBtn) {
-    watchBtn.dataset.watchLink = data.watchLink || "";
+    if (watchBtn) {
+        watchBtn.dataset.watchLink = data.watchLink || "";
+    }
+
+    if (Array.isArray(data.locked)) {
+        data.locked.forEach(month => {
+            document
+                .querySelector(`.month-btn[data-month="${month}"]`)
+                ?.classList.add("locked");
+        });
+    }
+
+   // Apply colors
+updateStatusColor(cells[1]?.querySelector('.status-select'));
+document.querySelectorAll('.dashboard-song-status')
+    .forEach(updateSongStatusColor);
+
 }
 
-if (Array.isArray(data.locked)) {
-    data.locked.forEach(month => {
-        document
-            .querySelector(`.month-btn[data-month="${month}"]`)
-            ?.classList.add("locked");
+/* ==================================
+   CLEAR TABLE (MONTH SWITCH)
+================================== */
+
+function clearProjectTable() {
+
+    document.querySelectorAll(".project-table tbody tr").forEach(row => {
+
+        const cells = row.querySelectorAll("td");
+
+        // Couple Name
+        const coupleName = cells[0]?.querySelector(".couple-name");
+        if (coupleName) coupleName.textContent = "";
+
+        // Instructions
+        const instructionBtn = cells[0]?.querySelector(".instruction-btn");
+        if (instructionBtn) {
+            instructionBtn.dataset.notes = "";
+            instructionBtn.style.background = "#ff7a1a";
+        }
+
+        // Watch Link
+        const watchBtn = cells[0]?.querySelector(".watch-btn");
+        if (watchBtn) {
+            watchBtn.dataset.watchLink = "";
+        }
+
+        // Status
+        const status = cells[1]?.querySelector(".status-select");
+        if (status) {
+            status.value = "IN PROGRESS";
+            updateStatusColor(status);
+        }
+
+        // Type
+        const type = cells[2]?.querySelector(".type-select");
+        if (type) {
+            type.value = "NOT SET";
+        }
+
+        // Raw Files
+        const raw = cells[3]?.querySelector(".dashboard-raw-input");
+        if (raw) raw.value = "";
+
+        // Drone
+        if (cells[4]) {
+            cells[4].innerText = "";
+        }
+
+        // Songs
+        [5, 6, 7, 8].forEach(index => {
+
+            const cell = cells[index];
+            if (!cell) return;
+
+            const link = cell.querySelector(".song-link");
+            if (link) link.value = "";
+
+            const songStatus = cell.querySelector(".dashboard-song-status");
+            if (songStatus) {
+                songStatus.value = "";
+                updateSongStatusColor(songStatus);
+            }
+
+            const notes = cell.querySelector(".song-notes");
+            if (notes) notes.value = "";
+
+        });
+
     });
+
 }
 
-// Apply colors after populating
-    updateStatusColor(cells[1]?.querySelector('.status-select'));
-    document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
-}
 function loadProjectsLocal() {
 
-    const savedData = localStorage.getItem("projects");
+    // Clear muna ang table bago mag-load ng selected month
+    clearProjectTable();
+
+    let savedData = localStorage.getItem(`projects_${currentMonth}`);
+
+    // Backward compatibility
+    // Kung September ang current month at wala pang projects_sep,
+    // gamitin muna ang lumang "projects"
+    if (!savedData && currentMonth === "sep") {
+        savedData = localStorage.getItem("projects");
+    }
 
     if (!savedData) {
         console.log("[LOCAL LOAD] No saved data.");
@@ -362,14 +471,29 @@ function saveProjectsLocal() {
             if (rowData) projectsData.push(rowData);
         });
 
-        localStorage.setItem(
-            "projects",
-            JSON.stringify(projectsData)
-        );
+        // Save to the selected month
+localStorage.setItem(
+    `projects_${currentMonth}`,
+    JSON.stringify(projectsData)
+);
 
-        console.log("[LOCAL SAVE] Saved to localStorage.");
+// Save per month
+localStorage.setItem(
+    `projects_${currentMonth}`,
+    JSON.stringify(projectsData)
+);
 
-    }, 500);
+// Keep legacy key for September only
+if (currentMonth === "sep") {
+    localStorage.setItem(
+        "projects",
+        JSON.stringify(projectsData)
+    );
+}
+
+console.log("[LOCAL SAVE] Saved to localStorage.");
+
+}, 500);
 
 }
 
@@ -440,17 +564,43 @@ const monthContextMenu = document.getElementById("monthContextMenu");
 
 document.querySelectorAll(".month-btn").forEach(button => {
 
+    // LEFT CLICK = Select Month
+    button.addEventListener("click", () => {
+
+    // Alisin ang active sa lahat
+    document.querySelectorAll(".month-btn")
+        .forEach(btn => btn.classList.remove("active"));
+
+    // I-set ang active month
+    button.classList.add("active");
+
+    // Update current month
+    currentMonth = button.dataset.month;
+
+    console.log("Current Month:", currentMonth);
+
+    // Load projects ng napiling month
+    loadProjectsLocal();
+
+});
+
+    // RIGHT CLICK = Context Menu
     button.addEventListener("contextmenu", (e) => {
+
         e.preventDefault();
+
+        currentMonth = button.dataset.month;
 
         monthContextMenu.style.display = "block";
         monthContextMenu.style.left = `${e.pageX}px`;
         monthContextMenu.style.top = `${e.pageY}px`;
 
-        monthContextMenu.dataset.month = button.dataset.month;
+        monthContextMenu.dataset.month = currentMonth;
+
+        console.log("Right Click Month:", currentMonth);
+
     });
 
-    
 });
 
 document.addEventListener("click", () => {
