@@ -183,7 +183,7 @@ select{
 
 .project-table th:nth-child(1),
 .project-table td:nth-child(1){
-    width:180px;
+    width:200px;
 }
 
 .project-table th:nth-child(2),
@@ -538,7 +538,7 @@ select{
 }
 
 .month-btn.active{
-    outline:3px solid #111827;
+    outline:3px solid #fe0a0a;
 }
 
 .month-btn:hover{
@@ -658,7 +658,7 @@ select{
 
 .instruction-btn:hover{
 
-    background:#ef6c00;
+    background:#18ef00;
 }
 
 .watch-btn{
