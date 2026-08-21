@@ -5,28 +5,110 @@
 // =========================
 const LOCAL_MODE = true;
 
-let currentYear =
-    document.getElementById("yearSelect")?.value || "2026";
+let currentYear = new Date().getFullYear().toString();
 
 let currentMonth =
     document.querySelector(".month-btn.active")?.dataset.month || "sep";
 
+// ===========================
+// LIVE CALENDAR
+// ===========================
+
+function updateLiveCalendar() {
+
+    const now = new Date();
+
+    const month = now.toLocaleString("en-US", {
+        month: "short"
+    }).toUpperCase();
+
+    const day = now.getDate();
+
+    const monthEl = document.getElementById("calendarMonth");
+    const dayEl = document.getElementById("calendarDay");
+
+    if (monthEl) {
+        monthEl.textContent = month;
+    }
+
+    if (dayEl) {
+        dayEl.textContent = day;
+    }
+
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Update agad pag-open ng page
+    updateLiveCalendar();
+
+    // Auto-check every minute
+    setInterval(updateLiveCalendar, 60000);
 
     console.log('[INIT] Page loaded, starting data load...');
 
-    currentYear =
-        document.getElementById("yearSelect")?.value || "2026";
+    currentYear = new Date().getFullYear().toString();
 
-    currentMonth =
-        document.querySelector(".month-btn.active")?.dataset.month || "sep";
+    const monthMap = [
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sep",
+    "oct",
+    "nov",
+    "dec"
+];
 
-    loadProjectsLocal();
+currentMonth = monthMap[new Date().getMonth()];
+
+// Remove current active
+document.querySelectorAll(".month-btn").forEach(btn => {
+    btn.classList.remove("active");
+});
+
+// Activate current month
+document.querySelector(`.month-btn[data-month="${currentMonth}"]`)
+    ?.classList.add("active");
+
+    // ==========================
+    // YEAR DROPDOWN
+    // ==========================
 
     const yearSelect = document.getElementById("yearSelect");
 
     if (yearSelect) {
 
+        const current = new Date().getFullYear();
+
+        // Clear existing options
+        yearSelect.innerHTML = "";
+
+        // Generate years automatically
+        for (let y = 2023; y <= current + 5; y++) {
+
+            const option = document.createElement("option");
+
+            option.value = y;
+            option.textContent = y;
+
+            if (y === current) {
+                option.selected = true;
+            }
+
+            yearSelect.appendChild(option);
+
+        }
+
+        currentYear = String(current);
+
+        document.getElementById("currentYearTitle").textContent = currentYear;
+
+        // Kapag nagpalit ng year
         yearSelect.addEventListener("change", () => {
 
             currentYear = yearSelect.value;
@@ -38,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     }
+
+    loadProjectsLocal();
 
     const nextYearBtn = document.querySelector(".next-year-btn");
 
