@@ -166,7 +166,7 @@ function collectRowData(row) {
     return {
     link: cell.querySelector('.song-link')?.value || "",
     status: cell.querySelector('.dashboard-song-status')?.value || "",
-    notes: cell.querySelector('.song-notes')?.value || ""
+    notes: cell.querySelector('.comments-btn')?.dataset.notes || ""
 };
 };
 
@@ -254,25 +254,42 @@ function populateRow(row, data) {
 
     const setSongData = (cellIndex, songData = {}) => {
 
-        const cell = cells[cellIndex];
-        if (!cell) return;
+    const cell = cells[cellIndex];
+    if (!cell) return;
 
-        const link = cell.querySelector(".song-link");
-        const status = cell.querySelector(".dashboard-song-status");
-        const notes = cell.querySelector(".song-notes");
+    const link = cell.querySelector(".song-link");
+    const status = cell.querySelector(".dashboard-song-status");
+    const commentsBtn = cell.querySelector(".comments-btn");
 
-        if (link) link.value = songData.link || "";
+    if (link) link.value = songData.link || "";
 
-        if (status) {
-            status.value = songData.status || "";
-            updateSongStatusColor(status);
-        }
+    if (status) {
+        status.value = songData.status || "";
+        updateSongStatusColor(status);
+    }
 
-        if (notes) {
-            notes.value = songData.notes || "";
-        }
+    const commentText = songData.notes || "";
 
-    };
+if (commentsBtn) {
+
+    commentsBtn.dataset.notes = commentText;
+
+    commentsBtn.classList.toggle(
+        "has-comments",
+        commentText.trim() !== ""
+    );
+
+}
+
+    // Green kapag may comments
+    if (commentsBtn) {
+        commentsBtn.classList.toggle(
+            "has-comments",
+            !!songData.notes?.trim()
+        );
+    }
+
+};
 
     setSongData(5, data.song1);
     setSongData(6, data.song2);
@@ -356,8 +373,12 @@ function clearProjectTable() {
                 updateSongStatusColor(songStatus);
             }
 
-            const notes = cell.querySelector(".song-notes");
-            if (notes) notes.value = "";
+            const commentsBtn = cell.querySelector(".comments-btn");
+
+if (commentsBtn) {
+    commentsBtn.dataset.notes = "";
+    commentsBtn.classList.remove("has-comments");
+}
 
         });
 
@@ -626,6 +647,7 @@ function setMonthEditable(editable) {
     document.querySelectorAll(`
         .instruction-btn,
         .watch-btn,
+        .comments-btn,
         .dashboard-raw-check-btn,
         .raw-check-btn,
         .generate-btn
@@ -642,6 +664,7 @@ function setMonthEditable(editable) {
         btn.disabled = !editable;
         btn.style.pointerEvents = editable ? "auto" : "none";
         btn.style.opacity = editable ? "1" : "0.6";
+
     });
 
 }
@@ -1103,11 +1126,70 @@ instructionTextarea.addEventListener("input", () => {
         instructionBtn.style.background = "#ff7a1a";
     }
 
+        saveProjects();
+
+});
+
+});
+
+// ===============================
+// COMMENTS MODAL
+// ===============================
+
+let activeCommentsButton = null;
+
+const commentsModal = document.getElementById("commentsModal");
+const commentsTextarea = document.getElementById("commentsTextarea");
+const closeCommentsModal = document.getElementById("closeCommentsModal");
+
+document.querySelectorAll(".comments-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        activeCommentsButton = button;
+
+        commentsTextarea.value =
+            button.dataset.notes || "";
+
+        commentsModal.classList.add("show");
+
+        commentsTextarea.focus();
+
+    });
+
+});
+
+closeCommentsModal?.addEventListener("click", () => {
+
+    commentsModal.classList.remove("show");
+
+});
+
+commentsModal?.addEventListener("click", (e) => {
+
+    if (e.target === commentsModal) {
+
+        commentsModal.classList.remove("show");
+
+    }
+
+});
+
+commentsTextarea?.addEventListener("input", () => {
+
+    if (!activeCommentsButton) return;
+
+    activeCommentsButton.dataset.notes = commentsTextarea.value;
+
+    activeCommentsButton.classList.toggle(
+        "has-comments",
+        commentsTextarea.value.trim() !== ""
+    );
+
     saveProjects();
 
 });
 
-});
 /* ==================================
    WATCH PLAYER WINDOW
 ================================== */
