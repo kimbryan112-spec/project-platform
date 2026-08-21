@@ -37,42 +37,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
         });
 
-}
+    }
 
-const nextYearBtn = document.querySelector(".next-year-btn");
+    const nextYearBtn = document.querySelector(".next-year-btn");
 
-if (nextYearBtn) {
+    if (nextYearBtn) {
 
-    nextYearBtn.addEventListener("click", () => {
+        nextYearBtn.addEventListener("click", () => {
 
-        const nextYear = String(Number(currentYear) + 1);
+            const nextYear = String(Number(currentYear) + 1);
 
-        const exists = [...yearSelect.options].some(
-            option => option.value === nextYear
-        );
+            const exists = [...yearSelect.options].some(
+                option => option.value === nextYear
+            );
 
-        if (!exists) {
+            if (!exists) {
 
-            const option = document.createElement("option");
+                const option = document.createElement("option");
 
-            option.value = nextYear;
-            option.textContent = nextYear;
+                option.value = nextYear;
+                option.textContent = nextYear;
 
-            yearSelect.appendChild(option);
+                yearSelect.appendChild(option);
 
-        }
+            }
 
-        currentYear = nextYear;
+            currentYear = nextYear;
 
-        yearSelect.value = currentYear;
+            yearSelect.value = currentYear;
 
-        document.getElementById("currentYearTitle").textContent = currentYear;
+            document.getElementById("currentYearTitle").textContent = currentYear;
 
-        loadProjectsLocal();
+            loadProjectsLocal();
 
-    });
+        });
 
-}
+    }
 
 const tableBody = document.querySelector('.project-table tbody');
 
@@ -190,13 +190,6 @@ function collectRowData(row) {
 
 instruction:
     cells[0]?.querySelector(".instruction-btn")?.dataset.notes || "",
-
-locked: [
-    ...new Set(
-        Array.from(document.querySelectorAll(".month-btn.locked"))
-            .map(btn => `${currentYear}_${btn.dataset.month}`)
-    )
-],
 
     song1: getSongData(5),
 song2: getSongData(6),
@@ -417,34 +410,32 @@ rows.forEach((row) => {
 
 });
 
-// Restore locked months (isang beses lang)
-const firstRow = projectsData[0];
+// Restore locked months
+const locks = getMonthLocks();
 
-if (firstRow?.locked) {
+document.querySelectorAll(".month-btn").forEach(btn => {
 
-    firstRow.locked.forEach(key => {
+    const key = getMonthKey(currentYear, btn.dataset.month);
 
-        const [year, month] = key.split("_");
+    if (locks[key]) {
+        btn.classList.add("locked");
+    } else {
+        btn.classList.remove("locked");
+    }
 
-        if (year === currentYear) {
+});
 
-            document
-                .querySelector(`.month-btn[data-month="${month}"]`)
-                ?.classList.add("locked");
+// Restore colors
+document.querySelectorAll(".status-select")
+    .forEach(updateStatusColor);
 
-        }
+document.querySelectorAll(".dashboard-song-status")
+    .forEach(updateSongStatusColor);
 
-    });
+// Apply editable/read-only state
+updateMonthLockUI();
 
-}
-
-    document.querySelectorAll(".status-select")
-        .forEach(updateStatusColor);
-
-    document.querySelectorAll(".dashboard-song-status")
-        .forEach(updateSongStatusColor);
-
-    console.log("[LOCAL LOAD] Loaded from localStorage.");
+console.log("[LOCAL LOAD] Loaded from localStorage.");
 
 }
 
@@ -454,6 +445,8 @@ async function loadProjects() {
     if (LOCAL_MODE) {
         return loadProjectsLocal();
     }
+
+    updateMonthLockUI();
 
     try {
         console.log('[LOAD] Fetching projects from /api/projects...');
@@ -509,6 +502,8 @@ function saveProjects() {
     if (LOCAL_MODE) {
         return saveProjectsLocal();
     }
+
+    updateMonthLockUI();
 
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(async () => {
@@ -577,7 +572,105 @@ if (currentYear === "2026" && currentMonth === "sep") {
 
 console.log("[LOCAL SAVE] Saved to localStorage.");
 
-}, 500);
+    }, 500);
+
+}
+
+// ==================================
+// MONTH LOCK HELPERS
+// ==================================
+
+function getMonthLocks() {
+    return JSON.parse(localStorage.getItem("monthLocks") || "{}");
+}
+
+function saveMonthLocks(locks) {
+    localStorage.setItem("monthLocks", JSON.stringify(locks));
+}
+
+function getMonthKey(year = currentYear, month = currentMonth) {
+    return `${year}_${month}`;
+}
+
+function isMonthLocked() {
+
+    return !!getMonthLocks()[getMonthKey()];
+
+}
+
+function setMonthEditable(editable) {
+
+    // Inputs / Selects
+    document.querySelectorAll(`
+        .status-select,
+        .type-select,
+        .dashboard-raw-input,
+        .song-link,
+        .dashboard-song-status,
+        .song-notes
+    `).forEach(input => {
+        input.disabled = !editable;
+    });
+
+    // Couple Name (contenteditable)
+    document.querySelectorAll(".couple-name").forEach(el => {
+        el.contentEditable = editable;
+    });
+
+    // Drone column (contenteditable)
+    document.querySelectorAll("td[contenteditable]").forEach(el => {
+        el.contentEditable = editable;
+    });
+
+    // Buttons
+    document.querySelectorAll(`
+        .instruction-btn,
+        .watch-btn,
+        .dashboard-raw-check-btn,
+        .raw-check-btn,
+        .generate-btn
+    `).forEach(btn => {
+
+        // Watch button laging enabled
+        if (btn.classList.contains("watch-btn")) {
+            btn.disabled = false;
+            btn.style.pointerEvents = "auto";
+            btn.style.opacity = "1";
+            return;
+        }
+
+        btn.disabled = !editable;
+        btn.style.pointerEvents = editable ? "auto" : "none";
+        btn.style.opacity = editable ? "1" : "0.6";
+    });
+
+}
+
+function updateMonthLockUI() {
+
+    console.log("===== updateMonthLockUI =====");
+    console.log("IS_ADMIN:", IS_ADMIN);
+    console.log("Current Year:", currentYear);
+    console.log("Current Month:", currentMonth);
+    console.log("Current Key:", getMonthKey());
+    console.log("All Locks:", getMonthLocks());
+    console.log("Locked:", isMonthLocked());
+
+    // Safety check
+    if (typeof IS_ADMIN === "undefined") {
+        return;
+    }
+
+    if (IS_ADMIN) {
+
+        // Admin = always editable
+        setMonthEditable(true);
+        return;
+
+    }
+
+    // Dashboard
+    setMonthEditable(!isMonthLocked());
 
 }
 
@@ -651,22 +744,22 @@ document.querySelectorAll(".month-btn").forEach(button => {
     // LEFT CLICK = Select Month
     button.addEventListener("click", () => {
 
-    // Alisin ang active sa lahat
-    document.querySelectorAll(".month-btn")
-        .forEach(btn => btn.classList.remove("active"));
+        // Alisin ang active sa lahat
+        document.querySelectorAll(".month-btn")
+            .forEach(btn => btn.classList.remove("active"));
 
-    // I-set ang active month
-    button.classList.add("active");
+        // I-set ang active month
+        button.classList.add("active");
 
-    // Update current month
-    currentMonth = button.dataset.month;
+        // Update current month
+        currentMonth = button.dataset.month;
 
-    console.log("Current Month:", currentMonth);
+        console.log("Current Month:", currentMonth);
 
-    // Load projects ng napiling month
-    loadProjectsLocal();
+        // Load projects ng napiling month
+        loadProjectsLocal();
 
-});
+    });
 
     // RIGHT CLICK = Context Menu
     button.addEventListener("contextmenu", (e) => {
@@ -701,13 +794,20 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
 
     if (button) {
 
-    button.classList.add("locked");
+        // Save lock state
+        const locks = getMonthLocks();
+        locks[getMonthKey(currentYear, month)] = true;
+        saveMonthLocks(locks);
 
-    saveProjects();
+        // UI
+        button.classList.add("locked");
 
-}
+        // Refresh editable/read-only state
+        updateMonthLockUI();
 
-    console.log("LOCK:", month);
+    }
+
+    console.log("LOCK:", `${currentYear}_${month}`);
 
     monthContextMenu.style.display = "none";
 
@@ -721,13 +821,20 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 
     if (button) {
 
-    button.classList.remove("locked");
+        // Remove lock state
+        const locks = getMonthLocks();
+        delete locks[getMonthKey(currentYear, month)];
+        saveMonthLocks(locks);
 
-    saveProjects();
+        // UI
+        button.classList.remove("locked");
 
-}
+        // Refresh editable/read-only state
+        updateMonthLockUI();
 
-    console.log("UNLOCK:", month);
+    }
+
+    console.log("UNLOCK:", `${currentYear}_${month}`);
 
     monthContextMenu.style.display = "none";
 
