@@ -31,33 +31,29 @@
 
         <nav>
 
-    <a href="admin.html">
-    📊 Admin Dashboard
-</a>
+    <a href="admin.html" id="adminMenu">
+        📊 Admin Dashboard
+    </a>
 
     <a href="dashboard.html" class="active">
         📋 Dashboard
     </a>
 
-</nav></nav>
+</nav>
 
 <div class="sidebar-footer">
 
     <div class="user-info">
 
-        <div class="user-name">
-            Kim Bryan Hernandez
-        </div>
+        <div class="user-name" id="userName"></div>
 
-        <div class="user-role">
-            Administrator
-        </div>
+<div class="user-role" id="userRole"></div>
 
     </div>
 
-    <button class="logout-btn">
-        🚪 Logout
-    </button>
+    <button id="logoutBtn" class="logout-btn">
+    🚪 Logout
+</button>
 
 </div>
 
@@ -988,21 +984,55 @@
         </div>
 
         <iframe
-            id="watchFrame"
-            src=""
-            allow="autoplay; fullscreen"
-            allowfullscreen>
-        </iframe>
+    id="watchFrame"
+    src=""
+    allow="autoplay; fullscreen"
+    allowfullscreen>
+</iframe>
 
     </div>
 
 </div>
 
 <script>
-const IS_ADMIN = false;
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+if (!currentUser) {
+    window.location.href = "../login.html";
+}
+
+// Dashboard user at Admin lang ang pwede
+if (
+    currentUser.role !== "admin" &&
+    currentUser.role !== "dashboard"
+) {
+    alert("Access Denied.");
+    window.location.href = "../login.html";
+}
+
+const IS_ADMIN = currentUser.role === "admin";
+
+// Hide Admin Dashboard menu for Manager
+if (!IS_ADMIN) {
+    const adminMenu = document.getElementById("adminMenu");
+
+    if (adminMenu) {
+        adminMenu.style.display = "none";
+    }
+}
+
+// Show user info
+document.getElementById("userName").textContent = currentUser.name || currentUser.username || "";
+
+// Display Position
+const roleMap = {
+    admin: "Administrator",
+    dashboard: "Manager"
+};
+
+document.getElementById("userRole").textContent =
+    roleMap[currentUser.role] || currentUser.role;
+
 </script>
 
 <script src="../js/script.js"></script>
-
-</body>
-</html>

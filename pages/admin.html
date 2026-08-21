@@ -577,8 +577,8 @@
                 style="width:100%;height:40px;padding:10px;">
 
             <p style="margin-top:10px;font-size:13px;color:#666;">
-                Changes are saved automatically.
-            </p>
+    Changes are saved automatically.
+</p>
 
         </div>
 
@@ -587,7 +587,25 @@
 </div>
 
 <script>
+
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+if (!currentUser) {
+
+    window.location.href = "../login.html";
+
+}
+
+if (currentUser.role !== "admin") {
+
+    alert("Access Denied.");
+
+    window.location.href = "dashboard.html";
+
+}
+
 const IS_ADMIN = true;
+
 </script>
 
 <script src="../js/script.js"></script>

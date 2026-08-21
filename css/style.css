@@ -183,7 +183,7 @@ select{
 
 .project-table th:nth-child(1),
 .project-table td:nth-child(1){
-    width:200px;
+    width:250px;
 }
 
 .project-table th:nth-child(2),
@@ -684,7 +684,9 @@ select{
 ========================== */
 
 .couple-cell{
-    min-width:220px;
+    width:280px;
+    max-width:300px;
+    overflow:hidden;
     padding:10px;
     vertical-align:top;
 }
@@ -695,10 +697,16 @@ select{
     border:2px solid #3b82f6;
     border-radius:8px;
     background:#fff;
-    font-size:16px;
+
+    font-size:14px;
     font-weight:600;
+
     outline:none;
     margin-bottom:8px;
+
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
 }
 
 .couple-name:empty::before{
@@ -1174,5 +1182,166 @@ border-bottom: 1px solid #e7d8b4;
     border-radius:6px;
 
     cursor:pointer;
+
+}
+
+/* ==================================
+   LOGIN PAGE
+================================== */
+
+.login-container{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:30px;
+
+}
+
+.login-card{
+
+    width:100%;
+    max-width:420px;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    padding:40px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.10);
+
+}
+
+.login-card .logo{
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+}
+
+.login-card h1{
+
+    text-align:center;
+
+    margin-bottom:10px;
+
+    font-size:32px;
+
+}
+
+.login-subtitle{
+
+    text-align:center;
+
+    color:#666;
+
+    margin-bottom:30px;
+
+}
+
+.form-group{
+
+    margin-bottom:18px;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+.form-group input{
+
+    width:100%;
+
+    height:44px;
+
+    padding:0 12px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    outline:none;
+
+}
+
+.form-group input:focus{
+
+    border-color:#2563eb;
+
+}
+
+.login-btn{
+
+    width:100%;
+
+    height:46px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#2563eb;
+
+    color:#fff;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+.login-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+.login-error{
+
+    min-height:20px;
+
+    margin-bottom:15px;
+
+    color:#dc2626;
+
+    text-align:center;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+.register-link{
+
+    margin-top:25px;
+
+    text-align:center;
+
+    color:#666;
+
+}
+
+.register-link a{
+
+    color:#2563eb;
+
+    font-weight:600;
 
 }

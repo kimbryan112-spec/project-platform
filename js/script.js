@@ -1514,3 +1514,22 @@ if (playerState) {
     });
 
 }
+// ===============================
+// LOGOUT
+// ===============================
+
+const logoutBtn = document.querySelector(".logout-btn");
+
+if (logoutBtn) {
+
+    logoutBtn.addEventListener("click", () => {
+
+        if (!confirm("Logout?")) return;
+
+        localStorage.removeItem("currentUser");
+
+        window.location.href = "../login.html";
+
+    });
+
+}
