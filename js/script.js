@@ -434,11 +434,13 @@ rows.forEach((row) => {
 // Restore locked months
 const locks = getMonthLocks();
 
+const isAdmin = typeof IS_ADMIN !== "undefined" && IS_ADMIN;
+
 document.querySelectorAll(".month-btn").forEach(btn => {
 
     const key = getMonthKey(currentYear, btn.dataset.month);
 
-    if (locks[key]) {
+    if (isAdmin && locks[key]) {
         btn.classList.add("locked");
     } else {
         btn.classList.remove("locked");
@@ -791,11 +793,25 @@ document.querySelectorAll(".month-btn").forEach(button => {
 
         currentMonth = button.dataset.month;
 
-        monthContextMenu.style.display = "block";
-        monthContextMenu.style.left = `${e.pageX}px`;
-        monthContextMenu.style.top = `${e.pageY}px`;
+        const lockBtn = document.getElementById("lockMonthBtn");
+const unlockBtn = document.getElementById("unlockMonthBtn");
 
-        monthContextMenu.dataset.month = currentMonth;
+const key = getMonthKey(currentYear, currentMonth);
+const locked = !!getMonthLocks()[key];
+
+if (locked) {
+    lockBtn.style.display = "none";
+    unlockBtn.style.display = "flex";   // o "block" depende sa CSS mo
+} else {
+    lockBtn.style.display = "flex";
+    unlockBtn.style.display = "none";
+}
+
+monthContextMenu.style.display = "block";
+monthContextMenu.style.left = `${e.pageX}px`;
+monthContextMenu.style.top = `${e.pageY}px`;
+
+monthContextMenu.dataset.month = currentMonth;
 
         console.log("Right Click Month:", currentMonth);
 
