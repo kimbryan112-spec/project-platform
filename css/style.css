@@ -171,10 +171,46 @@ select{
 }
 
 .project-table thead th{
+
     position:sticky;
     top:0;
-    z-index:10;
-    background:#f6f3f3;
+    z-index:20;
+
+    background:linear-gradient(
+        to bottom,
+        #3b82f6 0%,
+        #2563eb 55%,
+        #1d4ed8 100%
+    );
+
+    color:#fff;
+
+    text-align:center;
+
+    font-size:13px;
+
+    font-weight:800;
+
+    padding:8px;
+
+    border:1px solid #1e40af;
+
+    text-transform:uppercase;
+
+    letter-spacing:.7px;
+
+    /* 3D Header */
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.35),
+        inset 0 -2px 0 rgba(0,0,0,.18),
+        0 2px 5px rgba(0,0,0,.18);
+
+    /* 3D Text */
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.18),
+        0 -1px 0 rgba(0,0,0,.25),
+        1px 1px 2px rgba(0,0,0,.30);
+
 }
 
 /* ==================================
@@ -301,18 +337,24 @@ select{
 }
 
 .generate-btn{
+
     width:48%;
     height:30px;
-    background:#2563eb;
-    color:#fff;
-    border:none;
-    border-radius:4px;
-    cursor:pointer;
-    font-weight:600;
-}
 
-.generate-btn:hover{
-    background:#1d4ed8;
+    border:1px solid #1d4ed8;
+    border-radius:7px;
+
+    background:linear-gradient(
+        to bottom,
+        #60a5fa 0%,
+        #2563eb 52%,
+        #1d4ed8 100%
+    );
+
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+
 }
 
 /* ==================================
@@ -476,45 +518,41 @@ select{
     flex:1;
 }
 
-.raw-check-btn{
-    height:30px;
-    padding:0 12px;
-    border:none;
-    border-radius:4px;
-    background:#2563eb;
-    color:#fff;
-    font-size:12px;
-    font-weight:600;
-    cursor:pointer;
-}
+/* ==========================
+   CHECK BUTTON (3D)
+========================== */
 
-.raw-check-btn:hover{
-    background:#1d4ed8;
-}.dashboard-raw-files-actions{
-    display:flex;
-    align-items:center;
-    gap:6px;
+.raw-check-btn,
+.dashboard-raw-check-btn{
+
+    height:30px;
+    padding:0 14px;
+
+    border:1px solid #1d4ed8;
+    border-radius:7px;
+
+    background:linear-gradient(
+        to bottom,
+        #60a5fa 0%,
+        #2563eb 52%,
+        #1d4ed8 100%
+    );
+
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.25),
+        0 -1px 0 rgba(0,0,0,.25);
+
 }
 
 .dashboard-raw-input{
     flex:1;
 }
 
-.dashboard-raw-check-btn{
-    height:30px;
-    padding:0 12px;
-    border:none;
-    border-radius:4px;
-    background:#2563eb;
-    color:#fff;
-    font-size:12px;
-    font-weight:600;
-    cursor:pointer;
-}
-
-.dashboard-raw-check-btn:hover{
-    background:#1d4ed8;
-}/* ==================================
+/* ==================================
    YEAR + MONTH NAVIGATION
 ================================== */
 
@@ -606,26 +644,42 @@ select{
 }
 
 .month-btn{
+
     padding:10px 18px;
-    border:none;
+
+    border:1px solid #2563eb;
     border-radius:8px;
-    background:#3b82f6;
+
+    background:linear-gradient(
+        to bottom,
+        #60a5fa 0%,
+        #3b82f6 55%,
+        #2563eb 100%
+    );
+
     color:#fff;
-    font-weight:600;
+    font-weight:700;
     cursor:pointer;
-    transition:.2s;
+
 }
 
 .month-btn.has-data{
-    background:#02aa26;
+
+    border-color:#15803d;
+
+    background:linear-gradient(
+        to bottom,
+        #4ade80 0%,
+        #22c55e 55%,
+        #16a34a 100%
+    );
+
 }
 
 .month-btn.active{
-    outline:3px solid #fe0a0a;
-}
 
-.month-btn:hover{
-    transform:translateY(-2px);
+    outline:3px solid #ef4444;
+
 }
 
 .month-legend{
@@ -679,90 +733,193 @@ select{
     position: relative;
     box-shadow: inset 0 0 0 3px #b8860b; /* Dark Yellow inner border */
 }
+
+/* ==================================
+   REUSABLE BUTTONS (3D)
+================================== */
+
+.btn-3d{
+
+    color:#fff;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    border:none;
+
+    user-select:none;
+
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.22),
+        0 -1px 0 rgba(0,0,0,.25);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.45),
+        inset 0 -2px 0 rgba(0,0,0,.18),
+        0 2px 5px rgba(0,0,0,.20);
+
+    transition:
+        background .18s ease,
+        transform .15s ease,
+        box-shadow .15s ease,
+        filter .15s ease;
+
+}
+
+.btn-3d:hover{
+
+    transform:translateY(-1px);
+
+    filter:brightness(1.05);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.45),
+        inset 0 -2px 0 rgba(0,0,0,.18),
+        0 5px 12px rgba(0,0,0,.25);
+
+}
+
+.btn-3d:active{
+
+    transform:translateY(2px);
+
+    filter:brightness(.92);
+
+    box-shadow:
+        inset 0 3px 6px rgba(0,0,0,.30),
+        inset 0 -1px 0 rgba(255,255,255,.15),
+        0 1px 2px rgba(0,0,0,.15);
+
+}
+
 /* ==========================
    COUPLE CELL
 ========================== */
 
 .couple-cell{
+
     width:280px;
     max-width:300px;
-    overflow:hidden;
+
     padding:10px;
+
     vertical-align:top;
+
+    overflow:hidden;
+
 }
 
 .couple-name{
+
     min-height:38px;
-    padding:8px 10px;
-    border:2px solid #3b82f6;
-    border-radius:8px;
-    background:#fff;
 
-    font-size:14px;
-    font-weight:600;
-
-    outline:none;
     margin-bottom:8px;
 
-    overflow:hidden;
+    padding:8px 10px;
+
+    background:#fff;
+
+    border:2px solid #3b82f6;
+    border-radius:8px;
+
+    font-size:14px;
+    font-weight:700;
+    color:#222;
+
     white-space:nowrap;
+    overflow:hidden;
     text-overflow:ellipsis;
+
+    outline:none;
+
 }
 
 .couple-name:empty::before{
+
     content:"Enter couple name...";
     color:#b8b8b8;
     font-weight:400;
+
 }
 
 .couple-actions{
+
     display:flex;
+
     gap:8px;
+
 }
 
-.instruction-btn,
+/* ==================================
+   BUTTON BASE
+================================== */
+
 .watch-btn{
 
     flex:1;
-
     height:34px;
-
-    border:none;
-
     border-radius:8px;
 
-    font-size:13px;
-
-    font-weight:600;
-
-    cursor:pointer;
-
-    transition:.2s;
 }
 
 .instruction-btn{
 
-    background:#ff7a1a;
+    flex:1;
 
-    color:#fff;
+    min-height:34px;
+    padding:5px 8px;
+
+    border-radius:8px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:12px;
+    line-height:1.15;
+
+    white-space:normal;
+    text-align:center;
+
 }
 
-.instruction-btn:hover{
-
-    background:#18ef00;
-}
+/* ==================================
+   WATCH
+================================== */
 
 .watch-btn{
 
-    background:#00a8ff;
-
     color:#fff;
+    font-weight:700;
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.25),
+        0 -1px 0 rgba(0,0,0,.25);
+
+    background:linear-gradient(
+        to bottom,
+        #47b7ff 0%,
+        #1da1f2 48%,
+        #0c86d9 100%
+    );
+
+    border:1px solid #0b6cb5;
+
 }
 
 .watch-btn:hover{
 
-    background:#0090dd;
+    background:linear-gradient(
+        to bottom,
+        #67c7ff 0%,
+        #2bb3ff 50%,
+        #1297ea 100%
+    );
+
+    border-color:#0d7fd1;
+
 }
+
 /*==============================
         MODAL
 ==============================*/
@@ -1170,18 +1327,6 @@ border-bottom: 1px solid #e7d8b4;
 
     cursor:move;
     user-select:none;
-
-}
-
-.watch-controls button{
-
-    width:34px;
-    height:34px;
-
-    border:none;
-    border-radius:6px;
-
-    cursor:pointer;
 
 }
 

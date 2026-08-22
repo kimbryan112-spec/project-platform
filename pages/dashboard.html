@@ -118,18 +118,19 @@
 
     <div class="month-buttons">
 
-        <button class="month-btn has-data" data-month="jan">Jan ✓</button>
-<button class="month-btn has-data" data-month="feb">Feb ✓</button>
-<button class="month-btn has-data" data-month="mar">Mar ✓</button>
-<button class="month-btn has-data" data-month="apr">Apr ✓</button>
-<button class="month-btn has-data" data-month="may">May ✓</button>
-<button class="month-btn has-data" data-month="jun">Jun ✓</button>
-<button class="month-btn has-data" data-month="jul">Jul ✓</button>
-<button class="month-btn has-data" data-month="aug">Aug ✓</button>
-<button class="month-btn" data-month="sep">Sep</button>
-<button class="month-btn" data-month="oct">Oct</button>
-<button class="month-btn" data-month="nov">Nov</button>
-<button class="month-btn" data-month="dec">Dec</button>
+        <button class="month-btn btn-3d has-data" data-month="jan">Jan ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="feb">Feb ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="mar">Mar ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="apr">Apr ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="may">May ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="jun">Jun ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="jul">Jul ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="aug">Aug ✓</button>
+
+        <button class="month-btn btn-3d" data-month="sep">Sep</button>
+        <button class="month-btn btn-3d" data-month="oct">Oct</button>
+        <button class="month-btn btn-3d" data-month="nov">Nov</button>
+        <button class="month-btn btn-3d" data-month="dec">Dec</button>
 
     </div>
 
@@ -166,798 +167,1114 @@
 
                 <tbody>
     <!-- ROW 1 -->
-    <tr data-row-id="1">
-        <td class="couple-cell">
+<tr data-row-id="1">
 
-    <div class="couple-name" contenteditable="true"></div>
+    <td class="couple-cell">
 
-    <div class="couple-actions">
+        <div class="couple-name" contenteditable="true"></div>
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <div class="couple-actions">
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+            <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-    </div>
-
-</td>
-        <td>
-            <select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>FOR REVIEW</option>
-    <option>YONG'S FEEDBACK</option>
-    <option>APPROVED PROJ</option>
-    <option>DELIVERED</option>
-</select>
-        </td>
-        <td>
-            <select class="type-select">
-                <option>BASIC HIGHLIGHTS</option>
-                <option>ROMANTIC CINEMATIC</option>
-                <option selected>UPBEAT CINEMATIC</option>
-                <option>SLOW CLASSICAL</option>
-                <option>NORMAL CLASSICAL</option>
-                <option>FAST CLASSICAL</option>
-                <option>NOT SET</option>
-            </select>
-        </td>
-        <td>
-    <div class="dashboard-raw-files-actions">
-        <input
-            type="url"
-            class="dashboard-raw-input"
-            placeholder="Link here"
-        >
-
-        <button
-            type="button"
-            class="dashboard-raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
-</td>
-        <td contenteditable="true"></td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-
-        <div class="dashboard-song-actions">
-
-    <select class="dashboard-song-status">
-        <option selected></option>
-        <option>APPROVED</option>
-        <option>REJECT</option>
-        <option>RESERVED</option>
-    </select>
-
-    <button
-        type="button"
-        class="comments-btn"
-        data-comment-id="row1-teaser">
-        💬 Comments
-    </button>
-
-</div>
-    </div>
-</td>
-
-<td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-
-        <div class="dashboard-song-actions">
-
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
-
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
+            <button class="watch-btn btn-3d">
+    ▶ Watch
 </button>
 
         </div>
-    </div>
-</td>
 
-<td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
+    </td>
 
-        <div class="dashboard-song-actions">
+    <td>
+        <select class="status-select">
+            <option selected>PLANNED</option>
+            <option>IN PROGRESS</option>
+            <option>FOR REVIEW</option>
+            <option>YONG'S FEEDBACK</option>
+            <option>APPROVED PROJ</option>
+            <option>DELIVERED</option>
+        </select>
+    </td>
 
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    <td>
+        <select class="type-select">
+            <option>BASIC HIGHLIGHTS</option>
+            <option>ROMANTIC CINEMATIC</option>
+            <option selected>UPBEAT CINEMATIC</option>
+            <option>SLOW CLASSICAL</option>
+            <option>NORMAL CLASSICAL</option>
+            <option>FAST CLASSICAL</option>
+            <option>NOT SET</option>
+        </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <td>
 
-        </div>
-    </div>
-</td>
+        <div class="raw-files-actions">
 
-<td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-
-        <div class="dashboard-song-actions">
-
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+            <input
+                class="raw-input"
+                type="url"
+                placeholder="Link here">
 
             <button
     type="button"
-    class="comments-btn">
-    💬 Comments
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value,'_blank')">
+    Check
 </button>
 
         </div>
-    </div>
-</td>
-    </tr>
+
+    </td>
+
+    <td contenteditable="true"></td>
+
+    <!-- TEASER -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row1-teaser">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+    <!-- 1ST SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row1-song1">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+    <!-- 2ND SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row1-song2">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+    <!-- 3RD SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row1-song3">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
 
     <!-- ROW 2 -->
-    <tr data-row-id="2">
-        <td class="couple-cell">
+<tr data-row-id="2">
 
-    <div class="couple-name" contenteditable="true"></div>
+    <td class="couple-cell">
 
-    <div class="couple-actions">
+        <div class="couple-name" contenteditable="true"></div>
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <div class="couple-actions">
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+            <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-    </div>
+            <button class="watch-btn btn-3d">
+    ▶ Watch
+</button>
 
-</td>
-        <td><select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>FOR REVIEW</option>
-    <option>YONG'S FEEDBACK</option>
-    <option>APPROVED PROJ</option>
-    <option>DELIVERED</option>
-</select></td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="dashboard-raw-files-actions">
-        <input
-            type="url"
-            class="dashboard-raw-input"
-            placeholder="Link here"
-        >
+        </div>
 
-        <button
-            type="button"
-            class="dashboard-raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
-</td>
-        <td contenteditable="true"></td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
+    </td>
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    <td>
+        <select class="status-select">
+            <option selected>PLANNED</option>
+            <option>IN PROGRESS</option>
+            <option>FOR REVIEW</option>
+            <option>YONG'S FEEDBACK</option>
+            <option>APPROVED PROJ</option>
+            <option>DELIVERED</option>
+        </select>
+    </td>
+
+    <td>
+        <select class="type-select">
+            <option>BASIC HIGHLIGHTS</option>
+            <option>ROMANTIC CINEMATIC</option>
+            <option selected>UPBEAT CINEMATIC</option>
+            <option>SLOW CLASSICAL</option>
+            <option>NORMAL CLASSICAL</option>
+            <option>FAST CLASSICAL</option>
+            <option>NOT SET</option>
+        </select>
+    </td>
+
+    <td>
+
+        <div class="raw-files-actions">
+
+            <input
+                class="raw-input"
+                type="url"
+                placeholder="Link here">
 
             <button
     type="button"
-    class="comments-btn">
-    💬 Comments
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value,'_blank')">
+    Check
 </button>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <td contenteditable="true"></td>
+
+    <!-- TEASER -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row2-teaser">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 1ST SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row2-song1">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 2ND SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row2-song2">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-    </tr>
+
+    </td>
+
+    <!-- 3RD SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row2-song3">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
 
     <!-- ROW 3 -->
-    <tr data-row-id="3">
-        <td class="couple-cell">
+<tr data-row-id="3">
 
-    <div class="couple-name" contenteditable="true"></div>
+    <td class="couple-cell">
 
-    <div class="couple-actions">
+        <div class="couple-name" contenteditable="true"></div>
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <div class="couple-actions">
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+            <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-    </div>
+            <button class="watch-btn btn-3d">
+    ▶ Watch
+</button>
+        </div>
 
-</td>
-        <td><select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>FOR REVIEW</option>
-    <option>YONG'S FEEDBACK</option>
-    <option>APPROVED PROJ</option>
-    <option>DELIVERED</option>
-</select></td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="dashboard-raw-files-actions">
-        <input
-            type="url"
-            class="dashboard-raw-input"
-            placeholder="Link here"
-        >
+    </td>
 
-        <button
-            type="button"
-            class="dashboard-raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
-</td>
-        <td contenteditable="true"></td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
+    <td>
+        <select class="status-select">
+            <option selected>PLANNED</option>
+            <option>IN PROGRESS</option>
+            <option>FOR REVIEW</option>
+            <option>YONG'S FEEDBACK</option>
+            <option>APPROVED PROJ</option>
+            <option>DELIVERED</option>
+        </select>
+    </td>
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    <td>
+        <select class="type-select">
+            <option>BASIC HIGHLIGHTS</option>
+            <option>ROMANTIC CINEMATIC</option>
+            <option selected>UPBEAT CINEMATIC</option>
+            <option>SLOW CLASSICAL</option>
+            <option>NORMAL CLASSICAL</option>
+            <option>FAST CLASSICAL</option>
+            <option>NOT SET</option>
+        </select>
+    </td>
+
+    <td>
+
+        <div class="raw-files-actions">
+
+            <input
+                class="raw-input"
+                type="url"
+                placeholder="Link here">
 
             <button
     type="button"
-    class="comments-btn">
-    💬 Comments
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value,'_blank')">
+    Check
 </button>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <td contenteditable="true"></td>
+
+    <!-- TEASER -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row3-teaser">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 1ST SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row3-song1">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 2ND SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row3-song2">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-    </tr>
+
+    </td>
+
+    <!-- 3RD SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row3-song3">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
 
     <!-- ROW 4 -->
-    <tr data-row-id="4">
-        <td class="couple-cell">
+<tr data-row-id="4">
 
-    <div class="couple-name" contenteditable="true"></div>
+    <td class="couple-cell">
 
-    <div class="couple-actions">
+        <div class="couple-name" contenteditable="true"></div>
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <div class="couple-actions">
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+            <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
+            <button class="watch-btn btn-3d">
+    ▶ Watch
+</button>
 
-    </div>
+        </div>
 
-</td>
-        <td><select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>FOR REVIEW</option>
-    <option>YONG'S FEEDBACK</option>
-    <option>APPROVED PROJ</option>
-    <option>DELIVERED</option>
-</select></td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="dashboard-raw-files-actions">
-        <input
-            type="url"
-            class="dashboard-raw-input"
-            placeholder="Link here"
-        >
+    </td>
 
-        <button
-            type="button"
-            class="dashboard-raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
-</td>
-        <td contenteditable="true"></td>
-       <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
+    <td>
+        <select class="status-select">
+            <option selected>PLANNED</option>
+            <option>IN PROGRESS</option>
+            <option>FOR REVIEW</option>
+            <option>YONG'S FEEDBACK</option>
+            <option>APPROVED PROJ</option>
+            <option>DELIVERED</option>
+        </select>
+    </td>
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    <td>
+        <select class="type-select">
+            <option>BASIC HIGHLIGHTS</option>
+            <option>ROMANTIC CINEMATIC</option>
+            <option selected>UPBEAT CINEMATIC</option>
+            <option>SLOW CLASSICAL</option>
+            <option>NORMAL CLASSICAL</option>
+            <option>FAST CLASSICAL</option>
+            <option>NOT SET</option>
+        </select>
+    </td>
+
+    <td>
+
+        <div class="raw-files-actions">
+
+            <input
+                class="raw-input"
+                type="url"
+                placeholder="Link here">
 
             <button
     type="button"
-    class="comments-btn">
-    💬 Comments
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value,'_blank')">
+    Check
 </button>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <td contenteditable="true"></td>
+
+    <!-- TEASER -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row4-teaser">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 1ST SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row4-song1">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 2ND SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row4-song2">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-    </tr>
+
+    </td>
+
+    <!-- 3RD SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row4-song3">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
 
     <!-- ROW 5 -->
-    <tr data-row-id="5">
-        <td class="couple-cell">
+<tr data-row-id="5">
 
-    <div class="couple-name" contenteditable="true"></div>
+    <td class="couple-cell">
 
-    <div class="couple-actions">
+        <div class="couple-name" contenteditable="true"></div>
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <div class="couple-actions">
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
-
-    </div>
-
-</td>
-        <td><select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>FOR REVIEW</option>
-    <option>YONG'S FEEDBACK</option>
-    <option>APPROVED PROJ</option>
-    <option>DELIVERED</option>
-</select></td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="dashboard-raw-files-actions">
-        <input
-            type="url"
-            class="dashboard-raw-input"
-            placeholder="Link here"
-        >
-
-        <button
-            type="button"
-            class="dashboard-raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
-</td>
-        <td contenteditable="true"></td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
-
-           <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
+            <button class="instruction-btn btn-3d">
+    📝 Special Instructions
 </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+            <button class="watch-btn btn-3d">
+    ▶ Watch
+</button>
+
+        </div>
+
+    </td>
+
+    <td>
+        <select class="status-select">
+            <option selected>PLANNED</option>
+            <option>IN PROGRESS</option>
+            <option>FOR REVIEW</option>
+            <option>YONG'S FEEDBACK</option>
+            <option>APPROVED PROJ</option>
+            <option>DELIVERED</option>
+        </select>
+    </td>
+
+    <td>
+        <select class="type-select">
+            <option>BASIC HIGHLIGHTS</option>
+            <option>ROMANTIC CINEMATIC</option>
+            <option selected>UPBEAT CINEMATIC</option>
+            <option>SLOW CLASSICAL</option>
+            <option>NORMAL CLASSICAL</option>
+            <option>FAST CLASSICAL</option>
+            <option>NOT SET</option>
+        </select>
+    </td>
+
+    <td>
+
+        <div class="raw-files-actions">
+
+            <input
+                class="raw-input"
+                type="url"
+                placeholder="Link here">
 
             <button
     type="button"
-    class="comments-btn">
-    💬 Comments
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value,'_blank')">
+    Check
 </button>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <td contenteditable="true"></td>
+
+    <!-- TEASER -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row5-teaser">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 1ST SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row5-song1">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-    </tr>
+
+    </td>
+
+    <!-- 2ND SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row5-song2">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+    <!-- 3RD SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row5-song3">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
 
     <!-- ROW 6 -->
-    <tr data-row-id="6">
-        <td class="couple-cell">
+<tr data-row-id="6">
 
-    <div class="couple-name" contenteditable="true"></div>
+    <td class="couple-cell">
 
-    <div class="couple-actions">
+        <div class="couple-name" contenteditable="true"></div>
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <div class="couple-actions">
 
-        <button class="watch-btn">
-            ▶ Watch
-        </button>
+            <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-    </div>
+            <button class="watch-btn btn-3d">
+    ▶ Watch
+</button>
 
-</td>
-        <td><select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>FOR REVIEW</option>
-    <option>YONG'S FEEDBACK</option>
-    <option>APPROVED PROJ</option>
-    <option>DELIVERED</option>
-</select></td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="dashboard-raw-files-actions">
-        <input
-            type="url"
-            class="dashboard-raw-input"
-            placeholder="Link here"
-        >
+        </div>
 
-        <button
-            type="button"
-            class="dashboard-raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
-</td>
-        <td contenteditable="true"></td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
+    </td>
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    <td>
+        <select class="status-select">
+            <option selected>PLANNED</option>
+            <option>IN PROGRESS</option>
+            <option>FOR REVIEW</option>
+            <option>YONG'S FEEDBACK</option>
+            <option>APPROVED PROJ</option>
+            <option>DELIVERED</option>
+        </select>
+    </td>
+
+    <td>
+        <select class="type-select">
+            <option>BASIC HIGHLIGHTS</option>
+            <option>ROMANTIC CINEMATIC</option>
+            <option selected>UPBEAT CINEMATIC</option>
+            <option>SLOW CLASSICAL</option>
+            <option>NORMAL CLASSICAL</option>
+            <option>FAST CLASSICAL</option>
+            <option>NOT SET</option>
+        </select>
+    </td>
+
+    <td>
+
+        <div class="raw-files-actions">
+
+            <input
+                class="raw-input"
+                type="url"
+                placeholder="Link here">
 
             <button
     type="button"
-    class="comments-btn">
-    💬 Comments
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value,'_blank')">
+    Check
 </button>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <td contenteditable="true"></td>
+
+    <!-- TEASER -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row6-teaser">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 1ST SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row6-song1">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
 
-        <div class="dashboard-song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-            </select>
+    </td>
 
-            <button
-    type="button"
-    class="comments-btn">
-    💬 Comments
-</button>
+    <!-- 2ND SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row6-song2">
+                    💬 Comments
+                </button>
+
+            </div>
+
         </div>
-    </div>
-</td>
-    </tr>
+
+    </td>
+
+    <!-- 3RD SONG -->
+    <td class="song-cell">
+
+        <div class="song-card">
+
+            <input type="url" class="song-link">
+
+            <div class="dashboard-song-actions">
+
+                <select class="dashboard-song-status">
+                    <option selected></option>
+                    <option>APPROVED</option>
+                    <option>REJECT</option>
+                    <option>RESERVED</option>
+                </select>
+
+                <button
+                    type="button"
+                    class="secondary-btn comments-btn"
+                    data-comment-id="row6-song3">
+                    💬 Comments
+                </button>
+
+            </div>
+
+        </div>
+
+    </td>
+
+</tr>
 
 </tbody>
 
-            </table>
+</table>
 
-        </div>
+</div>
 
-    </main>
+</main>
 
 </div>
 

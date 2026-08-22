@@ -57,9 +57,9 @@
 
         </div>
 
-        <button id="logoutBtn" class="logout-btn">
-            🚪 Logout
-        </button>
+        <button id="logoutBtn" class="logout-btn btn-3d">
+    🚪 Logout
+</button>
 
     </div>
 
@@ -106,9 +106,9 @@
 
         <select id="yearSelect"></select>
 
-        <button class="next-year-btn">
-            + Next Year
-        </button>
+        <button class="next-year-btn btn-3d">
+    + Next Year
+</button>
 
         <div class="profile">
             KB
@@ -124,18 +124,19 @@
 
     <div class="month-buttons">
 
-        <button class="month-btn has-data" data-month="jan">Jan ✓</button>
-<button class="month-btn has-data" data-month="feb">Feb ✓</button>
-<button class="month-btn has-data" data-month="mar">Mar ✓</button>
-<button class="month-btn has-data" data-month="apr">Apr ✓</button>
-<button class="month-btn has-data" data-month="may">May ✓</button>
-<button class="month-btn has-data" data-month="jun">Jun ✓</button>
-<button class="month-btn has-data" data-month="jul">Jul ✓</button>
-<button class="month-btn has-data" data-month="aug">Aug ✓</button>
-<button class="month-btn" data-month="sep">Sep</button>
-<button class="month-btn" data-month="oct">Oct</button>
-<button class="month-btn" data-month="nov">Nov</button>
-<button class="month-btn" data-month="dec">Dec</button>
+        <button class="month-btn btn-3d has-data" data-month="jan">Jan ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="feb">Feb ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="mar">Mar ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="apr">Apr ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="may">May ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="jun">Jun ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="jul">Jul ✓</button>
+        <button class="month-btn btn-3d has-data" data-month="aug">Aug ✓</button>
+
+        <button class="month-btn btn-3d" data-month="sep">Sep</button>
+        <button class="month-btn btn-3d" data-month="oct">Oct</button>
+        <button class="month-btn btn-3d" data-month="nov">Nov</button>
+        <button class="month-btn btn-3d" data-month="dec">Dec</button>
 
     </div>
 
@@ -179,11 +180,11 @@
 
     <div class="couple-actions">
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-        <button class="watch-btn" data-watch-link="">
+        <button class="watch-btn btn-3d" data-watch-link="">
     ▶ Watch
 </button>
 
@@ -213,15 +214,20 @@
         </td>
         <td>
     <div class="raw-files-actions">
-        <input class="dashboard-raw-input" type="url" placeholder="Link here">
 
-        <button
-            type="button"
-            class="raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value, '_blank')">
-            Check
-        </button>
-    </div>
+    <input
+        class="raw-input"
+        type="url"
+        placeholder="Link here">
+
+    <button
+    type="button"
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value, '_blank')">
+    Check
+</button>
+
+</div>
 </td>
         <td contenteditable="true"></td>
         <td class="song-cell">
@@ -234,7 +240,9 @@
                         <option>REJECT</option>
                         <option>RESERVED</option>
                     </select>
-                    <button class="generate-btn">GENERATE</button>
+                    <button class="generate-btn btn-3d">
+    GENERATE
+</button>
                 </div>
             </div>
         </td>
@@ -248,7 +256,9 @@
                         <option>REJECT</option>
                         <option>RESERVED</option>
                     </select>
-                    <button class="generate-btn">GENERATE</button>
+                    <button class="generate-btn btn-3d">
+    GENERATE
+</button>
                 </div>
             </div>
         </td>
@@ -262,7 +272,9 @@
                         <option>REJECT</option>
                         <option>RESERVED</option>
                     </select>
-                    <button class="generate-btn">GENERATE</button>
+                    <button class="generate-btn btn-3d">
+    GENERATE
+</button>
                 </div>
             </div>
         </td>
@@ -276,7 +288,9 @@
                         <option>REJECT</option>
                         <option>RESERVED</option>
                     </select>
-                    <button class="generate-btn">GENERATE</button>
+                    <button class="generate-btn btn-3d">
+    GENERATE
+</button>
                 </div>
             </div>
         </td>
@@ -290,11 +304,11 @@
 
     <div class="couple-actions">
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-        <button class="watch-btn" data-watch-link="">
+        <button class="watch-btn btn-3d" data-watch-link="">
     ▶ Watch
 </button>
 
@@ -312,21 +326,34 @@
         <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
         <td>
     <div class="raw-files-actions">
-        <input class="dashboard-raw-input" type="url" placeholder="Link here">
 
-        <button
-            type="button"
-            class="raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
+    <input
+        class="raw-input"
+        type="url"
+        placeholder="Link here">
+
+    <button
+    type="button"
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value, '_blank')">
+    Check
+</button>
+
+</div>
 </td>
         <td contenteditable="true"></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
     </tr>
 
     <!-- ROW 3 -->
@@ -337,11 +364,11 @@
 
     <div class="couple-actions">
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-        <button class="watch-btn" data-watch-link="">
+        <button class="watch-btn btn-3d" data-watch-link="">
     ▶ Watch
 </button>
 
@@ -359,21 +386,34 @@
         <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
         <td>
     <div class="raw-files-actions">
-        <input class="dashboard-raw-input" type="url" placeholder="Link here">
-        
-        <button
-            type="button"
-            class="raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
+
+    <input
+        class="raw-input"
+        type="url"
+        placeholder="Link here">
+
+    <button
+    type="button"
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value, '_blank')">
+    Check
+</button>
+
+</div>
 </td>
         <td contenteditable="true"></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
     </tr>
 
     <!-- ROW 4 -->
@@ -384,11 +424,11 @@
 
     <div class="couple-actions">
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-        <button class="watch-btn" data-watch-link="">
+        <button class="watch-btn btn-3d" data-watch-link="">
     ▶ Watch
 </button>
 
@@ -406,21 +446,34 @@
         <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
         <td>
     <div class="raw-files-actions">
-        <input class="dashboard-raw-input" type="url" placeholder="Link here">
 
-        <button
-            type="button"
-            class="raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
+    <input
+        class="raw-input"
+        type="url"
+        placeholder="Link here">
+
+    <button
+    type="button"
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value, '_blank')">
+    Check
+</button>
+
+</div>
 </td>
         <td contenteditable="true"></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
     </tr>
 
     <!-- ROW 5 -->
@@ -431,11 +484,11 @@
 
     <div class="couple-actions">
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-        <button class="watch-btn" data-watch-link="">
+        <button class="watch-btn btn-3d" data-watch-link="">
     ▶ Watch
 </button>
 
@@ -453,21 +506,34 @@
         <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
         <td>
     <div class="raw-files-actions">
-        <input class="dashboard-raw-input" type="url" placeholder="Link here">
-        
-        <button
-            type="button"
-            class="raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
+
+    <input
+        class="raw-input"
+        type="url"
+        placeholder="Link here">
+
+    <button
+    type="button"
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value, '_blank')">
+    Check
+</button>
+
+</div>
 </td>
         <td contenteditable="true"></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
     </tr>
 
     <!-- ROW 6 -->
@@ -478,11 +544,11 @@
 
     <div class="couple-actions">
 
-        <button class="instruction-btn">
-            📝 Special Instructions
-        </button>
+        <button class="instruction-btn btn-3d">
+    📝 Special Instructions
+</button>
 
-        <button class="watch-btn" data-watch-link="">
+        <button class="watch-btn btn-3d" data-watch-link="">
     ▶ Watch
 </button>
 
@@ -500,21 +566,34 @@
         <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
         <td>
     <div class="raw-files-actions">
-        <input class="dashboard-raw-input" type="url" placeholder="Link here">
 
-        <button
-            type="button"
-            class="raw-check-btn"
-            onclick="window.open(this.previousElementSibling.value,'_blank')">
-            Check
-        </button>
-    </div>
+    <input
+        class="raw-input"
+        type="url"
+        placeholder="Link here">
+
+    <button
+    type="button"
+    class="raw-check-btn btn-3d"
+    onclick="window.open(this.previousElementSibling.value, '_blank')">
+    Check
+</button>
+
+</div>
 </td>
         <td contenteditable="true"></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
-        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn">GENERATE</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
+        <td class="song-cell"><div class="song-card"><input type="url" class="song-link"><div class="song-actions"><select class="dashboard-song-status"><option selected></option><option>APPROVED</option><option>REJECT</option><option>RESERVED</option></select><button class="generate-btn btn-3d">
+    GENERATE
+</button></div></div></td>
     </tr>
 
 </tbody>
