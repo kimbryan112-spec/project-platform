@@ -1641,3 +1641,74 @@ if (logoutBtn) {
     });
 
 }
+
+/* ==================================
+   BUTTON CLICK SOUND
+================================== */
+
+const clickSound = new Audio("../assets/sounds/click.mp3");
+clickSound.volume = 0.20;
+
+document.querySelectorAll(`
+    button,
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"]
+`).forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        clickSound.currentTime = 0;
+        clickSound.play().catch(() => {});
+
+    });
+
+});
+
+
+/* ==================================
+   TYPING SOUND
+================================== */
+
+const typingSound = new Audio("../assets/sounds/typing.mp3");
+typingSound.volume = 0.30;
+
+let lastTypingTime = 0;
+
+document.addEventListener("keydown", (e) => {
+
+    const target = e.target;
+
+    // Editable fields only
+    if (
+        !target.matches(`
+            input,
+            textarea,
+            [contenteditable="true"]
+        `)
+    ) return;
+
+    // Ignore modifier keys
+    if (
+        [
+            "Shift",
+            "Control",
+            "Alt",
+            "Meta",
+            "CapsLock",
+            "Tab",
+            "Escape"
+        ].includes(e.key)
+    ) return;
+
+    const now = Date.now();
+
+    if (now - lastTypingTime > 40) {
+
+        typingSound.currentTime = 0;
+        typingSound.play().catch(() => {});
+
+        lastTypingTime = now;
+    }
+
+});
