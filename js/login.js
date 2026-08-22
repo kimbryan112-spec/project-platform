@@ -8,16 +8,26 @@
 const users = [
 
     {
-        email: "adminyang@kbhfilms.com",
-        password: "Yangyang#12",
+        email: "admin@kbhfilms.com",
+        password: "admin123",
         role: "admin",
-        name: "Admin Yang"
+        displayRole: "Admin",
+        name: "Kim Bryan Hernandez"
+    },
+
+    {
+        email: "dashboard@kbhfilms.com",
+        password: "dashboard123",
+        role: "dashboard",
+        displayRole: "Manager",
+        name: "Dashboard User"
     },
 
     {
         email: "yongzhi@kbhfilms.com",
         password: "yong2023",
         role: "dashboard",
+        displayRole: "Manager",
         name: "Yong Zhi"
     }
 
