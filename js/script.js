@@ -1753,3 +1753,65 @@ document.addEventListener("keydown", (e) => {
     }
 
 });
+
+
+/* ==================================
+   BACKGROUND MUSIC
+================================== */
+
+const musicPlaylist = [];
+
+for (let i = 1; i <= 29; i++) {
+    musicPlaylist.push(`../assets/Music/${i}.mp3`);
+}
+
+const bgMusic = new Audio();
+bgMusic.volume = 0.15;
+
+let lastSongIndex = -1;
+
+function playRandomMusic() {
+
+    let randomIndex;
+
+    do {
+
+        randomIndex = Math.floor(
+            Math.random() * musicPlaylist.length
+        );
+
+    } while (
+        musicPlaylist.length > 1 &&
+        randomIndex === lastSongIndex
+    );
+
+    lastSongIndex = randomIndex;
+
+    bgMusic.src = musicPlaylist[randomIndex];
+
+    bgMusic.play().catch(() => {
+
+        // Browser autoplay fallback
+        document.addEventListener(
+            "click",
+            () => {
+
+                bgMusic.play();
+
+            },
+            { once: true }
+        );
+
+    });
+
+}
+
+// Play another random song when finished
+bgMusic.addEventListener("ended", () => {
+
+    playRandomMusic();
+
+});
+
+// Start playlist
+playRandomMusic();
