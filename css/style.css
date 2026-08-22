@@ -73,30 +73,104 @@ select{
 }
 
 .sidebar nav{
+
     display:flex;
     flex-direction:column;
+
     gap:12px;
+
     margin-top:30px;
+
 }
 
 .sidebar nav a{
+
     display:flex;
     align-items:center;
     gap:10px;
+
     padding:12px 16px;
-    border-radius:6px;
-    color:#fff;
+
+    border-radius:8px;
+
     font-size:16px;
-    font-weight:500;
-    transition:0.2s ease;
+    font-weight:600;
+
+    color:#fff;
+
+    text-decoration:none;
+
 }
 
-.sidebar nav a:hover{
-    background:#374151;
+/* ==================================
+   SIDEBAR + BTN-3D OVERRIDE
+================================== */
+
+.sidebar .btn-3d{
+
+    transform:none !important;
+
+    box-shadow:none !important;
+
+    text-shadow:none !important;
+
+    filter:none !important;
+
+    transition:background .2s ease !important;
+
 }
+
+.sidebar .btn-3d:hover{
+
+    transform:none !important;
+
+    box-shadow:none !important;
+
+    filter:none !important;
+
+}
+
+.sidebar .btn-3d:active{
+
+    transform:none !important;
+
+    box-shadow:none !important;
+
+}
+
+/* ==================================
+   ACTIVE PAGE
+================================== */
 
 .sidebar nav a.active{
-    background:#2563eb;
+
+    background:linear-gradient(
+        to bottom,
+        #60a5fa 0%,
+        #3b82f6 55%,
+        #2563eb 100%
+    );
+
+    border:1px solid #1d4ed8;
+
+}
+
+/* ==================================
+   INACTIVE PAGE
+================================== */
+
+.sidebar nav a:not(.active){
+
+    background:#374151;
+
+    border:1px solid #4b5563;
+
+}
+
+.sidebar nav a:not(.active):hover{
+
+    background:#4b5563;
+
 }
 
 /* ==================================
