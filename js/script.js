@@ -261,7 +261,7 @@ function collectRowData(row) {
     cells[0]?.querySelector(".couple-name")?.textContent.trim() || "",
 
     status:
-        cells[1]?.querySelector(".status-select")?.value || "",
+    cells[1]?.querySelector(".status-select")?.value || "PLANNED",
 
     type:
         cells[2]?.querySelector(".type-select")?.value || "",
@@ -317,10 +317,34 @@ function populateRow(row, data) {
 
     }
 
-    if (cells[1] && cells[1].querySelector('.status-select')) {
-        cells[1].querySelector('.status-select').value =
-            data.status || "IN PROGRESS";
+    if (cells[1]) {
+
+    const statusSelect = cells[1].querySelector(".status-select");
+
+    if (statusSelect) {
+
+        console.log("Row:", data.rowId);
+        console.log("Saved status:", `"${data.status}"`);
+
+        const savedStatus = (data.status || "").trim();
+
+console.log("Saved:", JSON.stringify(savedStatus));
+console.log(
+    "Available:",
+    [...statusSelect.options].map(o => JSON.stringify(o.value))
+);
+
+statusSelect.value = savedStatus;
+
+console.log("After:", JSON.stringify(statusSelect.value));
+
+        console.log("Select value after assign:", statusSelect.value);
+
+        updateStatusColor(statusSelect);
+
     }
+
+}
 
     if (cells[2] && cells[2].querySelector('.type-select')) {
         cells[2].querySelector('.type-select').value =
@@ -423,7 +447,7 @@ function clearProjectTable() {
         // Status
         const status = cells[1]?.querySelector(".status-select");
         if (status) {
-            status.value = "IN PROGRESS";
+            status.value = "PLANNED";
             updateStatusColor(status);
         }
 
@@ -507,11 +531,19 @@ rows.forEach((row) => {
 
     const rowId = parseInt(row.dataset.rowId);
 
-    const data = projectsData.find(item => item.rowId === rowId);
+    const data = projectsData.find(
+    item => Number(item.rowId) === Number(rowId)
+);
 
-    if (data) {
-        populateRow(row, data);
-    }
+console.log("==========");
+console.log("Current Row:", rowId);
+console.log("Matched Data:", data);
+
+if (data) {
+    populateRow(row, data);
+} else {
+    console.warn("No data found for row:", rowId);
+}
 
 });
 
@@ -1068,6 +1100,9 @@ button.addEventListener("contextmenu", (e) => {
 
 // Hide menu kapag nag-click sa labas
 document.addEventListener("click", (e) => {
+
+    // Kung wala ang context menu sa page, huwag mag-error
+    if (!watchContextMenu) return;
 
     if (!e.target.closest("#watchContextMenu")) {
         watchContextMenu.style.display = "none";
