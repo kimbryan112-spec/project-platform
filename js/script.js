@@ -1626,13 +1626,39 @@ if (playerState) {
 // LOGOUT
 // ===============================
 
-const logoutBtn = document.querySelector(".logout-btn");
+const logoutBtn = document.getElementById("logoutBtn");
+const logoutConfirm = document.getElementById("logoutConfirm");
+const confirmLogout = document.getElementById("confirmLogout");
+const cancelLogout = document.getElementById("cancelLogout");
 
 if (logoutBtn) {
 
-    logoutBtn.addEventListener("click", () => {
+    // Show / Hide popup
+    logoutBtn.addEventListener("click", (e) => {
 
-        if (!confirm("Logout?")) return;
+        e.stopPropagation();
+
+        logoutConfirm.classList.toggle("show");
+
+    });
+
+}
+
+if (cancelLogout) {
+
+    cancelLogout.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+        logoutConfirm.classList.remove("show");
+
+    });
+
+}
+
+if (confirmLogout) {
+
+    confirmLogout.addEventListener("click", () => {
 
         localStorage.removeItem("currentUser");
 
@@ -1641,6 +1667,21 @@ if (logoutBtn) {
     });
 
 }
+
+// Close popup when clicking outside
+document.addEventListener("click", (e) => {
+
+    if (
+        logoutConfirm &&
+        !logoutConfirm.contains(e.target) &&
+        !logoutBtn.contains(e.target)
+    ) {
+
+        logoutConfirm.classList.remove("show");
+
+    }
+
+});
 
 /* ==================================
    BUTTON CLICK SOUND

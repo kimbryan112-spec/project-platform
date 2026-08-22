@@ -597,15 +597,158 @@ select{
 }
 
 .logout-btn:hover{
+
     background:#620202;
-}.raw-files-actions{
+
+}
+
+/* ==================================
+   LOGOUT CONFIRM POPUP
+================================== */
+
+.logout-wrapper{
+
+    position:relative;
+
+    display:inline-block;
+
+    width:100%;
+
+}
+
+.logout-confirm{
+
+    position:absolute;
+
+    left:80%;
+    bottom:0;
+
+    width:190px;
+
+    padding:14px;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.20),
+        0 2px 8px rgba(0,0,0,.08);
+
+    opacity:0;
+    visibility:hidden;
+
+    transform:translateX(-12px) scale(.95);
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease,
+        visibility .25s;
+
+    z-index:9999;
+
+}
+
+.logout-confirm.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+    transform:translateX(0) scale(1);
+
+}
+
+.logout-confirm p{
+
+    margin:0 0 14px;
+
+    text-align:center;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#1f2937;
+
+    line-height:1.4;
+
+}
+
+.logout-actions{
+
     display:flex;
+
+    gap:8px;
+
+}
+
+.logout-actions button{
+
+    flex:1;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px 10px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s ease;
+
+}
+
+.yes-btn{
+
+    background:#dc2626;
+
+    color:#fff;
+
+}
+
+.yes-btn:hover{
+
+    background:#b91c1c;
+
+    transform:translateY(-1px);
+
+}
+
+.no-btn{
+
+    background:#e5e7eb;
+
+    color:#111827;
+
+}
+
+.no-btn:hover{
+
+    background:#d1d5db;
+
+    transform:translateY(-1px);
+
+}
+
+.raw-files-actions{
+
+    display:flex;
+
     align-items:center;
+
     gap:6px;
+
 }
 
 .raw-input{
+
     flex:1;
+
 }
 
 /* ==========================
