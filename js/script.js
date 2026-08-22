@@ -168,20 +168,24 @@ const tableBody = document.querySelector('.project-table tbody');
 
         tableBody.addEventListener('change', (e) => {
 
-            saveProjects();
+    saveProjects();
 
-            if (e.target.classList.contains('status-select')) {
-                updateStatusColor(e.target);
-            }
+    if (e.target.classList.contains('status-select')) {
+        updateStatusColor(e.target);
+    }
 
-            if (e.target.classList.contains('dashboard-song-status')) {
-                updateSongStatusColor(e.target);
-            }
+    if (e.target.classList.contains('type-select')) {
+        updateTypeColor(e.target);
+    }
 
-            document.querySelectorAll('.dashboard-song-status')
-                .forEach(updateSongStatusColor);
+    if (e.target.classList.contains('dashboard-song-status')) {
+        updateSongStatusColor(e.target);
+    }
 
-        });
+    document.querySelectorAll('.dashboard-song-status')
+        .forEach(updateSongStatusColor);
+
+});
 
     }
 
@@ -346,10 +350,16 @@ console.log("After:", JSON.stringify(statusSelect.value));
 
 }
 
-    if (cells[2] && cells[2].querySelector('.type-select')) {
-        cells[2].querySelector('.type-select').value =
-            data.type || "NOT SET";
+    if (cells[2]) {
+
+    const typeSelect = cells[2].querySelector(".type-select");
+
+    if (typeSelect) {
+        typeSelect.value = data.type || "NOT SET";
+        updateTypeColor(typeSelect);
     }
+
+}
 
     if (cells[3] && cells[3].querySelector('.dashboard-raw-input')) {
         cells[3].querySelector('.dashboard-raw-input').value =
@@ -453,9 +463,11 @@ function clearProjectTable() {
 
         // Type
         const type = cells[2]?.querySelector(".type-select");
-        if (type) {
-            type.value = "NOT SET";
-        }
+
+if (type) {
+    type.value = "NOT SET";
+    updateTypeColor(type);
+}
 
         // Raw Files
         const raw = cells[3]?.querySelector(".dashboard-raw-input");
@@ -568,6 +580,9 @@ document.querySelectorAll(".month-btn").forEach(btn => {
 document.querySelectorAll(".status-select")
     .forEach(updateStatusColor);
 
+document.querySelectorAll(".type-select")
+    .forEach(updateTypeColor);
+
 document.querySelectorAll(".dashboard-song-status")
     .forEach(updateSongStatusColor);
 
@@ -630,8 +645,14 @@ async function loadProjects() {
         console.error('[LOAD] Error loading projects from Cloudflare backend:', e);
     }
 
-    document.querySelectorAll('.status-select').forEach(updateStatusColor);
-    document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
+    document.querySelectorAll('.status-select')
+    .forEach(updateStatusColor);
+
+document.querySelectorAll('.type-select')
+    .forEach(updateTypeColor);
+
+document.querySelectorAll('.dashboard-song-status')
+    .forEach(updateSongStatusColor);
 }
 
 // ONLINE SAVE FUNCTION
@@ -819,42 +840,94 @@ function updateMonthLockUI() {
    UI HELPERS
 ================================== */
 
-function updateStatusColor(select) {
+function updateStatusColor(select){
 
-    if (!select) return;
+    if(!select) return;
 
-    const value = select.value;
+    // alisin muna lahat ng class
+    select.classList.remove(
+        "status-planned",
+        "status-progress",
+        "status-review",
+        "status-feedback",
+        "status-approved",
+        "status-delivered"
+    );
 
-    switch (value) {
+    switch(select.value){
 
-        case 'APPROVED PROJ':
-
-        case 'DELIVERED':
-
-            select.style.borderLeft = '5px solid #22c55e';
-
+        case "PLANNED":
+            select.classList.add("status-planned");
             break;
 
-        case 'FOR REVIEW':
+        case "IN PROGRESS":
+            select.classList.add("status-progress");
+            break;
+
+        case "FOR REVIEW":
+            select.classList.add("status-review");
+            break;
 
         case "YONG'S FEEDBACK":
-
-            select.style.borderLeft = '5px solid #f59e0b';
-
+            select.classList.add("status-feedback");
             break;
 
-        case 'IN PROGRESS':
+        case "APPROVED PROJ":
+            select.classList.add("status-approved");
+            break;
 
-            select.style.borderLeft = '5px solid #3b82f6';
+        case "DELIVERED":
+            select.classList.add("status-delivered");
+            break;
+    }
 
+}
+
+// ====================================
+// TYPE COLORS
+// ====================================
+
+function updateTypeColor(select){
+
+    select.classList.remove(
+        "type-basic",
+        "type-romantic",
+        "type-upbeat",
+        "type-slow",
+        "type-normal",
+        "type-fast",
+        "type-not-set"
+    );
+
+    switch(select.value){
+
+        case "BASIC HIGHLIGHTS":
+            select.classList.add("type-basic");
+            break;
+
+        case "ROMANTIC CINEMATIC":
+            select.classList.add("type-romantic");
+            break;
+
+        case "UPBEAT CINEMATIC":
+            select.classList.add("type-upbeat");
+            break;
+
+        case "SLOW CLASSICAL":
+            select.classList.add("type-slow");
+            break;
+
+        case "NORMAL CLASSICAL":
+            select.classList.add("type-normal");
+            break;
+
+        case "FAST CLASSICAL":
+            select.classList.add("type-fast");
             break;
 
         default:
-
-            select.style.borderLeft = '1px solid #cfcfcf';
-
+            select.classList.add("type-not-set");
     }
-
 }
 
 function updateSongStatusColor(select) {

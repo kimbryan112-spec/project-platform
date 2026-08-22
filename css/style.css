@@ -198,7 +198,7 @@ select{
 
 .project-table th:nth-child(4),
 .project-table td:nth-child(4){
-    width:190px;
+    width:130px;
 }
 
 .project-table th:nth-child(5),
@@ -1344,4 +1344,90 @@ border-bottom: 1px solid #e7d8b4;
 
     font-weight:600;
 
+}
+
+/* ==================================
+   PROJECT STATUS COLORS
+================================== */
+
+.status-planned{
+    background:#e5e7eb !important;
+    color:#374151 !important;
+    font-weight:1000;
+}
+
+.status-progress{
+    background:#dbeafe !important;
+    color:#1d4ed8 !important;
+    font-weight:1000;
+}
+
+.status-review{
+    background:#fef3c7 !important;
+    color:#92400e !important;
+    font-weight:1000;
+}
+
+.status-feedback{
+    background:#f3e8ff !important;
+    color:#7e22ce !important;
+    font-weight:1000;
+}
+
+.status-approved{
+    background:#dcfce7 !important;
+    color:#15803d !important;
+    font-weight:1000;
+}
+
+.status-delivered{
+    background:#eee797 !important;
+    color:#755e04 !important;
+    font-weight:1000;
+}
+
+/* ==================================
+   PROJECT TYPE COLORS
+================================== */
+
+.type-basic{
+    background:#dbeafe !important;
+    color:#1d4ed8 !important;
+    font-weight:700;
+}
+
+.type-romantic{
+    background:#ffe4e6 !important;
+    color:#be123c !important;
+    font-weight:700;
+}
+
+.type-upbeat{
+    background:#dcfce7 !important;
+    color:#15803d !important;
+    font-weight:700;
+}
+
+.type-slow{
+    background:#ede9fe !important;
+    color:#6d28d9 !important;
+    font-weight:700;
+}
+
+.type-normal{
+    background:#fef3c7 !important;
+    color:#92400e !important;
+    font-weight:700;
+}
+
+.type-fast{
+    background:#fee2e2 !important;
+    color:#b91c1c !important;
+    font-weight:700;
+}
+
+.type-not-set{
+    background:#f3f4f6 !important;
+    color:#374151 !important;
+    font-weight:700;
 }
