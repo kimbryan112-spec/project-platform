@@ -814,6 +814,11 @@ async function restoreDatabase() {
         const text = await file.text();
 
         const backupData = JSON.parse(text);
+        if (!Array.isArray(backupData.projects)) {
+
+    throw new Error("Invalid backup file.");
+
+}
 
         // ==================================
         // LOCAL STORAGE
@@ -821,16 +826,11 @@ async function restoreDatabase() {
 
         if (LOCAL_MODE) {
 
-            localStorage.clear();
+            alert(
+    "Restore from backup is only supported in Cloud Mode."
+);
 
-            for (const key in backupData) {
-
-                localStorage.setItem(
-                    key,
-                    backupData[key]
-                );
-
-            }
+return;
 
             alert("Database restored successfully.");
 
@@ -854,7 +854,7 @@ async function restoreDatabase() {
                 "Content-Type": "application/json"
             },
 
-            body: JSON.stringify(backupData)
+            body: JSON.stringify(backupData.projects)
 
         });
 

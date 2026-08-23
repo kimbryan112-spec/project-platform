@@ -1,49 +1,51 @@
 export async function onRequestGet(context) {
     try {
-        console.log('[API-GET] Fetching projects from D1 database...');
+
+        console.log("[API-GET] Fetching projects from D1 database...");
 
         const { results } = await context.env.DB.prepare(
             "SELECT * FROM projects ORDER BY row_index ASC"
         ).all();
 
-        console.log('[API-GET] Database results:', results);
-        console.log('[API-GET] Total records:', results.length);
+        console.log("[API-GET] Total records:", results.length);
 
         const formattedData = results.map(row => ({
+
             rowId: row.row_index,
             coupleName: row.couple_name || "",
             status: row.status || "IN PROGRESS",
             type: row.type || "UPBEAT CINEMATIC",
             rawFiles: row.raw_files || "",
             drone: row.drone || "",
-            instruction: row.instruction || "",
+
+            // Keep for frontend compatibility
+            instruction: "",
 
             song1: {
                 link: row.song1_link || "",
                 status: row.song1_status || "",
-                notes: row.song1_notes || ""
+                notes: ""
             },
 
             song2: {
                 link: row.song2_link || "",
                 status: row.song2_status || "",
-                notes: row.song2_notes || ""
+                notes: ""
             },
 
             song3: {
                 link: row.song3_link || "",
                 status: row.song3_status || "",
-                notes: row.song3_notes || ""
+                notes: ""
             },
 
             teaserSong: {
                 link: row.teaser_link || "",
                 status: row.teaser_status || "",
-                notes: row.teaser_notes || ""
+                notes: ""
             }
-        }));
 
-        console.log('[API-GET] Formatted response:', formattedData);
+        }));
 
         return new Response(
             JSON.stringify(formattedData),
@@ -55,13 +57,16 @@ export async function onRequestGet(context) {
             }
         );
 
-    } catch (err) {
-        console.error('[API-GET] Database error:', err);
+    }
+
+    catch (err) {
+
+        console.error("[API-GET] Database error:", err);
 
         return new Response(
             JSON.stringify({
-                error: err.message,
-                stack: err.stack
+                success: false,
+                message: err.message
             }),
             {
                 status: 500,
@@ -70,27 +75,51 @@ export async function onRequestGet(context) {
                 }
             }
         );
+
     }
+
 }
-        
 
 export async function onRequestPost(context) {
+
     try {
-        console.log('[API-POST] Receiving save request...');
+
+        console.log("[API-POST] Receiving save request...");
+
         const projects = await context.request.json();
-        console.log('[API-POST] Data to save:', projects);
+
+        console.log("[API-POST] Saving", projects.length, "projects");
 
         for (const row of projects) {
-            const rowId = row.rowId || (projects.indexOf(row) + 1);
-            console.log(`[API-POST] Saving row ${rowId}:`, row);
+
+            const rowId =
+                row.rowId || (projects.indexOf(row) + 1);
 
             await context.env.DB.prepare(`
                 INSERT INTO projects (
-                    row_index, couple_name, status, type, raw_files, drone,
-                    song1_link, song1_status, song2_link, song2_status,
-                    song3_link, song3_status, teaser_link, teaser_status, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                ON CONFLICT(row_index) DO UPDATE SET
+                    row_index,
+                    couple_name,
+                    status,
+                    type,
+                    raw_files,
+                    drone,
+                    song1_link,
+                    song1_status,
+                    song2_link,
+                    song2_status,
+                    song3_link,
+                    song3_status,
+                    teaser_link,
+                    teaser_status,
+                    updated_at
+                )
+                VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+                )
+
+                ON CONFLICT(row_index)
+                DO UPDATE SET
+
                     couple_name = excluded.couple_name,
                     status = excluded.status,
                     type = excluded.type,
@@ -105,44 +134,73 @@ export async function onRequestPost(context) {
                     teaser_link = excluded.teaser_link,
                     teaser_status = excluded.teaser_status,
                     updated_at = CURRENT_TIMESTAMP
-            `).bind(
-    rowId,
-    row.coupleName || "",
-    row.status || "IN PROGRESS",
-    row.type || "UPBEAT CINEMATIC",
-    row.rawFiles || "",
-    row.drone || "",
-    row.instruction || "",
+            `)
+            .bind(
 
-    row.song1?.link || "",
-    row.song1?.status || "",
-    row.song1?.notes || "",
+                rowId,
+                row.coupleName || "",
+                row.status || "IN PROGRESS",
+                row.type || "UPBEAT CINEMATIC",
+                row.rawFiles || "",
+                row.drone || "",
 
-    row.song2?.link || "",
-    row.song2?.status || "",
-    row.song2?.notes || "",
+                row.song1?.link || "",
+                row.song1?.status || "",
 
-    row.song3?.link || "",
-    row.song3?.status || "",
-    row.song3?.notes || "",
+                row.song2?.link || "",
+                row.song2?.status || "",
 
-    row.teaserSong?.link || "",
-    row.teaserSong?.status || "",
-    row.teaserSong?.notes || ""
-).run();
+                row.song3?.link || "",
+                row.song3?.status || "",
+
+                row.teaserSong?.link || "",
+                row.teaserSong?.status || ""
+
+            )
+            .run();
+
         }
 
-        console.log('[API-POST] Save successful');
-        return new Response(JSON.stringify({ success: true }), {
-            headers: { "Content-Type": "application/json" }
-        });
-    } catch (err) {
-        console.error('[API-POST] Database error:', err);
-        return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+        console.log("[API-POST] Save successful");
+
+        return new Response(
+            JSON.stringify({
+                success: true,
+                message: "Projects saved successfully."
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
     }
+
+    catch (err) {
+
+        console.error("[API-POST] Database error:", err);
+
+        return new Response(
+            JSON.stringify({
+                success: false,
+                message: err.message
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+    }
+
 }
 
 export default {
-  onRequestGet,
-  onRequestPost
+
+    onRequestGet,
+    onRequestPost
+
 };
