@@ -827,28 +827,35 @@ function setMonthEditable(editable) {
 function updateMonthLockUI() {
 
     console.log("===== updateMonthLockUI =====");
-    console.log("IS_ADMIN:", IS_ADMIN);
+
+    console.log(
+        "IS_ADMIN:",
+        typeof IS_ADMIN !== "undefined" ? IS_ADMIN : "(undefined)"
+    );
+
     console.log("Current Year:", currentYear);
     console.log("Current Month:", currentMonth);
     console.log("Current Key:", getMonthKey());
     console.log("All Locks:", getMonthLocks());
-    console.log("Locked:", isMonthLocked());
+
+    // Huwag gumamit ng isMonthLocked() hangga't hindi pa alam kung may IS_ADMIN
+    const locked = isMonthLocked();
+    console.log("Locked:", locked);
 
     // Safety check
     if (typeof IS_ADMIN === "undefined") {
+        console.warn("IS_ADMIN is not defined.");
         return;
     }
 
     if (IS_ADMIN) {
-
         // Admin = always editable
         setMonthEditable(true);
         return;
-
     }
 
-    // Dashboard
-    setMonthEditable(!isMonthLocked());
+    // Dashboard users
+    setMonthEditable(!locked);
 
 }
 
