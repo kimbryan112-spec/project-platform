@@ -3,7 +3,14 @@
 // true = localStorage
 // false = Cloudflare API
 // =========================
-const LOCAL_MODE = true;
+const LOCAL_MODE =
+    location.hostname === "127.0.0.1" ||
+    location.hostname === "localhost";
+
+console.log("================================");
+console.log("Host:", location.hostname);
+console.log("LOCAL_MODE:", LOCAL_MODE);
+console.log("================================");
 
 let currentYear = new Date().getFullYear().toString();
 
@@ -111,17 +118,17 @@ document.querySelector(`.month-btn[data-month="${currentMonth}"]`)
         // Kapag nagpalit ng year
         yearSelect.addEventListener("change", () => {
 
-            currentYear = yearSelect.value;
+    currentYear = yearSelect.value;
 
-            document.getElementById("currentYearTitle").textContent = currentYear;
+    document.getElementById("currentYearTitle").textContent = currentYear;
 
-            loadProjectsLocal();
+    loadProjects();
 
-        });
+});
 
     }
 
-    loadProjectsLocal();
+    loadProjects();
 
     const nextYearBtn = document.querySelector(".next-year-btn");
 
@@ -152,7 +159,7 @@ document.querySelector(`.month-btn[data-month="${currentMonth}"]`)
 
             document.getElementById("currentYearTitle").textContent = currentYear;
 
-            loadProjectsLocal();
+            loadProjects();
 
         });
 
@@ -597,8 +604,13 @@ console.log("[LOCAL LOAD] Loaded from localStorage.");
 async function loadProjects() {
 
     if (LOCAL_MODE) {
-        return loadProjectsLocal();
+
+        loadProjectsLocal();
+        return;
+
     }
+
+    clearProjectTable();
 
     updateMonthLockUI();
 
@@ -659,8 +671,12 @@ document.querySelectorAll('.dashboard-song-status')
 let saveTimeout;
 function saveProjects() {
 
+    // Laging mag-save sa localStorage
+    saveProjectsLocal();
+
+    // Kapag localhost, dito lang hanggang localStorage
     if (LOCAL_MODE) {
-        return saveProjectsLocal();
+        return;
     }
 
     updateMonthLockUI();
@@ -971,7 +987,7 @@ document.querySelectorAll(".month-btn").forEach(button => {
         console.log("Current Month:", currentMonth);
 
         // Load projects ng napiling month
-        loadProjectsLocal();
+        loadProjects();
 
     });
 
