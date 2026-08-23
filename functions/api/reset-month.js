@@ -4,31 +4,55 @@ export async function onRequestPost(context) {
 
         const { month, year } = await context.request.json();
 
-        await context.env.DB.prepare(`
+        console.log(
+            `[RESET MONTH] ${month}/${year}`
+        );
+
+        const result = await context.env.DB.prepare(`
             DELETE FROM projects
-            WHERE strftime('%Y', updated_at)=?
-            AND strftime('%m', updated_at)=?
+            WHERE project_year = ?
+              AND project_month = ?
         `)
         .bind(
-            String(year),
-            String(month).padStart(2, "0")
+            Number(year),
+            Number(month)
         )
         .run();
 
         return Response.json({
+
             success: true,
-            message: "Month reset completed successfully."
+
+            message: `Month ${month}/${year} reset successfully.`,
+
+            deleted: result.meta?.changes || 0
+
         });
 
-    } catch (err) {
+    }
+
+    catch (err) {
+
+        console.error("[RESET MONTH]", err);
 
         return Response.json({
+
             success: false,
+
             message: err.message
+
         }, {
+
             status: 500
+
         });
 
     }
 
 }
+
+export default {
+
+    onRequestPost
+
+};

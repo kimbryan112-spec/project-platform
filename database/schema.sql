@@ -26,7 +26,11 @@ CREATE TABLE IF NOT EXISTS projects (
 
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    row_index INTEGER NOT NULL UNIQUE,
+    year INTEGER NOT NULL,
+
+    month INTEGER NOT NULL,
+
+    row_index INTEGER NOT NULL,
 
     couple_name TEXT DEFAULT '',
 
@@ -38,23 +42,35 @@ CREATE TABLE IF NOT EXISTS projects (
 
     drone TEXT DEFAULT '',
 
+    instruction TEXT DEFAULT '',
+
     song1_link TEXT DEFAULT '',
 
     song1_status TEXT DEFAULT '',
+
+    song1_notes TEXT DEFAULT '',
 
     song2_link TEXT DEFAULT '',
 
     song2_status TEXT DEFAULT '',
 
+    song2_notes TEXT DEFAULT '',
+
     song3_link TEXT DEFAULT '',
 
     song3_status TEXT DEFAULT '',
+
+    song3_notes TEXT DEFAULT '',
 
     teaser_link TEXT DEFAULT '',
 
     teaser_status TEXT DEFAULT '',
 
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    teaser_notes TEXT DEFAULT '',
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(year, month, row_index)
 
 );
 
@@ -62,10 +78,24 @@ CREATE TABLE IF NOT EXISTS projects (
 -- DEFAULT ROWS
 -- =========================
 
-INSERT OR IGNORE INTO projects (row_index)
+INSERT OR IGNORE INTO projects (
+
+    year,
+
+    month,
+
+    row_index
+
+)
+
 VALUES
-(1),
-(2),
-(3),
-(4),
-(5);
+
+(2025, 1, 1),
+
+(2025, 1, 2),
+
+(2025, 1, 3),
+
+(2025, 1, 4),
+
+(2025, 1, 5);

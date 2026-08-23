@@ -4,27 +4,53 @@ export async function onRequestPost(context) {
 
         const { year } = await context.request.json();
 
-        await context.env.DB.prepare(`
+        console.log(
+            `[RESET YEAR] ${year}`
+        );
+
+        const result = await context.env.DB.prepare(`
             DELETE FROM projects
-            WHERE strftime('%Y', updated_at)=?
+            WHERE project_year = ?
         `)
-        .bind(String(year))
+        .bind(
+            Number(year)
+        )
         .run();
 
         return Response.json({
+
             success: true,
-            message: "Year reset completed successfully."
+
+            message: `Year ${year} reset successfully.`,
+
+            deleted: result.meta?.changes || 0
+
         });
 
-    } catch (err) {
+    }
+
+    catch (err) {
+
+        console.error("[RESET YEAR]", err);
 
         return Response.json({
+
             success: false,
+
             message: err.message
+
         }, {
+
             status: 500
+
         });
 
     }
 
 }
+
+export default {
+
+    onRequestPost
+
+};

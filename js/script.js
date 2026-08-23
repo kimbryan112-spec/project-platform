@@ -615,55 +615,143 @@ async function loadProjects() {
     updateMonthLockUI();
 
     try {
-        console.log('[LOAD] Fetching projects from /api/projects...');
-        const response = await fetch(`/api/projects?t=${Date.now()}`, {
-            cache: 'no-store',
-            headers: { 'Cache-Control': 'no-cache' }
-        });
-        
-        if (!response.ok) {
-            console.error('[LOAD] API returned error:', response.status);
-            return;
+
+    console.log(
+
+        `[LOAD] Fetching projects (${currentYear}-${currentMonth})...`
+
+    );
+
+    const response = await fetch(
+
+        `/api/projects?year=${encodeURIComponent(currentYear)}&month=${encodeURIComponent(currentMonth)}&t=${Date.now()}`,
+
+        {
+
+            cache: "no-store",
+
+            headers: {
+
+                "Cache-Control": "no-cache"
+
+            }
+
         }
 
-        const projectsData = await response.json();
-        console.log('[LOAD] API Response:', projectsData);
-        console.log('[LOAD] Total records from DB:', projectsData.length);
+    );
 
-        const rows = document.querySelectorAll('.project-table tbody tr');
-        console.log('[LOAD] Total rows in HTML:', rows.length);
-        
-        if (Array.isArray(projectsData) && projectsData.length > 0) {
-            let matchedCount = 0;
-            // Match data by rowId instead of index
-            rows.forEach((row) => {
-                const rowId = parseInt(row.getAttribute('data-row-id'), 10);
-                console.log(`[LOAD] Processing row with data-row-id: ${rowId}`);
-                
-                const data = projectsData.find(d => d.rowId === rowId);
-                if (data) {
-                    console.log(`[LOAD] Found matching data for rowId ${rowId}`);
-                    populateRow(row, data);
-                    matchedCount++;
-                } else {
-                    console.warn(`[LOAD] No matching data for rowId ${rowId}`);
-                }
-            });
-            console.log(`[LOAD] Successfully matched ${matchedCount} rows with database data`);
-        } else {
-            console.log('[LOAD] No data returned from API');
-        }
-    } catch (e) {
-        console.error('[LOAD] Error loading projects from Cloudflare backend:', e);
+    if (!response.ok) {
+
+        console.error(
+
+            "[LOAD] API returned error:",
+
+            response.status
+
+        );
+
+        return;
+
     }
 
-    document.querySelectorAll('.status-select')
+    const projectsData = await response.json();
+
+    console.log(
+
+        `[LOAD] Loaded ${projectsData.length} record(s) for ${currentYear}-${currentMonth}`
+
+    );
+
+    console.log(
+
+        "[LOAD] API Response:",
+
+        projectsData
+
+    );
+
+    console.log(
+        "[LOAD] Total records from DB:",
+        projectsData.length
+    );
+
+    const rows =
+        document.querySelectorAll(
+            ".project-table tbody tr"
+        );
+
+    console.log(
+        "[LOAD] Total rows in HTML:",
+        rows.length
+    );
+
+    if (
+        Array.isArray(projectsData) &&
+        projectsData.length > 0
+    ) {
+
+        let matchedCount = 0;
+
+        rows.forEach((row) => {
+
+            const rowId = parseInt(
+                row.getAttribute("data-row-id"),
+                10
+            );
+
+            console.log(
+                `[LOAD] Processing row ${rowId}`
+            );
+
+            const data =
+                projectsData.find(
+                    p => p.rowId === rowId
+                );
+
+            if (data) {
+
+                populateRow(row, data);
+
+                matchedCount++;
+
+            } else {
+
+                console.warn(
+                    `[LOAD] No matching data for row ${rowId}`
+                );
+
+            }
+
+        });
+
+        console.log(
+            `[LOAD] Successfully matched ${matchedCount} rows`
+        );
+
+    } else {
+
+        console.log(
+            "[LOAD] No data returned from API"
+        );
+
+    }
+
+} catch (e) {
+
+    console.error(
+        "[LOAD] Error loading projects:",
+        e
+    );
+
+}
+
+document.querySelectorAll(".status-select")
     .forEach(updateStatusColor);
 
-document.querySelectorAll('.type-select')
+document.querySelectorAll(".type-select")
     .forEach(updateTypeColor);
 
-document.querySelectorAll('.dashboard-song-status')
+document.querySelectorAll(".dashboard-song-status")
     .forEach(updateSongStatusColor);
 }
 
@@ -694,21 +782,63 @@ function saveProjects() {
         console.log('[SAVE] Saving to API:', projectsData);
 
         try {
-            const response = await fetch('/api/projects', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(projectsData)
-            });
 
-            if (response.ok) {
-                console.log("[SAVE] Successfully synced to Cloudflare backend!");
-            } else {
-                console.error('[SAVE] API error:', response.status);
-            }
-        } catch (e) {
-            console.error('[SAVE] Error saving projects to Cloudflare backend:', e);
-        }
-    }, 500);
+    const response = await fetch("/api/projects", {
+
+        method: "POST",
+
+        headers: {
+
+            "Content-Type": "application/json"
+
+        },
+
+        body: JSON.stringify({
+
+            year: Number(currentYear),
+
+            month: Number(currentMonth),
+
+            projects: projectsData
+
+        })
+
+    });
+
+    if (response.ok) {
+
+        console.log(
+
+            `[SAVE] Successfully synced (${currentYear}-${currentMonth}) to Cloudflare backend!`
+
+        );
+
+    } else {
+
+        console.error(
+
+            "[SAVE] API error:",
+
+            response.status
+
+        );
+
+    }
+
+} catch (e) {
+
+    console.error(
+
+        "[SAVE] Error saving projects to Cloudflare backend:",
+
+        e
+
+    );
+
+}
+
+}, 500);
+
 }
 
 function saveProjectsLocal() {
@@ -717,36 +847,66 @@ function saveProjectsLocal() {
 
     saveTimeout = setTimeout(() => {
 
-        const rows = document.querySelectorAll(".project-table tbody tr");
+        const rows =
+            document.querySelectorAll(
+                ".project-table tbody tr"
+            );
+
         const projectsData = [];
 
         rows.forEach(row => {
-            const rowData = collectRowData(row);
-            if (rowData) projectsData.push(rowData);
+
+            const rowData =
+                collectRowData(row);
+
+            if (rowData) {
+
+                projectsData.push(rowData);
+
+            }
+
         });
 
-        // Save to the selected month
-localStorage.setItem(
-    `projects_${currentYear}_${currentMonth}`,
-    JSON.stringify(projectsData)
-);
+        // Save to selected Year + Month
 
-// Backward compatibility
-if (currentYear === "2026" && currentMonth === "sep") {
+        localStorage.setItem(
 
-    localStorage.setItem(
-        "projects_sep",
-        JSON.stringify(projectsData)
-    );
+            `projects_${currentYear}_${currentMonth}`,
 
-    localStorage.setItem(
-        "projects",
-        JSON.stringify(projectsData)
-    );
+            JSON.stringify(projectsData)
 
-}
+        );
 
-console.log("[LOCAL SAVE] Saved to localStorage.");
+        // Backward compatibility
+
+        if (
+            currentYear === "2026" &&
+            currentMonth === "sep"
+        ) {
+
+            localStorage.setItem(
+
+                "projects_sep",
+
+                JSON.stringify(projectsData)
+
+            );
+
+            localStorage.setItem(
+
+                "projects",
+
+                JSON.stringify(projectsData)
+
+            );
+
+        }
+
+        console.log(
+
+            `[LOCAL SAVE] Saved ${projectsData.length} project(s) to ${currentYear}-${currentMonth}.`
+
+        );
 
     }, 500);
 
