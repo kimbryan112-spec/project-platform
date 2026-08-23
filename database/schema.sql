@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS projects (
 
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    year INTEGER NOT NULL,
+    project_year INTEGER NOT NULL,
 
-    month INTEGER NOT NULL,
+    project_month INTEGER NOT NULL,
 
     row_index INTEGER NOT NULL,
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS projects (
 
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
-    UNIQUE(year, month, row_index)
+    UNIQUE(project_year, project_month, row_index)
 
 );
 
@@ -80,9 +80,9 @@ CREATE TABLE IF NOT EXISTS projects (
 
 INSERT OR IGNORE INTO projects (
 
-    year,
+    project_year,
 
-    month,
+    project_month,
 
     row_index
 
