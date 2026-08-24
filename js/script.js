@@ -17,6 +17,38 @@ let currentYear = new Date().getFullYear().toString();
 let currentMonth =
     document.querySelector(".month-btn.active")?.dataset.month || "sep";
 
+// =========================
+// MONTH MAP
+// =========================
+const monthMap = {
+    jan: 1,
+    feb: 2,
+    mar: 3,
+    apr: 4,
+    may: 5,
+    jun: 6,
+    jul: 7,
+    aug: 8,
+    sep: 9,
+    oct: 10,
+    nov: 11,
+    dec: 12
+};
+
+const monthNames = [
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sep",
+    "oct",
+    "nov",
+    "dec"
+];
 // ===========================
 // LIVE CALENDAR
 // ===========================
@@ -56,22 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentYear = new Date().getFullYear().toString();
 
-    const monthMap = [
-    "jan",
-    "feb",
-    "mar",
-    "apr",
-    "may",
-    "jun",
-    "jul",
-    "aug",
-    "sep",
-    "oct",
-    "nov",
-    "dec"
-];
-
-currentMonth = monthMap[new Date().getMonth()];
+    currentMonth = monthNames[new Date().getMonth()];
 
 // Remove current active
 document.querySelectorAll(".month-btn").forEach(btn => {
