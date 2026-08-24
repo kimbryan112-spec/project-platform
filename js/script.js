@@ -624,21 +624,21 @@ async function loadProjects() {
 
     const response = await fetch(
 
-        `/api/projects?year=${encodeURIComponent(currentYear)}&month=${encodeURIComponent(currentMonth)}&t=${Date.now()}`,
+    `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
 
-        {
+    {
 
-            cache: "no-store",
+        cache: "no-store",
 
-            headers: {
+        headers: {
 
-                "Cache-Control": "no-cache"
-
-            }
+            "Cache-Control": "no-cache"
 
         }
 
-    );
+    }
+
+);
 
     if (!response.ok) {
 
@@ -783,7 +783,11 @@ function saveProjects() {
 
         try {
 
-    const response = await fetch("/api/projects", {
+    const response = await fetch(
+
+    `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}`,
+
+    {
 
         method: "POST",
 
@@ -793,17 +797,11 @@ function saveProjects() {
 
         },
 
-        body: JSON.stringify({
+        body: JSON.stringify(projectsData)
 
-            year: Number(currentYear),
+    }
 
-            month: Number(currentMonth),
-
-            projects: projectsData
-
-        })
-
-    });
+);
 
     if (response.ok) {
 
@@ -1846,7 +1844,7 @@ document.addEventListener("click", (e) => {
 ================================== */
 
 const clickSound = new Audio("../assets/sounds/click.mp3");
-clickSound.volume = 0.10;
+clickSound.volume = 0.2;
 
 document.querySelectorAll(`
     button,
