@@ -869,46 +869,21 @@ function saveProjectsLocal() {
 
         // Save to selected Year + Month
 
-        localStorage.setItem(
+localStorage.setItem(
 
-            `projects_${currentYear}_${currentMonth}`,
+    `projects_${currentYear}_${currentMonth}`,
 
-            JSON.stringify(projectsData)
+    JSON.stringify(projectsData)
 
-        );
+);
 
-        // Backward compatibility
+console.log(
 
-        if (
-            currentYear === "2026" &&
-            currentMonth === "sep"
-        ) {
+    `[LOCAL SAVE] Saved ${projectsData.length} project(s) to ${currentYear}-${currentMonth}.`
 
-            localStorage.setItem(
+);
 
-                "projects_sep",
-
-                JSON.stringify(projectsData)
-
-            );
-
-            localStorage.setItem(
-
-                "projects",
-
-                JSON.stringify(projectsData)
-
-            );
-
-        }
-
-        console.log(
-
-            `[LOCAL SAVE] Saved ${projectsData.length} project(s) to ${currentYear}-${currentMonth}.`
-
-        );
-
-    }, 500);
+}, 500);
 
 }
 

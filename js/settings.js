@@ -919,38 +919,40 @@ async function deleteEverything() {
     try {
 
         // ==================================
-        // LOCAL STORAGE
-        // ==================================
+// LOCAL STORAGE
+// ==================================
 
-        if (LOCAL_MODE) {
+if (LOCAL_MODE) {
 
-            for (let i = localStorage.length - 1; i >= 0; i--) {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
 
-                const key = localStorage.key(i);
+        const key = localStorage.key(i);
 
-                if (
-                    key &&
-                    (
-                        key.startsWith("projects_") ||
-                        key === "lastBackup"
-                    )
-                ) {
+        if (
+            key &&
+            (
+                key.startsWith("projects_") ||
+                key === "projects" ||
+                key === "kbhfilms_projects_data" ||
+                key === "lastBackup"
+            )
+        ) {
 
-                    localStorage.removeItem(key);
-
-                }
-
-            }
-
-            document.getElementById("confirmDelete").value = "";
-
-            alert("Database cleared successfully.");
-
-            loadDatabaseStatus();
-
-            return;
+            localStorage.removeItem(key);
 
         }
+
+    }
+
+    document.getElementById("confirmDelete").value = "";
+
+    alert("Database cleared successfully.");
+
+    loadDatabaseStatus();
+
+    return;
+
+}
 
         // ==================================
         // CLOUDFLARE API
