@@ -1846,7 +1846,7 @@ document.addEventListener("click", (e) => {
 ================================== */
 
 const clickSound = new Audio("../assets/sounds/click.mp3");
-clickSound.volume = 0.20;
+clickSound.volume = 0.10;
 
 document.querySelectorAll(`
     button,
