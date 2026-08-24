@@ -616,33 +616,42 @@ async function resetYear() {
     try {
 
         // ==================================
-        // LOCAL STORAGE
-        // ==================================
+// LOCAL STORAGE
+// ==================================
 
-        if (LOCAL_MODE) {
+if (LOCAL_MODE) {
 
-            for (let i = localStorage.length - 1; i >= 0; i--) {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
 
-                const key = localStorage.key(i);
+        const key = localStorage.key(i);
 
-                if (
-                    key &&
-                    key.startsWith(`projects_${year}_`)
-                ) {
-
-                    localStorage.removeItem(key);
-
-                }
-
-            }
-
-            alert("Year reset completed successfully.");
-
-            loadDatabaseStatus();
-
-            return;
-
+        if (
+            key &&
+            key.startsWith(`projects_${year}_`)
+        ) {
+            localStorage.removeItem(key);
         }
+
+    }
+
+    // Remove month locks for this year
+    const locks = JSON.parse(localStorage.getItem("monthLocks") || "{}");
+
+    Object.keys(locks).forEach(key => {
+        if (key.startsWith(`${year}_`)) {
+            delete locks[key];
+        }
+    });
+
+    localStorage.setItem("monthLocks", JSON.stringify(locks));
+
+    alert("Year reset completed successfully.");
+
+    loadDatabaseStatus();
+
+    return;
+
+}   
 
         // ==================================
         // CLOUDFLARE API
@@ -830,76 +839,94 @@ async function restoreDatabase() {
         const text = await file.text();
 
         const backupData = JSON.parse(text);
-        if (!Array.isArray(backupData.projects)) {
 
+// Accept both Local backup and Cloud backup formats
+const isLocalBackup =
+    backupData &&
+    typeof backupData === "object" &&
+    !Array.isArray(backupData);
+
+const isCloudBackup =
+    Array.isArray(backupData.projects);
+
+if (!isLocalBackup && !isCloudBackup) {
     throw new Error("Invalid backup file.");
+}
+
+        // ==================================
+// LOCAL STORAGE
+// ==================================
+
+if (LOCAL_MODE) {
+
+    // Burahin muna lahat ng existing localStorage
+    localStorage.clear();
+
+    // Ibalik lahat ng keys mula sa backup
+    Object.keys(backupData).forEach(key => {
+        localStorage.setItem(key, backupData[key]);
+    });
+
+    alert("Database restored successfully.");
+
+    fileInput.value = "";
+
+    loadDatabaseStatus();
+
+    return;
 
 }
 
         // ==================================
-        // LOCAL STORAGE
-        // ==================================
+// CLOUDFLARE API
+// ==================================
 
-        if (LOCAL_MODE) {
+if (!isCloudBackup) {
 
-            alert(
-    "Restore from backup is only supported in Cloud Mode."
-);
+    throw new Error(
+        "This backup file is for Local Storage only."
+    );
 
-return;
+}
 
-            alert("Database restored successfully.");
+const response = await fetch("/api/restore", {
 
-            fileInput.value = "";
+    method: "POST",
 
-            loadDatabaseStatus();
+    headers: {
+        "Content-Type": "application/json"
+    },
 
-            return;
+    body: JSON.stringify(backupData.projects)
 
-        }
+});
 
-        // ==================================
-        // CLOUDFLARE API
-        // ==================================
+const result = await response.json();
 
-        const response = await fetch("/api/restore", {
+if (!response.ok) {
 
-            method: "POST",
+    throw new Error(
+        result.message ||
+        "Unable to restore database."
+    );
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+}
 
-            body: JSON.stringify(backupData.projects)
+alert(result.message || "Database restored successfully.");
 
-        });
+fileInput.value = "";
 
-        const result = await response.json();
+loadDatabaseStatus();
 
-        if (!response.ok) {
+}
 
-            throw new Error(
-                result.message ||
-                "Unable to restore database."
-            );
+catch (error) {
 
-        }
+    console.error("Restore Error:", error);
 
-        alert(result.message || "Database restored successfully.");
+    alert(error.message || "Unable to restore database.");
 
-        fileInput.value = "";
-
-        loadDatabaseStatus();
-
-    }
-
-    catch (error) {
-
-        console.error("Restore Error:", error);
-
-        alert(error.message || "Unable to restore database.");
-
-    }
+}
 
 }
 
