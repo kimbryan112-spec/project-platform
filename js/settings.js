@@ -509,18 +509,34 @@ async function resetMonth() {
 
         if (LOCAL_MODE) {
 
-            const key =
-                `projects_${year}_${String(month).padStart(2, "0")}`;
+    const monthNamesShort = [
+        "jan", "feb", "mar", "apr", "may", "jun",
+        "jul", "aug", "sep", "oct", "nov", "dec"
+    ];
 
-            localStorage.removeItem(key);
+    const monthKey =
+        monthNamesShort[month - 1];
 
-            alert("Month reset completed.");
+    const key =
+        `projects_${year}_${monthKey}`;
 
-            loadDatabaseStatus();
+    localStorage.removeItem(key);
 
-            return;
+    // Remove old legacy key kung meron
+    if (year === 2026 && monthKey === "sep") {
 
-        }
+        localStorage.removeItem("projects_sep");
+        localStorage.removeItem("projects");
+
+    }
+
+    alert("Month reset completed.");
+
+    loadDatabaseStatus();
+
+    return;
+
+}
 
         // ==================================
         // CLOUDFLARE API
