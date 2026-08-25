@@ -64,6 +64,7 @@ const formattedData = results.map(row => ({
 
     rawFiles: row.raw_files || "",
 
+    drone: row.drone || "",
 
     instruction: row.instruction || "",
 
