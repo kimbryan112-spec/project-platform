@@ -16,6 +16,7 @@ let currentYear = new Date().getFullYear().toString();
 
 let currentMonth =
     document.querySelector(".month-btn.active")?.dataset.month || "sep";
+    let currentMonthLocked = false;
 
 // =========================
 // MONTH MAP
@@ -678,6 +679,10 @@ async function loadProjects() {
     }
 
     const projectsData = await response.json();
+    currentMonthLocked =
+    projectsData.length > 0
+        ? !!projectsData[0].monthLocked
+        : false;
 
     console.log(
 
@@ -738,19 +743,18 @@ async function loadProjects() {
         // ==========================
     // RESTORE MONTH LOCK BORDER
     // ==========================
-    if (data.monthLocked) {
+    const monthBtn = document.querySelector(
+    `.month-btn[data-month="${currentMonth}"]`
+);
 
-        document.querySelector(
-            `.month-btn[data-month="${currentMonth}"]`
-        )?.classList.add("locked");
+if (monthBtn) {
 
-    } else {
+    monthBtn.classList.toggle(
+        "locked",
+        !!projectsData[0]?.monthLocked
+    );
 
-        document.querySelector(
-            `.month-btn[data-month="${currentMonth}"]`
-        )?.classList.remove("locked");
-
-    }
+}
 
     console.log("================================");
     console.log("Current Row:", rowId);
@@ -974,9 +978,7 @@ function getMonthKey(year = currentYear, month = currentMonth) {
 }
 
 function isMonthLocked() {
-
-    return !!getMonthLocks()[getMonthKey()];
-
+    return currentMonthLocked;
 }
 
 function setMonthEditable(editable) {
@@ -1252,8 +1254,7 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
 
         // Save lock state
         const locks = getMonthLocks();
-        locks[getMonthKey(currentYear, month)] = true;
-        saveMonthLocks(locks);
+        currentMonthLocked = true;
 
         // UI
         button.classList.add("locked");
@@ -1279,8 +1280,7 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 
         // Remove lock state
         const locks = getMonthLocks();
-        delete locks[getMonthKey(currentYear, month)];
-        saveMonthLocks(locks);
+        currentMonthLocked = false;
 
         // UI
         button.classList.remove("locked");
