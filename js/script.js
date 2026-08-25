@@ -729,7 +729,7 @@ async function loadProjects() {
 
     populateRow(row, data);
 
-    // ==========================
+        // ==========================
     // RESTORE MONTH LOCK BORDER
     // ==========================
     if (data.monthLocked) {
@@ -745,6 +745,17 @@ async function loadProjects() {
         )?.classList.remove("locked");
 
     }
+
+    console.log("================================");
+    console.log("Current Row:", rowId);
+    console.log("API monthLocked:", data.monthLocked);
+    console.log(
+        "Button has locked class:",
+        document.querySelector(
+            `.month-btn[data-month="${currentMonth}"]`
+        )?.classList.contains("locked")
+    );
+    console.log("================================");
 
     matchedCount++;
 
@@ -792,6 +803,7 @@ document.querySelectorAll(".dashboard-song-status")
 // ONLINE SAVE FUNCTION
 let localSaveTimeout;
 let apiSaveTimeout;
+
 function saveProjects() {
 
     // Laging mag-save sa localStorage
@@ -806,25 +818,26 @@ function saveProjects() {
 
     clearTimeout(apiSaveTimeout);
 
-apiSaveTimeout = setTimeout(async () => {
-        const rows = document.querySelectorAll('.project-table tbody tr');
+    apiSaveTimeout = setTimeout(async () => {
+
+        const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
 
         const monthLocked = isMonthLocked();
 
-rows.forEach(row => {
+        rows.forEach(row => {
 
-    const rowData = collectRowData(row);
+            const rowData = collectRowData(row);
 
-    if (rowData) {
+            if (rowData) {
 
-        rowData.monthLocked = monthLocked;
+                rowData.monthLocked = monthLocked;
 
-        projectsData.push(rowData);
+                projectsData.push(rowData);
 
-    }
+            }
 
-});
+        });
 
         console.log("[API SAVE]");
 console.log('[SAVE] Saving to API:', projectsData);
