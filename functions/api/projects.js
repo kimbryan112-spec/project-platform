@@ -28,66 +28,73 @@ export async function onRequestGet(context) {
         .all();
 
         console.log(
-            `[API-GET] ${results.length} record(s) found.`
-        );
+    `[API-GET] ${results.length} record(s) found.`
+);
 
-        const formattedData = results.map(row => ({
+const monthLocked =
+    results.length > 0
+        ? Number(results[0].month_locked) === 1
+        : false;
 
-            rowId: row.row_index,
+const formattedData = results.map(row => ({
 
-            coupleName: row.couple_name || "",
+    rowId: row.row_index,
 
-            status: row.status || "IN PROGRESS",
+    coupleName: row.couple_name || "",
 
-            type: row.type || "UPBEAT CINEMATIC",
+    status: row.status || "IN PROGRESS",
 
-            rawFiles: row.raw_files || "",
+    type: row.type || "UPBEAT CINEMATIC",
 
-            drone: row.drone || "",
+    rawFiles: row.raw_files || "",
 
-            instruction: "",
+    drone: row.drone || "",
 
-            song1: {
+    instruction: "",
 
-                link: row.song1_link || "",
+    song1: {
 
-                status: row.song1_status || "",
+        link: row.song1_link || "",
 
-                notes: ""
+        status: row.song1_status || "",
 
-            },
+        notes: ""
 
-            song2: {
+    },
 
-                link: row.song2_link || "",
+    song2: {
 
-                status: row.song2_status || "",
+        link: row.song2_link || "",
 
-                notes: ""
+        status: row.song2_status || "",
 
-            },
+        notes: ""
 
-            song3: {
+    },
 
-                link: row.song3_link || "",
+    song3: {
 
-                status: row.song3_status || "",
+        link: row.song3_link || "",
 
-                notes: ""
+        status: row.song3_status || "",
 
-            },
+        notes: ""
 
-            teaserSong: {
+    },
 
-                link: row.teaser_link || "",
+    teaserSong: {
 
-                status: row.teaser_status || "",
+        link: row.teaser_link || "",
 
-                notes: ""
+        status: row.teaser_status || "",
 
-            }
+        notes: ""
 
-        }));
+    },
+
+    monthLocked: monthLocked
+
+}));
 
         return new Response(
 
@@ -171,119 +178,109 @@ export async function onRequestPost(context) {
 
             await context.env.DB.prepare(`
 
-                INSERT INTO projects (
+    INSERT INTO projects (
 
-                    project_year,
+        project_year,
+        project_month,
+        row_index,
 
-                    project_month,
+        couple_name,
+        status,
+        type,
 
-                    row_index,
+        raw_files,
+        drone,
 
-                    couple_name,
+        song1_link,
+        song1_status,
 
-                    status,
+        song2_link,
+        song2_status,
 
-                    type,
+        song3_link,
+        song3_status,
 
-                    raw_files,
+        teaser_link,
+        teaser_status,
 
-                    drone,
+        month_locked,
 
-                    song1_link,
+        updated_at
 
-                    song1_status,
+    )
 
-                    song2_link,
+    VALUES (
 
-                    song2_status,
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
 
-                    song3_link,
+    )
 
-                    song3_status,
+    ON CONFLICT(project_year, project_month, row_index)
 
-                    teaser_link,
+    DO UPDATE SET
 
-                    teaser_status,
+        couple_name = excluded.couple_name,
+        status = excluded.status,
+        type = excluded.type,
 
-                    updated_at
+        raw_files = excluded.raw_files,
+        drone = excluded.drone,
 
-                )
+        song1_link = excluded.song1_link,
+        song1_status = excluded.song1_status,
 
-                VALUES (
+        song2_link = excluded.song2_link,
+        song2_status = excluded.song2_status,
 
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+        song3_link = excluded.song3_link,
+        song3_status = excluded.song3_status,
 
-                )
+        teaser_link = excluded.teaser_link,
+        teaser_status = excluded.teaser_status,
 
-                ON CONFLICT(project_year, project_month, row_index)
+        month_locked = excluded.month_locked,
 
-                DO UPDATE SET
+        updated_at = CURRENT_TIMESTAMP
 
-                    couple_name = excluded.couple_name,
+`)
+.bind(
 
-                    status = excluded.status,
+    year,
 
-                    type = excluded.type,
+    month,
 
-                    raw_files = excluded.raw_files,
+    rowId,
 
-                    drone = excluded.drone,
+    row.coupleName || "",
 
-                    song1_link = excluded.song1_link,
+    row.status || "IN PROGRESS",
 
-                    song1_status = excluded.song1_status,
+    row.type || "UPBEAT CINEMATIC",
 
-                    song2_link = excluded.song2_link,
+    row.rawFiles || "",
 
-                    song2_status = excluded.song2_status,
+    row.drone || "",
 
-                    song3_link = excluded.song3_link,
+    row.song1?.link || "",
 
-                    song3_status = excluded.song3_status,
+    row.song1?.status || "",
 
-                    teaser_link = excluded.teaser_link,
+    row.song2?.link || "",
 
-                    teaser_status = excluded.teaser_status,
+    row.song2?.status || "",
 
-                    updated_at = CURRENT_TIMESTAMP
+    row.song3?.link || "",
 
-            `)
-            .bind(
+    row.song3?.status || "",
 
-                year,
+    row.teaserSong?.link || "",
 
-                month,
+    row.teaserSong?.status || "",
 
-                rowId,
+    row.monthLocked ? 1 : 0
 
-                row.coupleName || "",
-
-                row.status || "IN PROGRESS",
-
-                row.type || "UPBEAT CINEMATIC",
-
-                row.rawFiles || "",
-
-                row.drone || "",
-
-                row.song1?.link || "",
-
-                row.song1?.status || "",
-
-                row.song2?.link || "",
-
-                row.song2?.status || "",
-
-                row.song3?.link || "",
-
-                row.song3?.status || "",
-
-                row.teaserSong?.link || "",
-
-                row.teaserSong?.status || ""
-
-            )
-            .run();
+)
+.run();
 
         }
 

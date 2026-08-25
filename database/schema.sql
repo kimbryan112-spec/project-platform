@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS projects (
     teaser_status TEXT NOT NULL DEFAULT '',
     teaser_notes TEXT NOT NULL DEFAULT '',
 
+    month_locked INTEGER NOT NULL DEFAULT 0,
+
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE(project_year, project_month, row_index)
@@ -55,7 +57,11 @@ CREATE TABLE IF NOT EXISTS projects (
 -- DEFAULT ROWS
 -- =========================
 
-INSERT OR IGNORE INTO projects (project_year, project_month, row_index)
+INSERT OR IGNORE INTO projects (
+    project_year,
+    project_month,
+    row_index
+)
 VALUES
 (2025,1,1),
 (2025,1,2),

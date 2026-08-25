@@ -727,17 +727,34 @@ async function loadProjects() {
 
             if (data) {
 
-                populateRow(row, data);
+    populateRow(row, data);
 
-                matchedCount++;
+    // ==========================
+    // RESTORE MONTH LOCK BORDER
+    // ==========================
+    if (data.monthLocked) {
 
-            } else {
+        document.querySelector(
+            `.month-btn[data-month="${currentMonth}"]`
+        )?.classList.add("locked");
 
-                console.warn(
-                    `[LOAD] No matching data for row ${rowId}`
-                );
+    } else {
 
-            }
+        document.querySelector(
+            `.month-btn[data-month="${currentMonth}"]`
+        )?.classList.remove("locked");
+
+    }
+
+    matchedCount++;
+
+} else {
+
+    console.warn(
+        `[LOAD] No matching data for row ${rowId}`
+    );
+
+}
 
         });
 
