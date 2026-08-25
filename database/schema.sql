@@ -3,19 +3,12 @@
 -- =========================
 
 CREATE TABLE IF NOT EXISTS users (
-
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-
     full_name TEXT NOT NULL,
-
     email TEXT NOT NULL UNIQUE,
-
     password_hash TEXT NOT NULL,
-
     role TEXT NOT NULL DEFAULT 'dashboard',
-
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-
 );
 
 -- =========================
@@ -23,79 +16,49 @@ CREATE TABLE IF NOT EXISTS users (
 -- =========================
 
 CREATE TABLE IF NOT EXISTS projects (
-
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
     project_year INTEGER NOT NULL,
-
     project_month INTEGER NOT NULL,
-
     row_index INTEGER NOT NULL,
 
-    couple_name TEXT DEFAULT '',
+    couple_name TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'IN PROGRESS',
+    type TEXT NOT NULL DEFAULT 'UPBEAT CINEMATIC',
 
-    status TEXT DEFAULT 'IN PROGRESS',
+    raw_files TEXT NOT NULL DEFAULT '',
+    drone TEXT NOT NULL DEFAULT '',
+    instruction TEXT NOT NULL DEFAULT '',
 
-    type TEXT DEFAULT 'UPBEAT CINEMATIC',
+    song1_link TEXT NOT NULL DEFAULT '',
+    song1_status TEXT NOT NULL DEFAULT '',
+    song1_notes TEXT NOT NULL DEFAULT '',
 
-    raw_files TEXT DEFAULT '',
+    song2_link TEXT NOT NULL DEFAULT '',
+    song2_status TEXT NOT NULL DEFAULT '',
+    song2_notes TEXT NOT NULL DEFAULT '',
 
-    drone TEXT DEFAULT '',
+    song3_link TEXT NOT NULL DEFAULT '',
+    song3_status TEXT NOT NULL DEFAULT '',
+    song3_notes TEXT NOT NULL DEFAULT '',
 
-    instruction TEXT DEFAULT '',
+    teaser_link TEXT NOT NULL DEFAULT '',
+    teaser_status TEXT NOT NULL DEFAULT '',
+    teaser_notes TEXT NOT NULL DEFAULT '',
 
-    song1_link TEXT DEFAULT '',
-
-    song1_status TEXT DEFAULT '',
-
-    song1_notes TEXT DEFAULT '',
-
-    song2_link TEXT DEFAULT '',
-
-    song2_status TEXT DEFAULT '',
-
-    song2_notes TEXT DEFAULT '',
-
-    song3_link TEXT DEFAULT '',
-
-    song3_status TEXT DEFAULT '',
-
-    song3_notes TEXT DEFAULT '',
-
-    teaser_link TEXT DEFAULT '',
-
-    teaser_status TEXT DEFAULT '',
-
-    teaser_notes TEXT DEFAULT '',
-
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE(project_year, project_month, row_index)
-
 );
 
 -- =========================
 -- DEFAULT ROWS
 -- =========================
 
-INSERT OR IGNORE INTO projects (
-
-    project_year,
-
-    project_month,
-
-    row_index
-
-)
-
+INSERT OR IGNORE INTO projects (project_year, project_month, row_index)
 VALUES
-
-(2025, 1, 1),
-
-(2025, 1, 2),
-
-(2025, 1, 3),
-
-(2025, 1, 4),
-
-(2025, 1, 5);
+(2025,1,1),
+(2025,1,2),
+(2025,1,3),
+(2025,1,4),
+(2025,1,5);
