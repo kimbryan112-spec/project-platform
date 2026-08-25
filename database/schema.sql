@@ -46,8 +46,6 @@ CREATE TABLE IF NOT EXISTS projects (
     teaser_status TEXT NOT NULL DEFAULT '',
     teaser_notes TEXT NOT NULL DEFAULT '',
 
-    month_locked INTEGER NOT NULL DEFAULT 0,
-
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE(project_year, project_month, row_index)
@@ -68,3 +66,23 @@ VALUES
 (2025,1,3),
 (2025,1,4),
 (2025,1,5);
+
+-- =========================
+-- MONTH LOCKS TABLE
+-- =========================
+
+CREATE TABLE IF NOT EXISTS month_locks (
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    project_year INTEGER NOT NULL,
+
+    project_month INTEGER NOT NULL,
+
+    locked INTEGER NOT NULL DEFAULT 0,
+
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(project_year, project_month)
+
+);
