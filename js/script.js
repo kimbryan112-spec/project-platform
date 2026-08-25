@@ -737,31 +737,22 @@ async function loadProjects() {
     populateRow(row, data);
 
         // ==========================
-    // RESTORE MONTH LOCK BORDER
-    // ==========================
-    const monthBtn = document.querySelector(
-    `.month-btn[data-month="${currentMonth}"]`
-);
+// RESTORE MONTH LOCK BORDER
+// ==========================
+const locks = getMonthLocks();
+const isAdmin = typeof IS_ADMIN !== "undefined" && IS_ADMIN;
 
-if (monthBtn) {
+document.querySelectorAll(".month-btn").forEach(btn => {
 
-    monthBtn.classList.toggle(
-        "locked",
-        !!projectsData[0]?.monthLocked
-    );
+    const key = getMonthKey(currentYear, btn.dataset.month);
 
-}
+    if (isAdmin && locks[key]) {
+        btn.classList.add("locked");
+    } else {
+        btn.classList.remove("locked");
+    }
 
-    console.log("================================");
-    console.log("Current Row:", rowId);
-    console.log("API monthLocked:", data.monthLocked);
-    console.log(
-        "Button has locked class:",
-        document.querySelector(
-            `.month-btn[data-month="${currentMonth}"]`
-        )?.classList.contains("locked")
-    );
-    console.log("================================");
+});
 
     matchedCount++;
 
@@ -796,6 +787,8 @@ if (monthBtn) {
 
 }
 
+updateMonthLockUI();
+
 document.querySelectorAll(".status-select")
     .forEach(updateStatusColor);
 
@@ -804,6 +797,7 @@ document.querySelectorAll(".type-select")
 
 document.querySelectorAll(".dashboard-song-status")
     .forEach(updateSongStatusColor);
+
 }
 
 // ONLINE SAVE FUNCTION
