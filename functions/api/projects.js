@@ -103,29 +103,27 @@ export async function onRequestGet(context) {
 
     } catch (err) {
 
-    console.error("[API-POST ERROR]");
-    console.error(err);
-    console.error(err.stack);
+        console.error("[API-GET ERROR]");
+        console.error(err);
+        console.error(err.stack);
 
-    return new Response(
-        JSON.stringify({
-            success: false,
-            message: err.message,
-            stack: err.stack
-        }),
-        {
-            status: 500,
-            headers: {
-                "Content-Type": "application/json"
+        return new Response(
+            JSON.stringify({
+                success: false,
+                message: err.message,
+                stack: err.stack
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
             }
-        }
-    );
+        );
+
+    }
 
 }
-export default {
-    onRequestGet
-};
-
 export async function onRequestPost(context) {
 
     try {
@@ -223,39 +221,39 @@ DO UPDATE SET
     updated_at = CURRENT_TIMESTAMP
 
 `)
-.bind(
+            .bind(
 
-    year,
-    month,
-    row.rowId,
+                year,
+                month,
+                row.rowId,
 
-    row.coupleName || "",
-    row.status || "PLANNED",
-    row.type || "NOT SET",
+                row.coupleName || "",
+                row.status || "PLANNED",
+                row.type || "NOT SET",
 
-    row.rawFiles || "",
-    row.drone || "",
-    row.instruction || "",
-    row.watchLink || "",
+                row.rawFiles || "",
+                row.drone || "",
+                row.instruction || "",
+                row.watchLink || "",
 
-    row.song1?.link || "",
-    row.song1?.status || "",
-    row.song1?.notes || "",
+                row.song1?.link || "",
+                row.song1?.status || "",
+                row.song1?.notes || "",
 
-    row.song2?.link || "",
-    row.song2?.status || "",
-    row.song2?.notes || "",
+                row.song2?.link || "",
+                row.song2?.status || "",
+                row.song2?.notes || "",
 
-    row.song3?.link || "",
-    row.song3?.status || "",
-    row.song3?.notes || "",
+                row.song3?.link || "",
+                row.song3?.status || "",
+                row.song3?.notes || "",
 
-    row.teaserSong?.link || "",
-    row.teaserSong?.status || "",
-    row.teaserSong?.notes || ""
+                row.teaserSong?.link || "",
+                row.teaserSong?.status || "",
+                row.teaserSong?.notes || ""
 
-)
-.run();
+            )
+            .run();
 
         }
 
@@ -287,12 +285,12 @@ DO UPDATE SET
     updated_at = CURRENT_TIMESTAMP
 
 `)
-.bind(
-    year,
-    month,
-    monthLocked
-)
-.run();
+        .bind(
+            year,
+            month,
+            monthLocked
+        )
+        .run();
 
         return new Response(
             JSON.stringify({
@@ -307,12 +305,15 @@ DO UPDATE SET
 
     } catch (err) {
 
+        console.error("[API-POST ERROR]");
         console.error(err);
+        console.error(err.stack);
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message
+                message: err.message,
+                stack: err.stack
             }),
             {
                 status: 500,
@@ -325,3 +326,8 @@ DO UPDATE SET
     }
 
 }
+
+export default {
+    onRequestGet,
+    onRequestPost
+};
