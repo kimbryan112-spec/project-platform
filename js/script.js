@@ -84,6 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-check every minute
     setInterval(updateLiveCalendar, 60000);
 
+    const settingsBtn = document.getElementById("settingsMenu");
+
+    if (settingsBtn) {
+        settingsBtn.style.display = IS_ADMIN ? "" : "none";
+    }
+
     console.log('[INIT] Page loaded, starting data load...');
 
     currentYear = new Date().getFullYear().toString();

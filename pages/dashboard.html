@@ -41,9 +41,12 @@
                 📋 Dashboard
             </a>
 
-            <a href="settings.html" class="btn-3d">
-                ⚙ Settings
-                </a>
+            <a
+    id="settingsMenu"
+    href="settings.html"
+    class="btn-3d">
+    ⚙ Settings
+</a>
 
         </nav>
 
@@ -1397,6 +1400,13 @@ if (
 
 const IS_ADMIN = currentUser.role === "admin";
 
+// ======================
+// DEBUG
+// ======================
+console.log("Current User:", currentUser);
+console.log("Role:", currentUser.role);
+console.log("IS_ADMIN:", IS_ADMIN);
+
 // Hide Admin Dashboard menu for Manager
 if (!IS_ADMIN) {
     const adminMenu = document.getElementById("adminMenu");
@@ -1407,7 +1417,11 @@ if (!IS_ADMIN) {
 }
 
 // Show user info
-document.getElementById("userName").textContent = currentUser.name || currentUser.username || "";
+const userName = document.getElementById("userName");
+if (userName) {
+    userName.textContent =
+        currentUser.name || currentUser.username || "";
+}
 
 // Display Position
 const roleMap = {
@@ -1415,9 +1429,11 @@ const roleMap = {
     dashboard: "Manager"
 };
 
-document.getElementById("userRole").textContent =
-    roleMap[currentUser.role] || currentUser.role;
-
+const userRole = document.getElementById("userRole");
+if (userRole) {
+    userRole.textContent =
+        roleMap[currentUser.role] || currentUser.role;
+}
 </script>
 
 <script src="../js/script.js"></script>
