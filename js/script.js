@@ -679,10 +679,6 @@ async function loadProjects() {
     }
 
     const projectsData = await response.json();
-    currentMonthLocked =
-    projectsData.length > 0
-        ? !!projectsData[0].monthLocked
-        : false;
 
     console.log(
 
@@ -978,7 +974,9 @@ function getMonthKey(year = currentYear, month = currentMonth) {
 }
 
 function isMonthLocked() {
-    return currentMonthLocked;
+
+    return !!getMonthLocks()[getMonthKey()];
+
 }
 
 function setMonthEditable(editable) {
@@ -1254,7 +1252,8 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
 
         // Save lock state
         const locks = getMonthLocks();
-        currentMonthLocked = true;
+        locks[getMonthKey(currentYear, month)] = true;
+        saveMonthLocks(locks);
 
         // UI
         button.classList.add("locked");
@@ -1280,7 +1279,8 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 
         // Remove lock state
         const locks = getMonthLocks();
-        currentMonthLocked = false;
+        delete locks[getMonthKey(currentYear, month)];
+        saveMonthLocks(locks);
 
         // UI
         button.classList.remove("locked");
