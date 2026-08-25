@@ -2,8 +2,6 @@ export async function onRequestGet(context) {
 
     try {
 
-        console.log("[API-GET] Fetching projects...");
-
         const url = new URL(context.request.url);
 
         const year =
@@ -14,158 +12,119 @@ export async function onRequestGet(context) {
             Number(url.searchParams.get("month")) ||
             (new Date().getMonth() + 1);
 
-        console.log(`[API-GET] Year: ${year}`);
-        console.log(`[API-GET] Month: ${month}`);
+        console.log(`[GET] ${year}-${month}`);
 
-        const { results } = await context.env.DB.prepare(`
-            SELECT *
-            FROM projects
-            WHERE project_year = ?
-              AND project_month = ?
-            ORDER BY row_index ASC
-        `)
-        .bind(year, month)
-        .all();
+        const { results } =
+            await context.env.DB.prepare(`
 
-        console.log(
-    `[API-GET] ${results.length} record(s) found.`
-);
+                SELECT *
+                FROM projects
+                WHERE project_year = ?
+                  AND project_month = ?
+                ORDER BY row_index ASC
 
-// ==========================================
-// GET MONTH LOCK
-// ==========================================
+            `)
+            .bind(year, month)
+            .all();
 
-const { results: lockRows } =
-    await context.env.DB.prepare(`
+        const { results: lockRows } =
+            await context.env.DB.prepare(`
 
-        SELECT locked
-        FROM month_locks
-        WHERE project_year = ?
-          AND project_month = ?
-        LIMIT 1
+                SELECT locked
+                FROM month_locks
+                WHERE project_year = ?
+                  AND project_month = ?
+                LIMIT 1
 
-    `)
-    .bind(year, month)
-    .all();
+            `)
+            .bind(year, month)
+            .all();
 
-const monthLocked =
-    lockRows.length > 0
-        ? Number(lockRows[0].locked) === 1
-        : false;
-const formattedData = results.map(row => ({
+        const monthLocked =
+            lockRows.length > 0
+                ? Boolean(lockRows[0].locked)
+                : false;
 
-    rowId: row.row_index,
+        const data = results.map(row => ({
 
-    coupleName: row.couple_name || "",
+            rowId: row.row_index,
 
-    status: row.status || "IN PROGRESS",
+            coupleName: row.couple_name || "",
 
-    type: row.type || "UPBEAT CINEMATIC",
+            status: row.status || "PLANNED",
 
-    rawFiles: row.raw_files || "",
+            type: row.type || "NOT SET",
 
-    drone: row.drone || "",
+            rawFiles: row.raw_files || "",
 
-    instruction: row.instruction || "",
+            drone: row.drone || "",
 
-watchLink: row.watch_link || "",
+            instruction: row.instruction || "",
 
-song1: {
+            watchLink: row.watch_link || "",
 
-    link: row.song1_link || "",
+            song1: {
+                link: row.song1_link || "",
+                status: row.song1_status || "",
+                notes: row.song1_notes || ""
+            },
 
-    status: row.song1_status || "",
+            song2: {
+                link: row.song2_link || "",
+                status: row.song2_status || "",
+                notes: row.song2_notes || ""
+            },
 
-    notes: row.song1_notes || ""
+            song3: {
+                link: row.song3_link || "",
+                status: row.song3_status || "",
+                notes: row.song3_notes || ""
+            },
 
-},
+            teaserSong: {
+                link: row.teaser_link || "",
+                status: row.teaser_status || "",
+                notes: row.teaser_notes || ""
+            },
 
-    song2: {
+            monthLocked
 
-        link: row.song2_link || "",
-
-        status: row.song2_status || "",
-
-        notes: row.song2_notes || ""
-
-    },
-
-    song3: {
-
-        link: row.song3_link || "",
-
-        status: row.song3_status || "",
-
-        notes: row.song3_notes || ""
-
-    },
-
-    teaserSong: {
-
-        link: row.teaser_link || "",
-
-        status: row.teaser_status || "",
-
-        notes: row.teaser_notes || ""
-
-    },
-
-    monthLocked: monthLocked
-
-}));
+        }));
 
         return new Response(
-
-    JSON.stringify(formattedData),
-
-    {
-
-        headers: {
-
-            "Content-Type": "application/json",
-
-            "Cache-Control":
-                "no-cache, no-store, must-revalidate"
-
-        }
-
-    }
-
-);
-
-    }
-
-    catch (err) {
-
-        console.error("[API-GET]", err);
-
-        return new Response(
-
-            JSON.stringify({
-
-                success: false,
-
-                message: err.message
-
-            }),
-
+            JSON.stringify(data),
             {
-
-                status: 500,
-
                 headers: {
-
-                    "Content-Type": "application/json"
-
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store"
                 }
-
             }
-
         );
 
-    }
+    } catch (err) {
+
+    console.error("[API-POST ERROR]");
+    console.error(err);
+    console.error(err.stack);
+
+    return new Response(
+        JSON.stringify({
+            success: false,
+            message: err.message,
+            stack: err.stack
+        }),
+        {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
 
 }
+export default {
+    onRequestGet
+};
 
 export async function onRequestPost(context) {
 
@@ -181,22 +140,13 @@ export async function onRequestPost(context) {
             Number(url.searchParams.get("month")) ||
             (new Date().getMonth() + 1);
 
-        const projects =
-            await context.request.json();
+        const projects = await context.request.json();
 
         console.log(
-            `[API-POST] Saving ${projects.length} records (${month}/${year})`
+            `[POST] Saving ${projects.length} row(s) for ${year}-${month}`
         );
 
-        // ==========================================
-        // SAVE PROJECTS
-        // ==========================================
-
         for (const row of projects) {
-
-            const rowId =
-                row.rowId ||
-                (projects.indexOf(row) + 1);
 
             await context.env.DB.prepare(`
 
@@ -211,13 +161,13 @@ INSERT INTO projects (
     type,
 
     raw_files,
-drone,
-instruction,
-watch_link,
+    drone,
+    instruction,
+    watch_link,
 
-song1_link,
-song1_status,
-song1_notes,
+    song1_link,
+    song1_status,
+    song1_notes,
 
     song2_link,
     song2_status,
@@ -237,7 +187,7 @@ song1_notes,
 
 VALUES (
 
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
 
 )
 
@@ -250,73 +200,58 @@ DO UPDATE SET
     type = excluded.type,
 
     raw_files = excluded.raw_files,
-drone = excluded.drone,
-instruction = excluded.instruction,
-watch_link = excluded.watch_link,
+    drone = excluded.drone,
+    instruction = excluded.instruction,
+    watch_link = excluded.watch_link,
 
-song1_link = excluded.song1_link,
-song1_status = excluded.song1_status,
-song1_notes = excluded.song1_notes,
+    song1_link = excluded.song1_link,
+    song1_status = excluded.song1_status,
+    song1_notes = excluded.song1_notes,
 
-song2_link = excluded.song2_link,
-song2_status = excluded.song2_status,
-song2_notes = excluded.song2_notes,
+    song2_link = excluded.song2_link,
+    song2_status = excluded.song2_status,
+    song2_notes = excluded.song2_notes,
 
-song3_link = excluded.song3_link,
-song3_status = excluded.song3_status,
-song3_notes = excluded.song3_notes,
+    song3_link = excluded.song3_link,
+    song3_status = excluded.song3_status,
+    song3_notes = excluded.song3_notes,
 
-teaser_link = excluded.teaser_link,
-teaser_status = excluded.teaser_status,
-teaser_notes = excluded.teaser_notes,
+    teaser_link = excluded.teaser_link,
+    teaser_status = excluded.teaser_status,
+    teaser_notes = excluded.teaser_notes,
 
-updated_at = CURRENT_TIMESTAMP
+    updated_at = CURRENT_TIMESTAMP
 
 `)
 .bind(
 
     year,
-
     month,
-
-    rowId,
+    row.rowId,
 
     row.coupleName || "",
-
-    row.status || "IN PROGRESS",
-
-    row.type || "UPBEAT CINEMATIC",
+    row.status || "PLANNED",
+    row.type || "NOT SET",
 
     row.rawFiles || "",
-
     row.drone || "",
+    row.instruction || "",
+    row.watchLink || "",
 
-row.instruction || "",
-
-row.watchLink || "",
-
-row.song1?.link || "",
-
+    row.song1?.link || "",
     row.song1?.status || "",
-
     row.song1?.notes || "",
 
     row.song2?.link || "",
-
     row.song2?.status || "",
-
     row.song2?.notes || "",
 
     row.song3?.link || "",
-
     row.song3?.status || "",
-
     row.song3?.notes || "",
 
     row.teaserSong?.link || "",
-
     row.teaserSong?.status || "",
-
     row.teaserSong?.notes || ""
 
 )
@@ -324,14 +259,10 @@ row.song1?.link || "",
 
         }
 
-        // ==========================================
-// SAVE MONTH LOCK
-// ==========================================
+        const monthLocked =
+            projects.length > 0 && projects[0].monthLocked ? 1 : 0;
 
-const locked =
-    projects.length > 0 && projects[0].monthLocked ? 1 : 0;
-
-await context.env.DB.prepare(`
+        await context.env.DB.prepare(`
 
 INSERT INTO month_locks (
 
@@ -357,74 +288,40 @@ DO UPDATE SET
 
 `)
 .bind(
-
     year,
     month,
-    locked
-
+    monthLocked
 )
 .run();
 
-return new Response(
+        return new Response(
+            JSON.stringify({
+                success: true
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
 
-    JSON.stringify({
+    } catch (err) {
 
-        success: true,
+        console.error(err);
 
-        message: "Projects saved successfully."
-
-    }),
-
-    {
-
-        headers: {
-
-            "Content-Type": "application/json"
-
-        }
+        return new Response(
+            JSON.stringify({
+                success: false,
+                message: err.message
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
 
     }
 
-);
-
 }
-
-catch (err) {
-
-    console.error("[API-POST]", err);
-
-    return new Response(
-
-        JSON.stringify({
-
-            success: false,
-
-            message: err.message
-
-        }),
-
-        {
-
-            status: 500,
-
-            headers: {
-
-                "Content-Type": "application/json"
-
-            }
-
-        }
-
-    );
-
-}
-
-}
-
-export default {
-
-    onRequestGet,
-
-    onRequestPost
-
-};
