@@ -790,7 +790,8 @@ document.querySelectorAll(".dashboard-song-status")
 }
 
 // ONLINE SAVE FUNCTION
-let saveTimeout;
+let localSaveTimeout;
+let apiSaveTimeout;
 function saveProjects() {
 
     // Laging mag-save sa localStorage
@@ -803,8 +804,9 @@ function saveProjects() {
 
     updateMonthLockUI();
 
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(async () => {
+    clearTimeout(apiSaveTimeout);
+
+apiSaveTimeout = setTimeout(async () => {
         const rows = document.querySelectorAll('.project-table tbody tr');
         const projectsData = [];
 
@@ -824,9 +826,10 @@ rows.forEach(row => {
 
 });
 
-        console.log('[SAVE] Saving to API:', projectsData);
+        console.log("[API SAVE]");
+console.log('[SAVE] Saving to API:', projectsData);
 
-        try {
+try {
 
     const response = await fetch(
 
@@ -886,9 +889,9 @@ rows.forEach(row => {
 
 function saveProjectsLocal() {
 
-    clearTimeout(saveTimeout);
+    clearTimeout(localSaveTimeout);
 
-    saveTimeout = setTimeout(() => {
+localSaveTimeout = setTimeout(() => {
 
         const rows =
             document.querySelectorAll(
@@ -912,6 +915,8 @@ rows.forEach(row => {
     }
 
 });
+
+console.log("[LOCAL SAVE]");
 
         // Save to selected Year + Month
 
