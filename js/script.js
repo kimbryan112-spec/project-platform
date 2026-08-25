@@ -808,10 +808,21 @@ function saveProjects() {
         const rows = document.querySelectorAll('.project-table tbody tr');
         const projectsData = [];
 
-        rows.forEach(row => {
-            const rowData = collectRowData(row);
-            if (rowData) projectsData.push(rowData);
-        });
+        const monthLocked = isMonthLocked();
+
+rows.forEach(row => {
+
+    const rowData = collectRowData(row);
+
+    if (rowData) {
+
+        rowData.monthLocked = monthLocked;
+
+        projectsData.push(rowData);
+
+    }
+
+});
 
         console.log('[SAVE] Saving to API:', projectsData);
 
@@ -886,18 +897,21 @@ function saveProjectsLocal() {
 
         const projectsData = [];
 
-        rows.forEach(row => {
+        const monthLocked = isMonthLocked();
 
-            const rowData =
-                collectRowData(row);
+rows.forEach(row => {
 
-            if (rowData) {
+    const rowData = collectRowData(row);
 
-                projectsData.push(rowData);
+    if (rowData) {
 
-            }
+        rowData.monthLocked = monthLocked;
 
-        });
+        projectsData.push(rowData);
+
+    }
+
+});
 
         // Save to selected Year + Month
 

@@ -31,11 +31,27 @@ export async function onRequestGet(context) {
     `[API-GET] ${results.length} record(s) found.`
 );
 
-const monthLocked =
-    results.length > 0
-        ? Number(results[0].month_locked) === 1
-        : false;
+// ==========================================
+// GET MONTH LOCK
+// ==========================================
 
+const { results: lockRows } =
+    await context.env.DB.prepare(`
+
+        SELECT locked
+        FROM month_locks
+        WHERE project_year = ?
+          AND project_month = ?
+        LIMIT 1
+
+    `)
+    .bind(year, month)
+    .all();
+
+const monthLocked =
+    lockRows.length > 0
+        ? Number(lockRows[0].locked) === 1
+        : false;
 const formattedData = results.map(row => ({
 
     rowId: row.row_index,
@@ -50,17 +66,19 @@ const formattedData = results.map(row => ({
 
     drone: row.drone || "",
 
-    instruction: "",
+    instruction: row.instruction || "",
 
-    song1: {
+watchLink: row.watch_link || "",
 
-        link: row.song1_link || "",
+song1: {
 
-        status: row.song1_status || "",
+    link: row.song1_link || "",
 
-        notes: ""
+    status: row.song1_status || "",
 
-    },
+    notes: row.song1_notes || ""
+
+},
 
     song2: {
 
@@ -68,7 +86,7 @@ const formattedData = results.map(row => ({
 
         status: row.song2_status || "",
 
-        notes: ""
+        notes: row.song2_notes || ""
 
     },
 
@@ -78,7 +96,7 @@ const formattedData = results.map(row => ({
 
         status: row.song3_status || "",
 
-        notes: ""
+        notes: row.song3_notes || ""
 
     },
 
@@ -88,7 +106,7 @@ const formattedData = results.map(row => ({
 
         status: row.teaser_status || "",
 
-        notes: ""
+        notes: row.teaser_notes || ""
 
     },
 
@@ -170,6 +188,10 @@ export async function onRequestPost(context) {
             `[API-POST] Saving ${projects.length} records (${month}/${year})`
         );
 
+        // ==========================================
+        // SAVE PROJECTS
+        // ==========================================
+
         for (const row of projects) {
 
             const rowId =
@@ -178,69 +200,77 @@ export async function onRequestPost(context) {
 
             await context.env.DB.prepare(`
 
-    INSERT INTO projects (
+INSERT INTO projects (
 
-        project_year,
-        project_month,
-        row_index,
+    project_year,
+    project_month,
+    row_index,
 
-        couple_name,
-        status,
-        type,
+    couple_name,
+    status,
+    type,
 
-        raw_files,
-        drone,
+    raw_files,
+drone,
+instruction,
+watch_link,
 
-        song1_link,
-        song1_status,
+song1_link,
+song1_status,
+song1_notes,
 
-        song2_link,
-        song2_status,
+    song2_link,
+    song2_status,
+    song2_notes,
 
-        song3_link,
-        song3_status,
+    song3_link,
+    song3_status,
+    song3_notes,
 
-        teaser_link,
-        teaser_status,
+    teaser_link,
+    teaser_status,
+    teaser_notes,
 
-        month_locked,
+    updated_at
 
-        updated_at
+)
 
-    )
+VALUES (
 
-    VALUES (
+    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
 
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+)
 
-    )
+ON CONFLICT(project_year, project_month, row_index)
 
-    ON CONFLICT(project_year, project_month, row_index)
+DO UPDATE SET
 
-    DO UPDATE SET
+    couple_name = excluded.couple_name,
+    status = excluded.status,
+    type = excluded.type,
 
-        couple_name = excluded.couple_name,
-        status = excluded.status,
-        type = excluded.type,
+    raw_files = excluded.raw_files,
+drone = excluded.drone,
+instruction = excluded.instruction,
+watch_link = excluded.watch_link,
 
-        raw_files = excluded.raw_files,
-        drone = excluded.drone,
+song1_link = excluded.song1_link,
+song1_status = excluded.song1_status,
+song1_notes = excluded.song1_notes,
 
-        song1_link = excluded.song1_link,
-        song1_status = excluded.song1_status,
+song2_link = excluded.song2_link,
+song2_status = excluded.song2_status,
+song2_notes = excluded.song2_notes,
 
-        song2_link = excluded.song2_link,
-        song2_status = excluded.song2_status,
+song3_link = excluded.song3_link,
+song3_status = excluded.song3_status,
+song3_notes = excluded.song3_notes,
 
-        song3_link = excluded.song3_link,
-        song3_status = excluded.song3_status,
+teaser_link = excluded.teaser_link,
+teaser_status = excluded.teaser_status,
+teaser_notes = excluded.teaser_notes,
 
-        teaser_link = excluded.teaser_link,
-        teaser_status = excluded.teaser_status,
-
-        month_locked = excluded.month_locked,
-
-        updated_at = CURRENT_TIMESTAMP
+updated_at = CURRENT_TIMESTAMP
 
 `)
 .bind(
@@ -261,82 +291,133 @@ export async function onRequestPost(context) {
 
     row.drone || "",
 
-    row.song1?.link || "",
+row.instruction || "",
+
+row.watchLink || "",
+
+row.song1?.link || "",
 
     row.song1?.status || "",
+
+    row.song1?.notes || "",
 
     row.song2?.link || "",
 
     row.song2?.status || "",
 
+    row.song2?.notes || "",
+
     row.song3?.link || "",
 
     row.song3?.status || "",
+
+    row.song3?.notes || "",
 
     row.teaserSong?.link || "",
 
     row.teaserSong?.status || "",
 
-    row.monthLocked ? 1 : 0
+    row.teaserSong?.notes || ""
 
 )
 .run();
 
         }
 
-        return new Response(
+        // ==========================================
+// SAVE MONTH LOCK
+// ==========================================
 
-            JSON.stringify({
+const locked =
+    projects.length > 0 && projects[0].monthLocked ? 1 : 0;
 
-                success: true,
+await context.env.DB.prepare(`
 
-                message: "Projects saved successfully."
+INSERT INTO month_locks (
 
-            }),
+    project_year,
+    project_month,
+    locked,
+    updated_at
 
-            {
+)
 
-                headers: {
+VALUES (
 
-                    "Content-Type": "application/json"
+    ?, ?, ?, CURRENT_TIMESTAMP
 
-                }
+)
 
-            }
+ON CONFLICT(project_year, project_month)
 
-        );
+DO UPDATE SET
+
+    locked = excluded.locked,
+    updated_at = CURRENT_TIMESTAMP
+
+`)
+.bind(
+
+    year,
+    month,
+    locked
+
+)
+.run();
+
+return new Response(
+
+    JSON.stringify({
+
+        success: true,
+
+        message: "Projects saved successfully."
+
+    }),
+
+    {
+
+        headers: {
+
+            "Content-Type": "application/json"
+
+        }
 
     }
 
-        catch (err) {
+);
 
-        console.error("[API-POST]", err);
+}
 
-        return new Response(
+catch (err) {
 
-            JSON.stringify({
+    console.error("[API-POST]", err);
 
-                success: false,
+    return new Response(
 
-                message: err.message
+        JSON.stringify({
 
-            }),
+            success: false,
 
-            {
+            message: err.message
 
-                status: 500,
+        }),
 
-                headers: {
+        {
 
-                    "Content-Type": "application/json"
+            status: 500,
 
-                }
+            headers: {
+
+                "Content-Type": "application/json"
 
             }
 
-        );
+        }
 
-    }
+    );
+
+}
 
 }
 
