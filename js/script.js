@@ -739,14 +739,27 @@ async function loadProjects() {
         // ==========================
 // RESTORE MONTH LOCK BORDER
 // ==========================
-const locks = getMonthLocks();
+
 const isAdmin = typeof IS_ADMIN !== "undefined" && IS_ADMIN;
 
 document.querySelectorAll(".month-btn").forEach(btn => {
 
     const key = getMonthKey(currentYear, btn.dataset.month);
 
-    if (isAdmin && locks[key]) {
+    let locked = false;
+
+    if (LOCAL_MODE) {
+        // Local = localStorage
+        const locks = getMonthLocks();
+        locked = !!locks[key];
+    } else {
+        // Online = Cloudflare DB
+        locked =
+            btn.dataset.month === currentMonth &&
+            !!projectsData[0]?.monthLocked;
+    }
+
+    if (isAdmin && locked) {
         btn.classList.add("locked");
     } else {
         btn.classList.remove("locked");
