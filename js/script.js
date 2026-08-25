@@ -286,10 +286,10 @@ function collectRowData(row) {
     rowId: parseInt(rowId, 10),
 
     coupleName:
-    cells[0]?.querySelector(".couple-name")?.textContent.trim() || "",
+        cells[0]?.querySelector(".couple-name")?.textContent.trim() || "",
 
     status:
-    cells[1]?.querySelector(".status-select")?.value || "PLANNED",
+        cells[1]?.querySelector(".status-select")?.value || "PLANNED",
 
     type:
         cells[2]?.querySelector(".type-select")?.value || "",
@@ -298,24 +298,24 @@ function collectRowData(row) {
         cells[3]?.querySelector(".dashboard-raw-input")?.value || "",
 
     drone:
-    cells[4]?.innerText?.trim() || "",
+        cells[4]?.innerText?.trim() || "",
 
-instruction:
-    cells[0]?.querySelector(".instruction-btn")?.dataset.notes || "",
+    instruction:
+        cells[0]?.querySelector(".instruction-btn")?.dataset.notes || "",
 
     song1: getSongData(5),
-song2: getSongData(6),
-song3: getSongData(7),
-teaserSong: getSongData(8),
+    song2: getSongData(6),
+    song3: getSongData(7),
+    teaserSong: getSongData(8),
 
-watchLink:
-    cells[0]?.querySelector(".watch-btn")?.dataset.watchLink || ""
+    watchLink:
+        cells[0]?.querySelector(".watch-btn")?.dataset.watchLink || "",
+
+    monthLocked:
+        document
+            .querySelector(`.month-btn[data-month="${currentMonth}"]`)
+            ?.classList.contains("locked") || false
 };
-    } catch (err) {
-        console.error("Error collecting row data for row:", row, err);
-        return null;
-    }
-}
 
 function populateRow(row, data) {
 
