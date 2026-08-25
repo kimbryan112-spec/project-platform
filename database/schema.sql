@@ -27,10 +27,11 @@ CREATE TABLE IF NOT EXISTS projects (
     type TEXT NOT NULL DEFAULT 'UPBEAT CINEMATIC',
 
     raw_files TEXT NOT NULL DEFAULT '',
-    drone TEXT NOT NULL DEFAULT '',
-    instruction TEXT NOT NULL DEFAULT '',
+drone TEXT NOT NULL DEFAULT '',
+instruction TEXT NOT NULL DEFAULT '',
+watch_link TEXT NOT NULL DEFAULT '',
 
-    song1_link TEXT NOT NULL DEFAULT '',
+song1_link TEXT NOT NULL DEFAULT '',
     song1_status TEXT NOT NULL DEFAULT '',
     song1_notes TEXT NOT NULL DEFAULT '',
 
