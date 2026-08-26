@@ -64,28 +64,32 @@ export async function onRequestGet(context) {
             watchLink: row.watch_link || "",
 
             song1: {
-                link: row.song1_link || "",
-                status: row.song1_status || "",
-                notes: row.song1_notes || ""
-            },
+    title: row.song1_title || "",
+    link: row.song1_link || "",
+    status: row.song1_status || "",
+    notes: row.song1_notes || ""
+},
 
-            song2: {
-                link: row.song2_link || "",
-                status: row.song2_status || "",
-                notes: row.song2_notes || ""
-            },
+song2: {
+    title: row.song2_title || "",
+    link: row.song2_link || "",
+    status: row.song2_status || "",
+    notes: row.song2_notes || ""
+},
 
-            song3: {
-                link: row.song3_link || "",
-                status: row.song3_status || "",
-                notes: row.song3_notes || ""
-            },
+song3: {
+    title: row.song3_title || "",
+    link: row.song3_link || "",
+    status: row.song3_status || "",
+    notes: row.song3_notes || ""
+},
 
-            teaserSong: {
-                link: row.teaser_link || "",
-                status: row.teaser_status || "",
-                notes: row.teaser_notes || ""
-            },
+teaserSong: {
+    title: row.teaser_title || "",
+    link: row.teaser_link || "",
+    status: row.teaser_status || "",
+    notes: row.teaser_notes || ""
+},
 
             monthLocked
 
@@ -163,22 +167,25 @@ INSERT INTO projects (
     instruction,
     watch_link,
 
-    song1_title,
+song1_title,
 song1_link,
 song1_status,
 song1_notes,
 
-    song2_link,
-    song2_status,
-    song2_notes,
+song2_title,
+song2_link,
+song2_status,
+song2_notes,
 
-    song3_link,
-    song3_status,
-    song3_notes,
+song3_title,
+song3_link,
+song3_status,
+song3_notes,
 
-    teaser_link,
-    teaser_status,
-    teaser_notes,
+teaser_title,
+teaser_link,
+teaser_status,
+teaser_notes,
 
     updated_at
 
@@ -186,7 +193,10 @@ song1_notes,
 
 VALUES (
 
-    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+    ?, ?, ?, ?, ?,
+?, ?, ?, ?, ?,
+?, ?, ?, ?, ?,
+?, ?, ?, ?, ?, CURRENT_TIMESTAMP
 
 )
 
@@ -208,17 +218,20 @@ song1_link = excluded.song1_link,
 song1_status = excluded.song1_status,
 song1_notes = excluded.song1_notes,
 
-    song2_link = excluded.song2_link,
-    song2_status = excluded.song2_status,
-    song2_notes = excluded.song2_notes,
+song2_title = excluded.song2_title,
+song2_link = excluded.song2_link,
+song2_status = excluded.song2_status,
+song2_notes = excluded.song2_notes,
 
-    song3_link = excluded.song3_link,
-    song3_status = excluded.song3_status,
-    song3_notes = excluded.song3_notes,
+song3_title = excluded.song3_title,
+song3_link = excluded.song3_link,
+song3_status = excluded.song3_status,
+song3_notes = excluded.song3_notes,
 
-    teaser_link = excluded.teaser_link,
-    teaser_status = excluded.teaser_status,
-    teaser_notes = excluded.teaser_notes,
+teaser_title = excluded.teaser_title,
+teaser_link = excluded.teaser_link,
+teaser_status = excluded.teaser_status,
+teaser_notes = excluded.teaser_notes,
 
     updated_at = CURRENT_TIMESTAMP
 
@@ -239,21 +252,25 @@ song1_notes = excluded.song1_notes,
                 row.watchLink || "",
 
                 row.song1?.title || "",
+row.song1?.title || "",
 row.song1?.link || "",
 row.song1?.status || "",
 row.song1?.notes || "",
 
-                row.song2?.link || "",
-                row.song2?.status || "",
-                row.song2?.notes || "",
+row.song2?.title || "",
+row.song2?.link || "",
+row.song2?.status || "",
+row.song2?.notes || "",
 
-                row.song3?.link || "",
-                row.song3?.status || "",
-                row.song3?.notes || "",
+row.song3?.title || "",
+row.song3?.link || "",
+row.song3?.status || "",
+row.song3?.notes || "",
 
-                row.teaserSong?.link || "",
-                row.teaserSong?.status || "",
-                row.teaserSong?.notes || ""
+row.teaserSong?.title || "",
+row.teaserSong?.link || "",
+row.teaserSong?.status || "",
+row.teaserSong?.notes || ""
 
             )
             .run();
