@@ -44,18 +44,22 @@ CREATE TABLE IF NOT EXISTS projects (
 
     watch_link TEXT NOT NULL DEFAULT '',
 
+    song1_title TEXT NOT NULL DEFAULT '',
     song1_link TEXT NOT NULL DEFAULT '',
     song1_status TEXT NOT NULL DEFAULT '',
     song1_notes TEXT NOT NULL DEFAULT '',
 
+    song2_title TEXT NOT NULL DEFAULT '',
     song2_link TEXT NOT NULL DEFAULT '',
     song2_status TEXT NOT NULL DEFAULT '',
     song2_notes TEXT NOT NULL DEFAULT '',
 
+    song3_title TEXT NOT NULL DEFAULT '',
     song3_link TEXT NOT NULL DEFAULT '',
     song3_status TEXT NOT NULL DEFAULT '',
     song3_notes TEXT NOT NULL DEFAULT '',
 
+    teaser_title TEXT NOT NULL DEFAULT '',
     teaser_link TEXT NOT NULL DEFAULT '',
     teaser_status TEXT NOT NULL DEFAULT '',
     teaser_notes TEXT NOT NULL DEFAULT '',

@@ -192,10 +192,21 @@ teaser_notes,
 
 VALUES (
 
-    ?, ?, ?, ?, ?,
-?, ?, ?, ?, ?,
-?, ?, ?, ?, ?,
-?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+    ?, ?, ?,          -- project_year, project_month, row_index
+
+    ?, ?, ?,          -- couple_name, status, type
+
+    ?, ?, ?, ?,       -- raw_files, drone, instruction, watch_link
+
+    ?, ?, ?, ?,       -- song1_title, song1_link, song1_status, song1_notes
+
+    ?, ?, ?, ?,       -- song2_title, song2_link, song2_status, song2_notes
+
+    ?, ?, ?, ?,       -- song3_title, song3_link, song3_status, song3_notes
+
+    ?, ?, ?, ?,       -- teaser_title, teaser_link, teaser_status, teaser_notes
+
+    CURRENT_TIMESTAMP
 
 )
 
@@ -237,42 +248,41 @@ teaser_notes = excluded.teaser_notes,
 `)
             .bind(
 
-                year,
-                month,
-                row.rowId,
+    year,
+    month,
+    row.rowId,
 
-                row.coupleName || "",
-                row.status || "PLANNED",
-                row.type || "NOT SET",
+    row.coupleName || "",
+    row.status || "PLANNED",
+    row.type || "NOT SET",
 
-                row.rawFiles || "",
-                row.drone || "",
-                row.instruction || "",
-                row.watchLink || "",
+    row.rawFiles || "",
+    row.drone || "",
+    row.instruction || "",
+    row.watchLink || "",
 
-                row.song1?.title || "",
-row.song1?.title || "",
-row.song1?.link || "",
-row.song1?.status || "",
-row.song1?.notes || "",
+    row.song1?.title || "",
+    row.song1?.link || "",
+    row.song1?.status || "",
+    row.song1?.notes || "",
 
-row.song2?.title || "",
-row.song2?.link || "",
-row.song2?.status || "",
-row.song2?.notes || "",
+    row.song2?.title || "",
+    row.song2?.link || "",
+    row.song2?.status || "",
+    row.song2?.notes || "",
 
-row.song3?.title || "",
-row.song3?.link || "",
-row.song3?.status || "",
-row.song3?.notes || "",
+    row.song3?.title || "",
+    row.song3?.link || "",
+    row.song3?.status || "",
+    row.song3?.notes || "",
 
-row.teaserSong?.title || "",
-row.teaserSong?.link || "",
-row.teaserSong?.status || "",
-row.teaserSong?.notes || ""
+    row.teaserSong?.title || "",
+    row.teaserSong?.link || "",
+    row.teaserSong?.status || "",
+    row.teaserSong?.notes || ""
 
-            )
-            .run();
+)
+.run();
 
         }
 
