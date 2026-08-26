@@ -107,25 +107,21 @@ teaserSong: {
 
     } catch (err) {
 
-        console.error("[API-GET ERROR]");
-        console.error(err);
-        console.error(err.stack);
+    console.error(err);
 
-        return new Response(
-            JSON.stringify({
-                success: false,
-                message: err.message,
-                stack: err.stack
-            }),
-            {
-                status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+    return new Response(
+        JSON.stringify({
+            success: false,
+            message: err.message,
+            stack: err.stack
+        }),
+        {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
             }
-        );
-
-    }
+        }
+    );
 
 }
 export async function onRequestPost(context) {
