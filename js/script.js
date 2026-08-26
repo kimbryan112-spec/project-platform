@@ -210,8 +210,17 @@ const tableBody = document.querySelector('.project-table tbody');
     }
 
     if (e.target.classList.contains('dashboard-song-status')) {
-        updateSongStatusColor(e.target);
-    }
+    updateSongStatusColor(e.target);
+}
+
+if (e.target.classList.contains('drone-select')) {
+
+    e.target.classList.toggle(
+        "selected",
+        e.target.value !== "NO DRONE"
+    );
+
+}
 
     document.querySelectorAll('.dashboard-song-status')
         .forEach(updateSongStatusColor);
@@ -305,7 +314,7 @@ function collectRowData(row) {
         cells[3]?.querySelector(".dashboard-raw-input")?.value || "",
 
     drone:
-    cells[4]?.innerText?.trim() || "",
+    cells[4]?.querySelector(".drone-select")?.value || "NO DRONE",
 
 instruction:
     cells[0]?.querySelector(".instruction-btn")?.dataset.notes || "",
@@ -398,8 +407,21 @@ console.log("After:", JSON.stringify(statusSelect.value));
     }
 
     if (cells[4]) {
-        cells[4].innerText = data.drone || "";
+
+    const droneSelect = cells[4].querySelector(".drone-select");
+
+    if (droneSelect) {
+
+        droneSelect.value = data.drone || "NO DRONE";
+
+        droneSelect.classList.toggle(
+            "selected",
+            droneSelect.value !== "NO DRONE"
+        );
+
     }
+
+}
 
     const setSongData = (cellIndex, songData = {}) => {
 
@@ -506,8 +528,14 @@ if (type) {
 
         // Drone
         if (cells[4]) {
-            cells[4].innerText = "";
-        }
+
+    const droneSelect = cells[4].querySelector(".drone-select");
+
+    if (droneSelect) {
+        droneSelect.value = "NO DRONE";
+    }
+
+}
 
         // Songs
         [5, 6, 7, 8].forEach(index => {
@@ -2032,6 +2060,89 @@ function playRandomMusic() {
 bgMusic.addEventListener("ended", () => {
 
     playRandomMusic();
+
+});
+
+// Start playlist
+playRandomMusic();
+
+/* ==================================
+   DRONE AUTOCOMPLETE
+================================== */
+
+document.querySelectorAll(".drone-cell").forEach(cell => {
+
+    const search = cell.querySelector(".drone-search");
+    const select = cell.querySelector(".drone-select");
+    const suggestions = cell.querySelector(".drone-suggestions");
+
+    if (!search || !select || !suggestions) return;
+
+    search.addEventListener("input", () => {
+
+        const keyword = search.value.trim().toUpperCase();
+
+        suggestions.innerHTML = "";
+
+        if (!keyword) {
+            suggestions.classList.remove("show");
+            return;
+        }
+
+        [...select.options].forEach(option => {
+
+            if (
+                option.value === "NO DRONE" ||
+                !option.text.toUpperCase().includes(keyword)
+            ) return;
+
+            const item = document.createElement("div");
+
+            item.className = "drone-suggestion";
+
+            item.innerHTML = option.text.replace(
+                new RegExp(keyword, "ig"),
+                match => `<b>${match}</b>`
+            );
+
+            item.addEventListener("click", () => {
+
+                select.value = option.value;
+
+                select.classList.toggle(
+                    "selected",
+                    select.value !== "NO DRONE"
+                );
+
+                search.value = "";
+
+                suggestions.innerHTML = "";
+                suggestions.classList.remove("show");
+
+                saveProjects();
+
+            });
+
+            suggestions.appendChild(item);
+
+        });
+
+        suggestions.classList.toggle(
+            "show",
+            suggestions.children.length > 0
+        );
+
+    });
+
+    document.addEventListener("click", (e) => {
+
+        if (!cell.contains(e.target)) {
+
+            suggestions.classList.remove("show");
+
+        }
+
+    });
 
 });
 
