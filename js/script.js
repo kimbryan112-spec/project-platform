@@ -875,7 +875,14 @@ function saveProjects() {
         });
 
         console.log("[API SAVE]");
-console.log('[SAVE] Saving to API:', projectsData);
+console.log("[SAVE] API Payload");
+console.table(projectsData.map(r => ({
+    row: r.rowId,
+    song1: r.song1?.link,
+    song2: r.song2?.link,
+    song3: r.song3?.link,
+    teaser: r.teaserSong?.link
+})));
 
 try {
 
