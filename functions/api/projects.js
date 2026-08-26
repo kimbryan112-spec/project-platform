@@ -124,6 +124,9 @@ teaserSong: {
     );
 
 }
+
+} // <-- dapat meron nito
+
 export async function onRequestPost(context) {
 
     try {
