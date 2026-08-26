@@ -432,7 +432,10 @@ console.log("After:", JSON.stringify(statusSelect.value));
     const status = cell.querySelector(".dashboard-song-status");
     const commentsBtn = cell.querySelector(".comments-btn");
 
-    if (link) link.value = songData.link || "";
+    if (link) {
+    link.value = songData.link || "";
+    updateSongLinkStyle(link);
+}
 
     if (status) {
         status.value = songData.status || "";
@@ -2071,6 +2074,29 @@ bgMusic.addEventListener("ended", () => {
 playRandomMusic();
 
 /* ==================================
+   SONG LINK STYLE
+================================== */
+
+function updateSongLinkStyle(input){
+
+    if(!input) return;
+
+    input.classList.toggle(
+        "has-link",
+        /^https?:\/\/|^www\./i.test(input.value.trim())
+    );
+
+}
+
+document.addEventListener("input", (e) => {
+
+    if(!e.target.classList.contains("song-link")) return;
+
+    updateSongLinkStyle(e.target);
+
+});
+
+/* ==================================
    DRONE AUTOCOMPLETE
 ================================== */
 
@@ -2156,13 +2182,33 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
         updateDroneColor(select);
     });
 
-    document.addEventListener("click", (e) => {
+       document.addEventListener("click", (e) => {
 
         if (!cell.contains(e.target)) {
             suggestions.classList.remove("show");
         }
 
     });
+
+});
+
+/* ==================================
+   DOUBLE CLICK TO OPEN LINKS
+================================== */
+
+document.addEventListener("mousedown", (e) => {
+
+    if (e.detail !== 2) return;
+
+    const input = e.target.closest(".song-link");
+
+    if (!input) return;
+
+    const value = input.value.trim();
+
+    if (!/^https?:\/\//i.test(value)) return;
+
+    window.open(value, "_blank");
 
 });
 

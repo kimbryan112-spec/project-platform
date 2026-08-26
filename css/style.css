@@ -552,6 +552,12 @@ select{
     background:#fff;
 }
 
+.song-link.has-link{
+    text-decoration: underline;
+    color:#d100b8;
+    font-weight:700;
+}
+
 .generate-btn{
 
     width:48%;
@@ -2341,4 +2347,26 @@ RESPONSIVE
 
     }
 
+}
+
+/* ==================================
+   INPUT LINK STYLE
+================================== */
+
+input[type="text"],
+input[type="url"]{
+    color:#d100b8;           /* magenta */
+    font-weight:700;
+}
+
+input[type="text"]::placeholder,
+input[type="url"]::placeholder{
+    color:#9ca3af;
+    font-weight:500;
+}
+
+.input-link{
+    color:#d100b8 !important;
+    text-decoration:underline;
+    cursor:pointer;
 }
