@@ -644,6 +644,8 @@ document.querySelectorAll(".type-select")
 
 document.querySelectorAll(".dashboard-song-status")
     .forEach(updateSongStatusColor);
+    document.querySelectorAll(".drone-select")
+    .forEach(updateDroneColor);
 
 // Apply editable/read-only state
 updateMonthLockUI();
@@ -825,6 +827,8 @@ document.querySelectorAll(".type-select")
 
 document.querySelectorAll(".dashboard-song-status")
     .forEach(updateSongStatusColor);
+    document.querySelectorAll(".drone-select")
+    .forEach(updateDroneColor);
 
 }
 
@@ -2070,6 +2074,21 @@ playRandomMusic();
    DRONE AUTOCOMPLETE
 ================================== */
 
+function updateDroneColor(select){
+
+    if(!select) return;
+
+    select.classList.remove("selected","client-drone");
+
+    if(select.value === "CLIENT'S DRONE"){
+        select.classList.add("client-drone");
+    }
+    else if(select.value !== "NO DRONE"){
+        select.classList.add("selected");
+    }
+
+}
+
 document.querySelectorAll(".drone-cell").forEach(cell => {
 
     const search = cell.querySelector(".drone-search");
@@ -2077,6 +2096,8 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
     const suggestions = cell.querySelector(".drone-suggestions");
 
     if (!search || !select || !suggestions) return;
+
+    updateDroneColor(select);
 
     search.addEventListener("input", () => {
 
@@ -2109,10 +2130,7 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
 
                 select.value = option.value;
 
-                select.classList.toggle(
-                    "selected",
-                    select.value !== "NO DRONE"
-                );
+                updateDroneColor(select);
 
                 search.value = "";
 
@@ -2134,12 +2152,14 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
 
     });
 
+    select.addEventListener("change", () => {
+        updateDroneColor(select);
+    });
+
     document.addEventListener("click", (e) => {
 
         if (!cell.contains(e.target)) {
-
             suggestions.classList.remove("show");
-
         }
 
     });

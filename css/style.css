@@ -507,6 +507,14 @@ select{
     font-weight:700;
 }
 
+/* CLIENT'S DRONE */
+.drone-select.client-drone{
+    background:#dbeafe;      /* cerulean/light blue */
+    color:#1d4ed8;
+    border-color:#3b82f6;
+    font-weight:700;
+}
+
 /* ==================================
    SONG CARD
 ================================== */
