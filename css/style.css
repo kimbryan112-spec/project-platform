@@ -501,9 +501,9 @@ select{
 /* Selected drone */
 
 .drone-select.selected{
-    background:#dcfce7;
-    color:#166534;
-    border-color:#22c55e;
+    background:#e0f09e;
+    color:#495001;
+    border-color:#dfed9f;
     font-weight:700;
 }
 
