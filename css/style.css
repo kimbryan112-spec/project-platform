@@ -541,6 +541,12 @@ select{
     padding:0 2px;
     border:1px solid #d1d5db;
     border-radius:4px;
+    color:#f439bb !important;
+
+    text-decoration:underline;
+    text-decoration-color:#2563eb;
+    text-decoration-thickness:1.5px;
+    text-underline-offset:2px;
 }
 
 .song-status{
@@ -2369,4 +2375,114 @@ input[type="url"]::placeholder{
     color:#d100b8 !important;
     text-decoration:underline;
     cursor:pointer;
+}
+
+/* ==================================
+   SONG CONTEXT MENU
+================================== */
+
+#songContextMenu{
+
+    position:absolute;
+    display:none;
+
+    background:#ffffff;
+    border:1px solid #dfe3ea;
+    border-radius:12px;
+
+    min-width:210px;
+    padding:6px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.15),
+        0 2px 8px rgba(0,0,0,.08);
+
+    z-index:9999999;
+
+    /* TANGGALIN ITO */
+    /* transform:translateY(-100%); */
+
+    margin-top:-2px;
+}
+
+#songContextMenu button{
+
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    border:none;
+    background:transparent;
+
+    padding:10px 14px;
+
+    border-radius:8px;
+
+    font-size:14px;
+    font-weight:600;
+    color:#222;
+
+    cursor:pointer;
+    transition:.18s ease;
+}
+
+#songContextMenu button:hover{
+
+    background:#f4f7fb;
+
+}
+
+#songContextMenu button i{
+
+    width:18px;
+
+    display:inline-flex;
+    justify-content:center;
+    align-items:center;
+
+    background:transparent !important;
+    color:#666 !important;
+
+    border:none !important;
+    box-shadow:none !important;
+
+    padding:0 !important;
+    margin:0;
+
+    font-size:14px;
+
+}
+
+/* ==================================
+   SONG LINK MODAL
+================================== */
+
+#songLinkModal .modal-content{
+
+    width:560px;
+    max-width:90%;
+
+}
+
+#songLinkInput{
+
+    width:100%;
+    height:42px;
+
+    padding:0 12px;
+
+    border:1px solid #d1d5db;
+    border-radius:8px;
+
+    font-size:14px;
+
+    outline:none;
+
+}
+
+#songLinkInput:focus{
+
+    border-color:#2563eb;
+
 }

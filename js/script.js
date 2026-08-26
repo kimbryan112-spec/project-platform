@@ -282,20 +282,27 @@ function collectRowData(row) {
         }
 
         const getSongData = (cellIndex) => {
+
     const cell = cells[cellIndex];
+
     if (!cell) {
         return {
+            title: "",
             link: "",
             status: "",
             notes: ""
         };
     }
 
+    const titleInput = cell.querySelector(".song-link");
+    const attachBtn = cell.querySelector(".attach-song-btn");
+
     return {
-    link: cell.querySelector('.song-link')?.value || "",
-    status: cell.querySelector('.dashboard-song-status')?.value || "",
-    notes: cell.querySelector('.comments-btn')?.dataset.notes || ""
-};
+        title: titleInput?.value || "",
+        link: titleInput?.dataset.songLink || "",
+        status: cell.querySelector(".dashboard-song-status")?.value || "",
+        notes: cell.querySelector(".comments-btn")?.dataset.notes || ""
+    };
 };
 
         return {
@@ -423,44 +430,42 @@ console.log("After:", JSON.stringify(statusSelect.value));
 
 }
 
-    const setSongData = (cellIndex, songData = {}) => {
+const setSongData = (cellIndex, songData = {}) => {
 
     const cell = cells[cellIndex];
     if (!cell) return;
 
-    const link = cell.querySelector(".song-link");
+    const titleInput = cell.querySelector(".song-link");
     const status = cell.querySelector(".dashboard-song-status");
     const commentsBtn = cell.querySelector(".comments-btn");
 
-    if (link) {
-    link.value = songData.link || "";
-    updateSongLinkStyle(link);
-}
+    if (titleInput) {
+
+        titleInput.value = songData.title || "";
+        titleInput.dataset.songLink = songData.link || "";
+
+        updateSongLinkStyle(titleInput);
+
+    }
 
     if (status) {
+
         status.value = songData.status || "";
         updateSongStatusColor(status);
+
     }
 
     const commentText = songData.notes || "";
 
-if (commentsBtn) {
-
-    commentsBtn.dataset.notes = commentText;
-
-    commentsBtn.classList.toggle(
-        "has-comments",
-        commentText.trim() !== ""
-    );
-
-}
-
-    // Green kapag may comments
     if (commentsBtn) {
+
+        commentsBtn.dataset.notes = commentText;
+
         commentsBtn.classList.toggle(
             "has-comments",
-            !!songData.notes?.trim()
+            commentText.trim() !== ""
         );
+
     }
 
 };
@@ -546,8 +551,14 @@ if (type) {
             const cell = cells[index];
             if (!cell) return;
 
-            const link = cell.querySelector(".song-link");
-            if (link) link.value = "";
+            const attachBtn = cell.querySelector(".attach-song-btn");
+
+if (attachBtn) {
+
+    attachBtn.dataset.songLink = "";
+    attachBtn.classList.remove("has-link");
+
+}
 
             const songStatus = cell.querySelector(".dashboard-song-status");
             if (songStatus) {
@@ -1337,6 +1348,42 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 
 let activeWatchButton = null;
 
+const songContextMenu = document.getElementById("songContextMenu");
+
+// ===============================
+// SONG RIGHT CLICK
+// ===============================
+
+let activeSongInput = null;
+
+document.addEventListener("contextmenu", (e) => {
+
+    const input = e.target.closest(".song-link");
+
+    if (!input) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    activeSongInput = input;
+
+    const rect = input.getBoundingClientRect();
+
+songContextMenu.style.display = "block";
+
+songContextMenu.style.left =
+    `${window.scrollX + rect.left}px`;
+
+songContextMenu.style.top =
+    `${window.scrollY + rect.top - songContextMenu.offsetHeight - 8}px`;
+
+});
+
+const songLinkModal = document.getElementById("songLinkModal");
+const songLinkInput = document.getElementById("songLinkInput");
+const songTitleInput = document.getElementById("songTitleInput");
+const closeSongLinkModal = document.getElementById("closeSongLinkModal");
+
 const watchModal = document.getElementById("watchModal");
 const watchFrame = document.getElementById("watchFrame");
 
@@ -1530,6 +1577,68 @@ watchLinkModal?.addEventListener("click", (e) => {
     if (e.target === watchLinkModal) {
 
         watchLinkModal.classList.remove("show");
+
+    }
+
+});
+
+// ===============================
+// SONG LINK MODAL
+// ===============================
+
+document.getElementById("attachSongLinkBtn")?.addEventListener("click", () => {
+
+    if (!activeSongInput) return;
+
+    songContextMenu.style.display = "none";
+
+    songTitleInput.value =
+        activeSongInput.value || "";
+
+    songLinkInput.value =
+        activeSongInput.dataset.songLink || "";
+
+    songLinkModal.classList.add("show");
+
+    songTitleInput.focus();
+
+});
+
+songLinkInput?.addEventListener("input", () => {
+
+    if (!activeSongInput) return;
+
+    activeSongInput.dataset.songLink =
+        songLinkInput.value.trim();
+
+    updateSongLinkStyle(activeSongInput);
+
+    saveProjects();
+
+});
+
+songTitleInput?.addEventListener("input", () => {
+
+    if (!activeSongInput) return;
+
+    activeSongInput.value =
+        songTitleInput.value;
+
+    saveProjects();
+
+});
+
+closeSongLinkModal?.addEventListener("click", () => {
+
+    songLinkModal.classList.remove("show");
+
+});
+
+songLinkModal?.addEventListener("click", (e) => {
+
+    if (e.target === songLinkModal) {
+
+        songLinkModal.classList.remove("show");
 
     }
 
@@ -2090,14 +2199,14 @@ function updateSongLinkStyle(input){
 
     input.classList.toggle(
         "has-link",
-        /^https?:\/\/|^www\./i.test(input.value.trim())
+        !!input.dataset.songLink?.trim()
     );
 
 }
 
 document.addEventListener("input", (e) => {
 
-    if(!e.target.classList.contains("song-link")) return;
+    if(!e.target.classList.contains("song-title")) return;
 
     updateSongLinkStyle(e.target);
 
@@ -2203,19 +2312,17 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
    DOUBLE CLICK TO OPEN LINKS
 ================================== */
 
-document.addEventListener("mousedown", (e) => {
-
-    if (e.detail !== 2) return;
+document.addEventListener("dblclick", (e) => {
 
     const input = e.target.closest(".song-link");
 
     if (!input) return;
 
-    const value = input.value.trim();
+    const link = input.dataset.songLink?.trim();
 
-    if (!/^https?:\/\//i.test(value)) return;
+    if (!link) return;
 
-    window.open(value, "_blank");
+    window.open(link, "_blank");
 
 });
 

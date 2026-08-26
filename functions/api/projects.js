@@ -163,9 +163,10 @@ INSERT INTO projects (
     instruction,
     watch_link,
 
-    song1_link,
-    song1_status,
-    song1_notes,
+    song1_title,
+song1_link,
+song1_status,
+song1_notes,
 
     song2_link,
     song2_status,
@@ -202,9 +203,10 @@ DO UPDATE SET
     instruction = excluded.instruction,
     watch_link = excluded.watch_link,
 
-    song1_link = excluded.song1_link,
-    song1_status = excluded.song1_status,
-    song1_notes = excluded.song1_notes,
+    song1_title = excluded.song1_title,
+song1_link = excluded.song1_link,
+song1_status = excluded.song1_status,
+song1_notes = excluded.song1_notes,
 
     song2_link = excluded.song2_link,
     song2_status = excluded.song2_status,
@@ -236,9 +238,10 @@ DO UPDATE SET
                 row.instruction || "",
                 row.watchLink || "",
 
-                row.song1?.link || "",
-                row.song1?.status || "",
-                row.song1?.notes || "",
+                row.song1?.title || "",
+row.song1?.link || "",
+row.song1?.status || "",
+row.song1?.notes || "",
 
                 row.song2?.link || "",
                 row.song2?.status || "",

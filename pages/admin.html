@@ -1139,14 +1139,64 @@
                 style="width:100%;height:40px;padding:10px;">
 
             <p style="margin-top:10px;font-size:13px;color:#666;">
-    Changes are saved automatically.
-</p>
+                Changes are saved automatically.
+            </p>
 
         </div>
 
     </div>
 
 </div>
+
+
+<!-- SONG CONTEXT MENU -->
+
+<div id="songContextMenu" class="context-menu">
+    <div id="attachSongLinkBtn">
+        📎 Attach Song Link
+    </div>
+</div>
+
+<!-- SONG LINK MODAL -->
+
+<div id="songLinkModal" class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h3>🎵 Attach Song Link</h3>
+
+            <button
+                id="closeSongLinkModal"
+                class="close-modal">
+                ✕
+            </button>
+        </div>
+
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+
+            <div>
+                <label>Song Title</label>
+                <input
+                    id="songTitleInput"
+                    type="text"
+                    placeholder="Enter song title...">
+            </div>
+
+            <div>
+                <label>YouTube / Spotify Link</label>
+                <input
+                    id="songLinkInput"
+                    type="url"
+                    placeholder="Paste link...">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script>
 
