@@ -1484,7 +1484,7 @@ document.addEventListener("click", () => {
    LOCK MONTH
 ================================== */
 
-document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
+document.getElementById("lockMonthBtn")?.addEventListener("click", async () => {
 
     const month = monthContextMenu.dataset.month;
 
@@ -1494,26 +1494,19 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
 
     if (!button) return;
 
-    // Save local (optional)
+    // Save local
     const locks = getMonthLocks();
+
     locks[getMonthKey(currentYear, month)] = true;
+
     saveMonthLocks(locks);
 
-    // Save to Cloudflare
-// Save to D1
-saveProjects();
+    // Save to D1
+    await saveMonthLock(currentYear, month, true);
 
-// Update UI
-button.classList.add("locked");
-
-updateMonthLockUI();
-
-monthContextMenu.style.display = "none";
-
-    // UI
+    // Update UI
     button.classList.add("locked");
 
-    // Refresh
     updateMonthLockUI();
 
     console.log("LOCK:", `${currentYear}_${month}`);
@@ -1526,7 +1519,7 @@ monthContextMenu.style.display = "none";
    UNLOCK MONTH
 ================================== */
 
-document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
+document.getElementById("unlockMonthBtn")?.addEventListener("click", async () => {
 
     const month = monthContextMenu.dataset.month;
 
@@ -1538,22 +1531,17 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 
     // Remove local
     const locks = getMonthLocks();
+
     delete locks[getMonthKey(currentYear, month)];
+
     saveMonthLocks(locks);
 
-    // Save to Cloudflare D1
-    saveProjects();
+    // Save to D1
+    await saveMonthLock(currentYear, month, false);
 
-button.classList.remove("locked");
-
-updateMonthLockUI();
-
-monthContextMenu.style.display = "none";
-
-    // UI
+    // Update UI
     button.classList.remove("locked");
 
-    // Refresh
     updateMonthLockUI();
 
     console.log("UNLOCK:", `${currentYear}_${month}`);
