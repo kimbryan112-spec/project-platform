@@ -656,7 +656,18 @@ if (type) {
             const cell = cells[index];
             if (!cell) return;
 
-            const attachBtn = cell.querySelector(".attach-song-btn");
+            const titleInput = cell.querySelector(".song-link");
+
+if (titleInput) {
+
+    titleInput.value = "";
+    titleInput.dataset.songLink = "";
+
+    updateSongLinkStyle(titleInput);
+
+}
+
+const attachBtn = cell.querySelector(".attach-song-btn");
 
 if (attachBtn) {
 
