@@ -3,10 +3,8 @@ export async function onRequestPost(context) {
     try {
 
         const {
-
             email,
             password
-
         } = await context.request.json();
 
         const user = await context.env.DB.prepare(`
@@ -65,23 +63,68 @@ export async function onRequestPost(context) {
 
         }
 
-        return Response.json({
+        // ===============================
+        // CREATE SESSION
+        // ===============================
+
+        const sessionId = crypto.randomUUID();
+
+        const expires = new Date(
+            Date.now() + (7 * 24 * 60 * 60 * 1000)
+        ).toISOString();
+
+        await context.env.DB.prepare(`
+
+            INSERT INTO sessions (
+
+                id,
+                user_id,
+                expires_at
+
+            )
+
+            VALUES (
+
+                ?, ?, ?
+
+            )
+
+        `)
+        .bind(
+            sessionId,
+            user.id,
+            expires
+        )
+        .run();
+
+        // ===============================
+        // RESPONSE
+        // ===============================
+
+        const response = Response.json({
 
             success: true,
 
             user: {
 
                 id: user.id,
-
                 email: user.email,
-
                 role: user.role,
-
                 name: user.fullname
 
             }
 
         });
+
+        response.headers.append(
+
+            "Set-Cookie",
+
+            `session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=604800`
+
+        );
+
+        return response;
 
     }
 
@@ -92,7 +135,6 @@ export async function onRequestPost(context) {
             {
 
                 success: false,
-
                 message: err.message
 
             },
