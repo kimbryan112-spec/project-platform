@@ -1537,7 +1537,7 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", async () => {
     saveMonthLocks(locks);
 
     // Save to D1
-    await saveMonthLock(currentYear, month, true);
+    saveProjects();
 
     // Update UI
     button.classList.add("locked");
@@ -1572,7 +1572,7 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", async () =>
     saveMonthLocks(locks);
 
     // Save to D1
-    await saveMonthLock(currentYear, month, false);
+    saveProjects();
 
     // Update UI
     button.classList.remove("locked");
