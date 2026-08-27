@@ -169,9 +169,38 @@
 
     </div>
 
-    <div class="month-legend">
-        <span>🔵 No data yet</span>
-        <span>🟢 Has data</span>
+<div class="month-legend">
+    <span>🔵 No data yet</span>
+    <span>🟢 Has data</span>
+</div>
+
+<!-- MUSIC PLAYER -->
+<div class="music-player">
+
+    <div class="music-controls">
+
+        <button id="musicPrev" class="music-btn">⏮</button>
+
+        <button id="musicPlay" class="music-btn play">⏯</button>
+
+        <button id="musicNext" class="music-btn">⏭</button>
+
+        <span class="volume-icon" id="volumeIcon">🔊</span>
+
+    </div>
+
+    <div class="volume-row">
+
+        <input
+            type="range"
+            id="musicVolume"
+            min="0"
+            max="100"
+            value="75"
+        >
+
+        <span id="volumeValue">75%</span>
+
     </div>
 
 </div>
@@ -180,7 +209,7 @@
 
 <div class="table-wrapper">
 
-            <table class="project-table">
+    <table class="project-table">
 
                 <thead>
 

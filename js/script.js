@@ -2425,7 +2425,7 @@ for (let i = 1; i <= 29; i++) {
 }
 
 const bgMusic = new Audio();
-bgMusic.volume = 0.15;
+bgMusic.volume = 0.25;
 
 let lastSongIndex = -1;
 
@@ -2474,6 +2474,150 @@ bgMusic.addEventListener("ended", () => {
 
 // Start playlist
 playRandomMusic();
+
+/* ==================================
+   MUSIC PLAYER CONTROLS
+================================== */
+
+const playBtn = document.getElementById("musicPlay");
+const prevBtn = document.getElementById("musicPrev");
+const nextBtn = document.getElementById("musicNext");
+const volumeSlider = document.getElementById("musicVolume");
+const volumeValue = document.getElementById("volumeValue");
+const volumeIcon = document.getElementById("volumeIcon");
+
+/* ===========================
+   PLAY / PAUSE
+=========================== */
+
+playBtn.addEventListener("click", () => {
+
+    if (bgMusic.paused) {
+
+        bgMusic.play();
+
+    } else {
+
+        bgMusic.pause();
+
+    }
+
+});
+
+/* ===========================
+   NEXT SONG
+=========================== */
+
+nextBtn.addEventListener("click", () => {
+
+    playRandomMusic();
+
+});
+
+/* ===========================
+   PREVIOUS SONG
+=========================== */
+
+prevBtn.addEventListener("click", () => {
+
+    if (musicPlaylist.length <= 1) return;
+
+    let randomIndex;
+
+    do{
+
+        randomIndex = Math.floor(
+            Math.random() * musicPlaylist.length
+        );
+
+    }while(randomIndex === lastSongIndex);
+
+    lastSongIndex = randomIndex;
+
+    bgMusic.src = musicPlaylist[randomIndex];
+
+    bgMusic.play();
+
+});
+
+/* ===========================
+   VOLUME
+=========================== */
+
+volumeSlider.addEventListener("input", () => {
+
+    bgMusic.volume = volumeSlider.value / 100;
+
+    volumeValue.textContent = volumeSlider.value + "%";
+
+    if (bgMusic.volume === 0) {
+
+        volumeIcon.textContent = "🔇";
+
+    } else {
+
+        lastVolume = bgMusic.volume;
+
+        volumeIcon.textContent = "🔊";
+
+    }
+
+});
+
+/* ===========================
+   INITIAL VOLUME
+=========================== */
+
+const initialVolume = Math.round(bgMusic.volume * 100);
+
+volumeSlider.value = initialVolume;
+volumeValue.textContent = initialVolume + "%";
+
+/* ===========================
+   BUTTON STATE
+=========================== */
+
+bgMusic.addEventListener("play", () => {
+
+    playBtn.textContent = "⏸";
+
+});
+
+bgMusic.addEventListener("pause", () => {
+
+    playBtn.textContent = "▶";
+
+});
+
+/* ===========================
+   MUTE / UNMUTE
+=========================== */
+
+let lastVolume = bgMusic.volume;
+
+volumeIcon.addEventListener("click", () => {
+
+    if (bgMusic.volume > 0) {
+
+        lastVolume = bgMusic.volume;
+
+        bgMusic.volume = 0;
+
+        volumeSlider.value = 0;
+        volumeValue.textContent = "0%";
+        volumeIcon.textContent = "🔇";
+
+    } else {
+
+        bgMusic.volume = lastVolume || 0.15;
+
+        volumeSlider.value = Math.round(bgMusic.volume * 100);
+        volumeValue.textContent = volumeSlider.value + "%";
+        volumeIcon.textContent = "🔊";
+
+    }
+
+});
 
 /* ==================================
    SONG LINK STYLE
