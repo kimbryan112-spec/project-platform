@@ -3014,6 +3014,85 @@ input[type="url"]::placeholder{
 }
 
 /* ==================================
+   RESPONSIVE
+================================== */
+
+/* Large Laptop */
+@media (max-width:1400px){
+
+    .music-player{
+
+        top:150px;
+        right:30px;
+
+        transform:scale(.95);
+        transform-origin:top right;
+
+    }
+
+}
+
+/* Laptop */
+@media (max-width:1200px){
+
+    .music-player{
+
+        top:148px;
+        right:15px;
+
+        transform:scale(.88);
+        transform-origin:top right;
+
+    }
+
+}
+
+/* Tablet */
+@media (max-width:992px){
+
+    .music-player{
+
+        top:145px;
+        right:10px;
+
+        transform:scale(.75);
+        transform-origin:top right;
+
+    }
+
+}
+
+/* Mobile */
+@media (max-width:768px){
+
+    .music-player{
+
+        top:142px;
+        right:5px;
+
+        transform:scale(.60);
+        transform-origin:top right;
+
+    }
+
+}
+
+/* Small Phones */
+@media (max-width:480px){
+
+    .music-player{
+
+        top:140px;
+        right:2px;
+
+        transform:scale(.50);
+        transform-origin:top right;
+
+    }
+
+}
+
+/* ==================================
    DISABLED SIDEBAR BUTTON
 ================================== */
 
