@@ -119,15 +119,8 @@ monthLocked:
         }
     }
 );
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store"
-                }
-            }
-        );
 
-    } catch (err) {
+} catch (err) {
 
     console.error(err);
 
