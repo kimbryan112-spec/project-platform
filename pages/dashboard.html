@@ -1987,17 +1987,11 @@ if (!currentUser) {
 
 // Dashboard user at Admin lang ang pwede
 if (
-
     currentUser.role !== "admin" &&
-
-    currentUser.role !== "manager"
-
+    currentUser.role !== "dashboard"
 ) {
-
     alert("Access Denied.");
-
     window.location.href = "../login.html";
-
 }
 
 const IS_ADMIN = currentUser.role === "admin";

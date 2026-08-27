@@ -1,11 +1,38 @@
 // ===============================
+// PROJECT PLATFORM
+// LOCAL LOGIN
+// ===============================
+
+// Default Users (Local Mode)
+
+const users = [
+
+    {
+        email: "adminyang@kbhfilms.com",
+        password: "Yangyang#12",
+        role: "admin",
+        displayRole: "Admin",
+        name: "Kim Bryan Hernandez"
+    },
+
+    {
+        email: "yongzhi@kbhfilms.com",
+        password: "yong2023",
+        role: "dashboard",
+        displayRole: "Manager",
+        name: "Yong Zhi"
+    },
+
+];
+
+// ===============================
 // LOGIN
 // ===============================
 
 const loginForm = document.getElementById("loginForm");
 const errorText = document.getElementById("loginError");
 
-loginForm.addEventListener("submit", async function (e) {
+loginForm.addEventListener("submit", function (e) {
 
     e.preventDefault();
 
@@ -19,55 +46,38 @@ loginForm.addEventListener("submit", async function (e) {
         .getElementById("password")
         .value;
 
-    errorText.textContent = "";
+    const user = users.find(u =>
+        u.email === email &&
+        u.password === password
+    );
 
-    try {
-
-        const response = await fetch("/api/login", {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-                email,
-                password
-            })
-
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-
-            errorText.textContent = data.message;
-            return;
-
-        }
-
-        localStorage.setItem(
-            "currentUser",
-            JSON.stringify(data.user)
-        );
-
-        if (data.user.role === "admin") {
-
-            window.location.href = "pages/admin.html";
-
-        } else {
-
-            window.location.href = "pages/dashboard.html";
-
-        }
-
-    } catch (err) {
-
-        console.error(err);
+    if (!user) {
 
         errorText.textContent =
-            "Unable to connect to server.";
+            "Invalid email or password.";
+
+        return;
+
+    }
+
+    // Save Current User
+
+    localStorage.setItem(
+        "currentUser",
+        JSON.stringify(user)
+    );
+
+    // Redirect
+
+    if (user.role === "admin") {
+
+        window.location.href =
+            "pages/admin.html";
+
+    } else {
+
+        window.location.href =
+            "pages/dashboard.html";
 
     }
 
