@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS projects (
 
     status TEXT NOT NULL DEFAULT 'PLANNED',
 
+    progress INTEGER NOT NULL DEFAULT 0,
+
     type TEXT NOT NULL DEFAULT 'NOT SET',
 
     raw_files TEXT NOT NULL DEFAULT '',

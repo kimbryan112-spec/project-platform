@@ -53,7 +53,9 @@ export async function onRequestGet(context) {
 
             status: row.status || "PLANNED",
 
-            type: row.type || "NOT SET",
+progress: row.progress || 0,
+
+type: row.type || "NOT SET",
 
             rawFiles: row.raw_files || "",
 
@@ -158,8 +160,9 @@ INSERT INTO projects (
     row_index,
 
     couple_name,
-    status,
-    type,
+status,
+progress,
+type,
 
     raw_files,
     drone,
@@ -194,7 +197,7 @@ VALUES (
 
     ?, ?, ?,          -- project_year, project_month, row_index
 
-    ?, ?, ?,          -- couple_name, status, type
+    ?, ?, ?, ?,       -- couple_name, status, progress, type
 
     ?, ?, ?, ?,       -- raw_files, drone, instruction, watch_link
 
@@ -215,8 +218,9 @@ ON CONFLICT(project_year, project_month, row_index)
 DO UPDATE SET
 
     couple_name = excluded.couple_name,
-    status = excluded.status,
-    type = excluded.type,
+status = excluded.status,
+progress = excluded.progress,
+type = excluded.type,
 
     raw_files = excluded.raw_files,
     drone = excluded.drone,
@@ -253,8 +257,9 @@ teaser_notes = excluded.teaser_notes,
     row.rowId,
 
     row.coupleName || "",
-    row.status || "PLANNED",
-    row.type || "NOT SET",
+row.status || "PLANNED",
+row.progress || 0,
+row.type || "NOT SET",
 
     row.rawFiles || "",
     row.drone || "",
