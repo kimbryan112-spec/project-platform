@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS users (
 
     role TEXT NOT NULL DEFAULT 'dashboard',
 
+    active INTEGER NOT NULL DEFAULT 1,
+
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 
 );
@@ -103,20 +105,20 @@ CREATE TABLE IF NOT EXISTS month_locks (
 
 );
 
-CREATE TABLE IF NOT EXISTS users (
+-- =========================
+-- SESSIONS TABLE
+-- =========================
 
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS sessions (
 
-    email TEXT NOT NULL UNIQUE,
+    id TEXT PRIMARY KEY,
 
-    password TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
 
-    role TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
 
-    fullname TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    active INTEGER DEFAULT 1,
-
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 
 );
