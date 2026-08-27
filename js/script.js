@@ -756,10 +756,13 @@ document.querySelectorAll(".month-btn").forEach(btn => {
 
     const key = getMonthKey(currentYear, btn.dataset.month);
 
-    btn.classList.toggle(
-        "locked",
-        !!monthLocks[key]
-    );
+    const locked = !!monthLocks[key];
+
+    if (IS_ADMIN) {
+        btn.classList.toggle("locked", locked);
+    } else {
+        btn.classList.remove("locked");
+    }
 
 });
 
