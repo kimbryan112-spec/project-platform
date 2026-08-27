@@ -27,23 +27,30 @@ export async function onRequestGet(context) {
             .bind(year, month)
             .all();
 
-        const { results: lockRows } =
-            await context.env.DB.prepare(`
+        // ========================================
+// LOAD ALL LOCKED MONTHS
+// ========================================
 
-                SELECT locked
-                FROM month_locks
-                WHERE project_year = ?
-                  AND project_month = ?
-                LIMIT 1
+const { results: lockRows } =
+    await context.env.DB.prepare(`
 
-            `)
-            .bind(year, month)
-            .all();
+        SELECT
+            project_year,
+            project_month,
+            locked
+        FROM month_locks
+        WHERE locked = 1
 
-        const monthLocked =
-            lockRows.length > 0
-                ? Boolean(lockRows[0].locked)
-                : false;
+    `).all();
+
+// Convert to object para madaling gamitin sa frontend
+const monthLocks = {};
+
+lockRows.forEach(row => {
+
+    monthLocks[`${row.project_year}_${row.project_month}`] = true;
+
+});
 
         const data = results.map(row => ({
 
@@ -95,12 +102,23 @@ teaserSong: {
     notes: row.teaser_notes || ""
 },
 
-monthLocked
+monthLocked:
+    monthLocks[`${year}_${month}`] || false
 
-        }));
+}));
 
         return new Response(
-            JSON.stringify(data),
+    JSON.stringify({
+        projects: data,
+        lockedMonths: monthLocks
+    }),
+    {
+        headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-store"
+        }
+    }
+);
             {
                 headers: {
                     "Content-Type": "application/json",

@@ -742,20 +742,18 @@ if (data) {
 
 });
 
-// Restore locked months
-const locks = getMonthLocks();
-
-const isAdmin = typeof IS_ADMIN !== "undefined" && IS_ADMIN;
+// ==================================
+// RESTORE LOCKED MONTHS
+// ==================================
 
 document.querySelectorAll(".month-btn").forEach(btn => {
 
     const key = getMonthKey(currentYear, btn.dataset.month);
 
-    if (isAdmin && locks[key]) {
-        btn.classList.add("locked");
-    } else {
-        btn.classList.remove("locked");
-    }
+    btn.classList.toggle(
+        "locked",
+        !!monthLocks[key]
+    );
 
 });
 
@@ -832,21 +830,15 @@ async function loadProjects() {
 
         }
 
-        const projectsData = await response.json();
+        const responseData = await response.json();
+
+const projectsData = responseData.projects || [];
+
+monthLocks = responseData.lockedMonths || {};
 
         // ==================================
         // RESTORE MONTH LOCK FROM D1
         // ==================================
-
-        monthLocks = {};
-
-        if (
-            Array.isArray(projectsData) &&
-            projectsData.length > 0 &&
-            projectsData[0].monthLocked
-        ) {
-            monthLocks[getMonthKey(currentYear, currentMonth)] = true;
-        }
 
         updateMonthLockUI();
 
