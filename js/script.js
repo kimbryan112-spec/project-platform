@@ -91,6 +91,17 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsBtn.style.display = IS_ADMIN ? "" : "none";
     }
 
+    // Dashboard button (Manager only = disabled)
+const dashboardMenu = document.getElementById("dashboardMenu");
+
+if (dashboardMenu && !IS_ADMIN) {
+
+    dashboardMenu.removeAttribute("href");
+dashboardMenu.style.pointerEvents = "none";
+dashboardMenu.style.cursor = "default";
+
+}
+
     console.log('[INIT] Page loaded, starting data load...');
 
     currentYear = new Date().getFullYear().toString();
@@ -1134,9 +1145,19 @@ document.querySelectorAll(`
     .dashboard-raw-input,
     .song-link,
     .dashboard-song-status,
-    .song-notes
+    .song-notes,
+    .drone-search,
+    .drone-select
 `).forEach(input => {
+
     input.disabled = !editable;
+
+    input.style.pointerEvents = editable ? "auto" : "none";
+
+    input.style.opacity = "1";
+
+    input.style.filter = "none";
+
 });
 
 // Progress Slider
@@ -1170,13 +1191,14 @@ document.querySelectorAll(".progress-slider").forEach(slider => {
 
     // Buttons
     document.querySelectorAll(`
-        .instruction-btn,
-        .watch-btn,
-        .comments-btn,
-        .dashboard-raw-check-btn,
-        .raw-check-btn,
-        .generate-btn
-    `).forEach(btn => {
+    .instruction-btn,
+    .watch-btn,
+    .comments-btn,
+    .dashboard-raw-check-btn,
+    .raw-check-btn,
+    .generate-btn,
+    .get-files-btn
+`).forEach(btn => {
 
         // Watch button laging enabled
         if (btn.classList.contains("watch-btn")) {
@@ -1187,8 +1209,9 @@ document.querySelectorAll(".progress-slider").forEach(slider => {
         }
 
         btn.disabled = !editable;
-        btn.style.pointerEvents = editable ? "auto" : "none";
-        btn.style.opacity = editable ? "1" : "0.6";
+btn.style.pointerEvents = editable ? "auto" : "none";
+btn.style.opacity = "1"; // laging full color
+btn.style.filter = "none";
 
     });
 

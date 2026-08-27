@@ -2985,3 +2985,37 @@ input[type="url"]::placeholder{
     }
 
 }
+
+/* ==================================
+   DISABLED SIDEBAR BUTTON
+================================== */
+
+.sidebar .disabled-menu{
+
+    pointer-events:none !important;
+
+    cursor:not-allowed !important;
+
+    opacity:.45;
+
+    filter:grayscale(100%) brightness(.85);
+
+    user-select:none;
+
+}
+
+.sidebar .disabled-menu:hover{
+
+    transform:none !important;
+
+    background:#374151 !important;
+
+    box-shadow:none !important;
+
+}
+
+.sidebar .disabled-menu:active{
+
+    transform:none !important;
+
+}
