@@ -798,13 +798,20 @@ async function loadProjects() {
 
     try {
 
-        console.log(
+    console.log(
+        `[LOAD] Fetching projects (${currentYear}-${currentMonth})...`
+    );
 
-            `[LOAD] Fetching projects (${currentYear}-${currentMonth})...`
+    console.log("========== LOAD ==========");
+    console.log("currentYear :", currentYear);
+    console.log("currentMonth:", currentMonth);
+    console.log("month number:", monthMap[currentMonth]);
+    console.log(
+        "Request URL:",
+        `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}`
+    );
 
-        );
-
-        const response = await fetch(
+    const response = await fetch(
 
             `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
 
