@@ -1315,6 +1315,28 @@ select{
 
 }
 
+/* Play icon */
+
+.play-icon{
+
+    color:#ffffff;
+
+    margin-right:4px;
+
+    transition:color .2s ease;
+
+}
+
+.play-icon.has-link{
+
+    color:#7CFF6B;
+
+    text-shadow:
+        0 0 3px rgba(124,255,107,.75),
+        0 0 6px rgba(124,255,107,.45);
+
+}
+
 .watch-btn:hover{
 
     background:linear-gradient(

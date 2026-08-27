@@ -509,18 +509,26 @@ const setSongData = (cellIndex, songData = {}) => {
     setSongData(8, data.teaserSong);
 
     // ==========================
-    // WATCH LINK
-    // ==========================
+// WATCH LINK
+// ==========================
 
-    const watchBtn =
-        cells[0]?.querySelector(".watch-btn");
+const watchBtn =
+    cells[0]?.querySelector(".watch-btn");
 
-    if (watchBtn) {
+if (watchBtn) {
 
-        watchBtn.dataset.watchLink =
-            data.watchLink || "";
+    watchBtn.dataset.watchLink =
+        data.watchLink || "";
 
-    }
+    const playIcon =
+        watchBtn.querySelector(".play-icon");
+
+    playIcon?.classList.toggle(
+        "has-link",
+        (data.watchLink || "").trim() !== ""
+    );
+
+}
 
     // ==========================
     // GET FILES LINK
@@ -587,6 +595,11 @@ const watchBtn = cells[0]?.querySelector(".watch-btn");
 if (watchBtn) {
 
     watchBtn.dataset.watchLink = "";
+
+    const playIcon =
+        watchBtn.querySelector(".play-icon");
+
+    playIcon?.classList.remove("has-link");
 
 }
 
@@ -1621,9 +1634,15 @@ button.addEventListener("contextmenu", (e) => {
 
     activeWatchButton = button;
 
+    const rect = button.getBoundingClientRect();
+
     watchContextMenu.style.display = "block";
-    watchContextMenu.style.left = `${e.pageX}px`;
-    watchContextMenu.style.top = `${e.pageY}px`;
+
+    watchContextMenu.style.left =
+        `${rect.left + window.scrollX}px`;
+
+    watchContextMenu.style.top =
+        `${rect.bottom + window.scrollY + 2}px`;
 
 });
 
@@ -1768,9 +1787,17 @@ watchLinkInput?.addEventListener("input", () => {
     if (!activeWatchButton) return;
 
     activeWatchButton.dataset.watchLink =
-        watchLinkInput.value.trim();
+    watchLinkInput.value.trim();
 
-    saveProjects();
+const playIcon =
+    activeWatchButton.querySelector(".play-icon");
+
+playIcon?.classList.toggle(
+    "has-link",
+    watchLinkInput.value.trim() !== ""
+);
+
+saveProjects();
 
 });
 
