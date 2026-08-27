@@ -990,7 +990,7 @@ apiSaveTimeout = setTimeout(async () => {
     if (rowData) {
 
         rowData.monthLocked =
-    !!monthLocks[getMonthKey(currentYear, currentMonth)];
+    !!monthLocks[getMonthKey(saveYear, saveMonth)];
 
         projectsData.push(rowData);
 
@@ -1033,10 +1033,8 @@ try {
     if (response.ok) {
 
         console.log(
-
-            `[SAVE] Successfully synced (${currentYear}-${currentMonth}) to Cloudflare backend!`
-
-        );
+    `[SAVE] Successfully synced (${saveYear}-${saveMonth}) to Cloudflare backend!`
+);
 
     } else {
 
