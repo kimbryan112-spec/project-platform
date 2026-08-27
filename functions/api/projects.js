@@ -68,8 +68,6 @@ type: row.type || "NOT SET",
 filesLink: row.files_link || "",
 
 song1: {
-
-            song1: {
     title: row.song1_title || "",
     link: row.song1_link || "",
     status: row.song1_status || "",
@@ -97,7 +95,7 @@ teaserSong: {
     notes: row.teaser_notes || ""
 },
 
-            monthLocked
+monthLocked
 
         }));
 
