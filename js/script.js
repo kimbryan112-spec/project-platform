@@ -345,6 +345,9 @@ teaserSong: getSongData(8),
 watchLink:
     cells[0]?.querySelector(".watch-btn")?.dataset.watchLink || "",
 
+filesLink:
+    cells[1]?.querySelector(".get-files-btn")?.dataset.filesLink || "",
+
 progress:
     parseInt(
         row.querySelector(".progress-slider")?.value || 0,
@@ -505,10 +508,37 @@ const setSongData = (cellIndex, songData = {}) => {
     setSongData(7, data.song3);
     setSongData(8, data.teaserSong);
 
-    const watchBtn = cells[0]?.querySelector(".watch-btn");
+    // ==========================
+    // WATCH LINK
+    // ==========================
+
+    const watchBtn =
+        cells[0]?.querySelector(".watch-btn");
 
     if (watchBtn) {
-        watchBtn.dataset.watchLink = data.watchLink || "";
+
+        watchBtn.dataset.watchLink =
+            data.watchLink || "";
+
+    }
+
+    // ==========================
+    // GET FILES LINK
+    // ==========================
+
+    const getFilesBtn =
+        cells[1]?.querySelector(".get-files-btn");
+
+    if (getFilesBtn) {
+
+        getFilesBtn.dataset.filesLink =
+            data.filesLink || "";
+
+        getFilesBtn.classList.toggle(
+            "has-link",
+            !!data.filesLink
+        );
+
     }
 
     const slider =
@@ -552,10 +582,24 @@ function clearProjectTable() {
         }
 
         // Watch Link
-        const watchBtn = cells[0]?.querySelector(".watch-btn");
-        if (watchBtn) {
-            watchBtn.dataset.watchLink = "";
-        }
+const watchBtn = cells[0]?.querySelector(".watch-btn");
+
+if (watchBtn) {
+
+    watchBtn.dataset.watchLink = "";
+
+}
+
+// Get Files
+const getFilesBtn = cells[1]?.querySelector(".get-files-btn");
+
+if (getFilesBtn) {
+
+    getFilesBtn.dataset.filesLink = "";
+
+    getFilesBtn.classList.remove("has-link");
+
+}
 
         // Status
         const status = cells[1]?.querySelector(".status-select");
@@ -1435,6 +1479,7 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 ================================== */
 
 let activeWatchButton = null;
+let activeFilesButton = null;
 
 const songContextMenu = document.getElementById("songContextMenu");
 
@@ -1457,13 +1502,13 @@ document.addEventListener("contextmenu", (e) => {
 
     const rect = input.getBoundingClientRect();
 
-songContextMenu.style.display = "block";
+    songContextMenu.style.display = "block";
 
-songContextMenu.style.left =
-    `${window.scrollX + rect.left}px`;
+    songContextMenu.style.left =
+        `${window.scrollX + rect.left}px`;
 
-songContextMenu.style.top =
-    `${window.scrollY + rect.top - songContextMenu.offsetHeight - 8}px`;
+    songContextMenu.style.top =
+        `${window.scrollY + rect.top - songContextMenu.offsetHeight - 8}px`;
 
 });
 
@@ -1481,6 +1526,15 @@ const watchLinkModal = document.getElementById("watchLinkModal");
 const watchLinkInput = document.getElementById("watchLinkInput");
 const closeWatchLinkModal = document.getElementById("closeWatchLinkModal");
 
+// ==================================
+// GET FILES
+// ==================================
+
+const filesContextMenu = document.getElementById("filesContextMenu");
+const filesLinkModal = document.getElementById("filesLinkModal");
+const filesLinkInput = document.getElementById("filesLinkInput");
+const closeFilesLinkModal = document.getElementById("closeFilesLinkModal");
+
 document.querySelectorAll(".watch-btn").forEach(button => {
 
     // LEFT CLICK
@@ -1489,8 +1543,13 @@ document.querySelectorAll(".watch-btn").forEach(button => {
         let link = button.dataset.watchLink;
 
 if (!link) {
-    alert("No Watch Link attached.");
+
+    alert(
+        "📂 Project Files Coming Soon!\n\nPlease wait while the administrator attaches the project folder."
+    );
+
     return;
+
 }
 
 // Convert supported links to embeddable format
@@ -1570,14 +1629,75 @@ button.addEventListener("contextmenu", (e) => {
 
 });
 
-// Hide menu kapag nag-click sa labas
+// ==================================
+// GET FILES BUTTON EVENTS
+// ==================================
+
+document.querySelectorAll(".get-files-btn").forEach(button => {
+
+    // LEFT CLICK
+    button.addEventListener("click", () => {
+
+        const link = button.dataset.filesLink;
+
+        if (!link) {
+
+    alert(
+        "📂 Project Files Coming Soon!\n\nPlease wait while the administrator attaches the project folder."
+    );
+
+    return;
+
+}
+
+        window.open(link, "_blank");
+
+    });
+
+    // RIGHT CLICK
+    button.addEventListener("contextmenu", (e) => {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        activeFilesButton = button;
+
+        filesContextMenu.style.display = "block";
+        filesContextMenu.style.left = `${e.pageX}px`;
+        filesContextMenu.style.top = `${e.pageY}px`;
+
+    });
+
+});
+
+// ==================================
+// HIDE ALL CONTEXT MENUS
+// ==================================
+
 document.addEventListener("click", (e) => {
 
-    // Kung wala ang context menu sa page, huwag mag-error
-    if (!watchContextMenu) return;
+    // SONG MENU
+    if (
+        songContextMenu &&
+        !e.target.closest("#songContextMenu")
+    ) {
+        songContextMenu.style.display = "none";
+    }
 
-    if (!e.target.closest("#watchContextMenu")) {
+    // WATCH MENU
+    if (
+        watchContextMenu &&
+        !e.target.closest("#watchContextMenu")
+    ) {
         watchContextMenu.style.display = "none";
+    }
+
+    // FILES MENU
+    if (
+        filesContextMenu &&
+        !e.target.closest("#filesContextMenu")
+    ) {
+        filesContextMenu.style.display = "none";
     }
 
 });
@@ -1665,6 +1785,57 @@ watchLinkModal?.addEventListener("click", (e) => {
     if (e.target === watchLinkModal) {
 
         watchLinkModal.classList.remove("show");
+
+    }
+
+});
+
+/* ==================================
+   GET FILES MODAL
+================================== */
+
+document.getElementById("attachFilesLinkBtn")?.addEventListener("click", () => {
+
+    if (!activeFilesButton) return;
+
+    filesContextMenu.style.display = "none";
+
+    filesLinkInput.value =
+        activeFilesButton.dataset.filesLink || "";
+
+    filesLinkModal.classList.add("show");
+
+    filesLinkInput.focus();
+
+});
+
+filesLinkInput?.addEventListener("input", () => {
+
+    if (!activeFilesButton) return;
+
+    activeFilesButton.dataset.filesLink =
+        filesLinkInput.value.trim();
+
+    activeFilesButton.classList.toggle(
+        "has-link",
+        filesLinkInput.value.trim() !== ""
+    );
+
+    saveProjects();
+
+});
+
+closeFilesLinkModal?.addEventListener("click", () => {
+
+    filesLinkModal.classList.remove("show");
+
+});
+
+filesLinkModal?.addEventListener("click", (e) => {
+
+    if (e.target === filesLinkModal) {
+
+        filesLinkModal.classList.remove("show");
 
     }
 
@@ -2451,15 +2622,33 @@ function updateRowProgress(row) {
         !label
     ) return;
 
-    // Show only while IN PROGRESS
-    const show =
-        status.value === "IN PROGRESS";
+    // ==================================
+// SHOW / HIDE CONTROLS
+// ==================================
 
-    slider.style.display =
-        show ? "block" : "none";
+const getFilesBtn =
+    row.querySelector(".get-files-btn");
 
-    label.style.display =
-        show ? "block" : "none";
+const inProgress =
+    status.value === "IN PROGRESS";
+
+const delivered =
+    status.value === "DELIVERED";
+
+// Progress controls
+slider.style.display =
+    inProgress ? "block" : "none";
+
+label.style.display =
+    inProgress ? "block" : "none";
+
+// GET FILES button
+if (getFilesBtn) {
+
+    getFilesBtn.style.display =
+        delivered ? "block" : "none";
+
+}
 
     // Percentage
     label.textContent =
@@ -2495,6 +2684,50 @@ document.querySelectorAll(".progress-slider").forEach(slider => {
         saveProjects();
 
     });
+
+});
+
+/* ==================================
+   GET FILES BUTTON
+================================== */
+
+document.querySelectorAll(".get-files-btn").forEach(btn => {
+
+    // Left click = Open attached folder
+    btn.addEventListener("click", () => {
+
+        const link = btn.dataset.filesLink;
+
+        if (!link) {
+
+    alert(
+        "📂 Project Files Coming Soon!\n\nPlease wait while the administrator attaches the project folder."
+    );
+
+    return;
+
+}
+
+        window.open(link, "_blank");
+
+    });
+
+// ==================================
+// RIGHT CLICK = CUSTOM MODAL
+// ==================================
+
+btn.addEventListener("contextmenu", (e) => {
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    activeFilesButton = btn;
+
+    filesContextMenu.style.display = "block";
+    filesContextMenu.style.left = `${e.pageX}px`;
+    filesContextMenu.style.top = `${e.pageY}px`;
+
+});
 
 });
 

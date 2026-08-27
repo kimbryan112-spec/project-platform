@@ -2565,3 +2565,132 @@ input[type="url"]::placeholder{
     transform:scale(1.04);
 
 }
+
+/* ===========================
+   GET FILES BUTTON
+=========================== */
+
+.get-files-btn{
+
+    display:none;
+
+    width:120px;
+    height:48px;
+
+    position:relative;
+
+    margin:6px auto 0;
+
+    border:none;
+    border-radius:0 8px 8px 8px;
+
+    cursor:pointer;
+
+    font-size:16px;
+    font-weight:800;
+    letter-spacing:.4px;
+
+    color:#ffffff;
+
+    background:linear-gradient(
+        to bottom,
+        #ffd95c 0%,
+        #f5b300 55%,
+        #cf8a00 100%
+    );
+
+    box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.55),
+        inset 0 -2px 0 rgba(0,0,0,.18),
+        0 4px 10px rgba(0,0,0,.25);
+
+    transition:.18s;
+
+}
+
+/* ===========================
+   HAS ATTACHED LINK
+=========================== */
+
+.get-files-btn.has-link{
+
+    color:#00fc37;
+
+    font-weight:900;
+
+    text-shadow:
+        0 1px 0 rgba(255,255,255,.75),
+        0 0 4px rgba(0,120,40,.25);
+
+}
+
+/* Folder tab */
+
+.get-files-btn::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:-10px;
+    left:12px;
+
+    width:46px;
+    height:13px;
+
+    border-radius:8px 8px 0 0;
+
+    background:linear-gradient(
+        to bottom,
+        #ffe88d,
+        #f7c526
+    );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.6);
+
+}
+
+/* Folder body shine */
+
+.get-files-btn::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:12px;
+    left:0;
+    right:0;
+
+    height:18px;
+
+    background:rgba(255,255,255,.18);
+
+    pointer-events:none;
+
+}
+
+/* Hover */
+
+.get-files-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.6),
+        inset 0 -2px 0 rgba(0,0,0,.18),
+        0 8px 16px rgba(0,0,0,.30);
+
+}
+
+/* Click */
+
+.get-files-btn:active{
+
+    transform:translateY(1px);
+
+    box-shadow:
+        inset 0 3px 5px rgba(0,0,0,.20);
+
+}
