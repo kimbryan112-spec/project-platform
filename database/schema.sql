@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS projects (
 
     watch_link TEXT NOT NULL DEFAULT '',
 
+    files_link TEXT NOT NULL DEFAULT '',
+
     song1_title TEXT NOT NULL DEFAULT '',
     song1_link TEXT NOT NULL DEFAULT '',
     song1_status TEXT NOT NULL DEFAULT '',
