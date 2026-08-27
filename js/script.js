@@ -851,6 +851,8 @@ async function loadProjects() {
 const projectsData = responseData.projects || [];
 
 monthLocks = responseData.lockedMonths || {};
+console.log("LOCKS FROM API:", responseData.lockedMonths);
+console.log("monthLocks:", monthLocks);
 
         // ==================================
         // RESTORE MONTH LOCK FROM D1
@@ -932,14 +934,29 @@ monthLocks = responseData.lockedMonths || {};
 
     document.querySelectorAll(".month-btn").forEach(btn => {
 
-        const key = getMonthKey(currentYear, btn.dataset.month);
+    const key = getMonthKey(currentYear, btn.dataset.month);
 
-        btn.classList.toggle(
-            "locked",
-            !!monthLocks[key]
-        );
+    console.log(
+        btn.dataset.month,
+        key,
+        monthLocks[key]
+    );
 
-    });
+    const locked = !!monthLocks[key];
+
+    if (IS_ADMIN) {
+
+        btn.classList.toggle("locked", locked);
+
+    } else {
+
+        btn.classList.remove("locked");
+
+    }
+
+});
+
+updateMonthLockUI();
 
     console.log(
         `[LOAD] Successfully matched ${matchedCount} rows`
@@ -961,8 +978,6 @@ monthLocks = responseData.lockedMonths || {};
     );
 
 }
-
-updateMonthLockUI();
 
 document.querySelectorAll(".status-select")
     .forEach(updateStatusColor);
@@ -1243,6 +1258,23 @@ btn.style.filter = "none";
 function updateMonthLockUI() {
 
     console.log("===== updateMonthLockUI =====");
+    document.querySelectorAll(".month-btn").forEach(btn => {
+
+    const key = getMonthKey(currentYear, btn.dataset.month);
+
+    const locked = !!monthLocks[key];
+
+    if (IS_ADMIN) {
+
+        btn.classList.toggle("locked", locked);
+
+    } else {
+
+        btn.classList.remove("locked");
+
+    }
+
+});
 
     console.log(
         "IS_ADMIN:",

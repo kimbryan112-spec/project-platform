@@ -46,9 +46,26 @@ const { results: lockRows } =
 // Convert to object para madaling gamitin sa frontend
 const monthLocks = {};
 
+const monthNames = {
+    1: "jan",
+    2: "feb",
+    3: "mar",
+    4: "apr",
+    5: "may",
+    6: "jun",
+    7: "jul",
+    8: "aug",
+    9: "sep",
+    10: "oct",
+    11: "nov",
+    12: "dec"
+};
+
 lockRows.forEach(row => {
 
-    monthLocks[`${row.project_year}_${row.project_month}`] = true;
+    const monthName = monthNames[row.project_month];
+
+    monthLocks[`${row.project_year}_${monthName}`] = true;
 
 });
 
