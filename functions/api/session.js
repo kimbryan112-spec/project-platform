@@ -2,14 +2,54 @@ export async function onRequestGet(context) {
 
     try {
 
-        const user = context.request.headers.get("x-user");
+        // ===============================
+        // GET SESSION COOKIE
+        // ===============================
 
-        if (!user) {
+        const cookie = context.request.headers.get("Cookie") || "";
+
+        const match = cookie.match(/(?:^|;\s*)session=([^;]+)/);
+
+        if (!match) {
 
             return Response.json({
-
                 loggedIn: false
+            });
 
+        }
+
+        const sessionId = match[1];
+
+        // ===============================
+        // FIND VALID SESSION
+        // ===============================
+
+        const session = await context.env.DB.prepare(`
+
+            SELECT
+                users.id,
+                users.email,
+                users.role,
+                users.fullname
+
+            FROM sessions
+
+            JOIN users
+                ON users.id = sessions.user_id
+
+            WHERE sessions.id = ?
+            AND sessions.expires_at > datetime('now')
+
+            LIMIT 1
+
+        `)
+        .bind(sessionId)
+        .first();
+
+        if (!session) {
+
+            return Response.json({
+                loggedIn: false
             });
 
         }
@@ -18,7 +58,14 @@ export async function onRequestGet(context) {
 
             loggedIn: true,
 
-            user: JSON.parse(user)
+            user: {
+
+                id: session.id,
+                email: session.email,
+                role: session.role,
+                name: session.fullname
+
+            }
 
         });
 
@@ -28,7 +75,12 @@ export async function onRequestGet(context) {
 
         return Response.json({
 
-            loggedIn: false
+            loggedIn: false,
+            error: err.message
+
+        }, {
+
+            status: 500
 
         });
 

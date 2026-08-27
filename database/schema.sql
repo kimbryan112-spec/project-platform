@@ -102,3 +102,21 @@ CREATE TABLE IF NOT EXISTS month_locks (
     )
 
 );
+
+CREATE TABLE IF NOT EXISTS users (
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    email TEXT NOT NULL UNIQUE,
+
+    password TEXT NOT NULL,
+
+    role TEXT NOT NULL,
+
+    fullname TEXT NOT NULL,
+
+    active INTEGER DEFAULT 1,
+
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+
+);
