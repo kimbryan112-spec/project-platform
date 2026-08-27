@@ -956,10 +956,16 @@ select{
 
 .year-month-panel{
 
+    position:relative;
+
     background:#fff;
+
     padding:5px;
+
     border-radius:7px;
+
     margin-bottom:10px;
+
     box-shadow:0 2px 12px rgba(0,0,0,.05);
 
 }
@@ -967,8 +973,11 @@ select{
 .year-header{
 
     display:flex;
+
     align-items:center;
+
     gap:20px;
+
     margin-top:5px;
 
 }
@@ -978,6 +987,7 @@ select{
     margin:0;
 
     font-size:58px;
+
     font-weight:900;
 
     color:#1e293b;
@@ -2752,8 +2762,9 @@ input[type="url"]::placeholder{
 
     position:absolute;
 
-    top:152px;
-    right:58px;
+    top:5px;
+
+    right:650px;
 
     width:165px;
 
@@ -2772,7 +2783,7 @@ input[type="url"]::placeholder{
     align-items:center;
     justify-content:center;
 
-    z-index:999;
+    z-index:100;
 
     backdrop-filter:none;
 
@@ -3008,85 +3019,6 @@ input[type="url"]::placeholder{
     100%{
 
         transform:scale(1);
-
-    }
-
-}
-
-/* ==================================
-   RESPONSIVE
-================================== */
-
-/* Large Laptop */
-@media (max-width:1400px){
-
-    .music-player{
-
-        top:150px;
-        right:30px;
-
-        transform:scale(.95);
-        transform-origin:top right;
-
-    }
-
-}
-
-/* Laptop */
-@media (max-width:1200px){
-
-    .music-player{
-
-        top:148px;
-        right:15px;
-
-        transform:scale(.88);
-        transform-origin:top right;
-
-    }
-
-}
-
-/* Tablet */
-@media (max-width:992px){
-
-    .music-player{
-
-        top:145px;
-        right:10px;
-
-        transform:scale(.75);
-        transform-origin:top right;
-
-    }
-
-}
-
-/* Mobile */
-@media (max-width:768px){
-
-    .music-player{
-
-        top:142px;
-        right:5px;
-
-        transform:scale(.60);
-        transform-origin:top right;
-
-    }
-
-}
-
-/* Small Phones */
-@media (max-width:480px){
-
-    .music-player{
-
-        top:140px;
-        right:2px;
-
-        transform:scale(.50);
-        transform-origin:top right;
 
     }
 
