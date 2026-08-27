@@ -331,11 +331,6 @@ function collectRowData(row) {
     status:
     cells[1]?.querySelector(".status-select")?.value || "PLANNED",
 
-progress:
-    Number(
-        cells[1]?.querySelector(".progress-slider")?.value || 0
-    ),
-
 type:
     cells[2]?.querySelector(".type-select")?.value || "",
 
@@ -872,72 +867,72 @@ monthLocks = responseData.lockedMonths || {};
         );
 
         if (
-            Array.isArray(projectsData) &&
-            projectsData.length > 0
-        ) {
+    Array.isArray(projectsData) &&
+    projectsData.length > 0
+) {
 
-            let matchedCount = 0;
+    let matchedCount = 0;
 
-            rows.forEach((row) => {
+    rows.forEach((row) => {
 
-                const rowId = parseInt(
-                    row.getAttribute("data-row-id"),
-                    10
-                );
+        const rowId = parseInt(
+            row.getAttribute("data-row-id"),
+            10
+        );
 
-                console.log(
-                    `[LOAD] Processing row ${rowId}`
-                );
+        console.log(
+            `[LOAD] Processing row ${rowId}`
+        );
 
-                const data =
-                    projectsData.find(
-                        p => p.rowId === rowId
-                    );
+        const data =
+            projectsData.find(
+                p => p.rowId === rowId
+            );
 
-                if (data) {
+        if (data) {
 
-                    populateRow(row, data);
+            populateRow(row, data);
 
-        // ==========================
-// RESTORE MONTH LOCK BORDER
-// ==========================
+            matchedCount++;
 
-document.querySelectorAll(".month-btn").forEach(btn => {
+        } else {
 
-    const key = getMonthKey(currentYear, btn.dataset.month);
+            console.warn(
+                `[LOAD] No matching data for row ${rowId}`
+            );
 
-    btn.classList.toggle(
-        "locked",
-        !!monthLocks[key]
+        }
+
+    });
+
+    // ==========================
+    // RESTORE MONTH LOCK BORDER
+    // ==========================
+
+    document.querySelectorAll(".month-btn").forEach(btn => {
+
+        const key = getMonthKey(currentYear, btn.dataset.month);
+
+        btn.classList.toggle(
+            "locked",
+            !!monthLocks[key]
+        );
+
+    });
+
+    console.log(
+        `[LOAD] Successfully matched ${matchedCount} rows`
     );
-
-});
-
-matchedCount++;
 
 } else {
 
-    console.warn(
-        `[LOAD] No matching data for row ${rowId}`
+    console.log(
+        "[LOAD] No data returned from API"
     );
 
 }
 
-        });
-
-        console.log(
-            `[LOAD] Successfully matched ${matchedCount} rows`
-        );
-
-    } else {
-
-        console.log(
-            "[LOAD] No data returned from API"
-        );
-
-    }
-
-} catch (e) {
+    } catch (e) {
 
     console.error(
         "[LOAD] Error loading projects:",
@@ -956,7 +951,8 @@ document.querySelectorAll(".type-select")
 
 document.querySelectorAll(".dashboard-song-status")
     .forEach(updateSongStatusColor);
-    document.querySelectorAll(".drone-select")
+
+document.querySelectorAll(".drone-select")
     .forEach(updateDroneColor);
 
 }
@@ -977,9 +973,12 @@ function saveProjects() {
 
     updateMonthLockUI();
 
-    clearTimeout(apiSaveTimeout);
+    const saveYear = currentYear;
+const saveMonth = currentMonth;
 
-    apiSaveTimeout = setTimeout(async () => {
+clearTimeout(apiSaveTimeout);
+
+apiSaveTimeout = setTimeout(async () => {
 
         const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
@@ -990,7 +989,8 @@ function saveProjects() {
 
     if (rowData) {
 
-        rowData.monthLocked = !!monthLocks[getMonthKey()];
+        rowData.monthLocked =
+    !!monthLocks[getMonthKey(currentYear, currentMonth)];
 
         projectsData.push(rowData);
 
@@ -1012,7 +1012,7 @@ try {
 
     const response = await fetch(
 
-    `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}`,
+    `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
 
     {
 
@@ -1085,7 +1085,8 @@ localSaveTimeout = setTimeout(() => {
 
     if (rowData) {
 
-        rowData.monthLocked = !!monthLocks[getMonthKey()];
+        rowData.monthLocked =
+    !!monthLocks[getMonthKey(currentYear, currentMonth)];
 
         projectsData.push(rowData);
 
@@ -1483,12 +1484,15 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
     saveMonthLocks(locks);
 
     // Save to Cloudflare
+// Save to D1
 saveProjects();
 
-    if (!response.ok) {
-        alert("Failed to lock month.");
-        return;
-    }
+// Update UI
+button.classList.add("locked");
+
+updateMonthLockUI();
+
+monthContextMenu.style.display = "none";
 
     // UI
     button.classList.add("locked");
@@ -1524,10 +1528,11 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
     // Save to Cloudflare D1
     saveProjects();
 
-    if (!response.ok) {
-        alert("Failed to unlock month.");
-        return;
-    }
+button.classList.remove("locked");
+
+updateMonthLockUI();
+
+monthContextMenu.style.display = "none";
 
     // UI
     button.classList.remove("locked");
