@@ -1478,13 +1478,13 @@ document.querySelectorAll(".month-btn").forEach(button => {
 
         e.preventDefault();
 
-        currentMonth = button.dataset.month;
+        const selectedMonth = button.dataset.month;
 
-        const lockBtn = document.getElementById("lockMonthBtn");
-        const unlockBtn = document.getElementById("unlockMonthBtn");
+const lockBtn = document.getElementById("lockMonthBtn");
+const unlockBtn = document.getElementById("unlockMonthBtn");
 
-        const key = getMonthKey(currentYear, currentMonth);
-        const locked = !!getMonthLocks()[key];
+const key = getMonthKey(currentYear, selectedMonth);
+const locked = !!getMonthLocks()[key];
 
         if (locked) {
             lockBtn.style.display = "none";
@@ -1498,9 +1498,9 @@ document.querySelectorAll(".month-btn").forEach(button => {
         monthContextMenu.style.left = `${e.pageX}px`;
         monthContextMenu.style.top = `${e.pageY}px`;
 
-        monthContextMenu.dataset.month = currentMonth;
+        monthContextMenu.dataset.month = selectedMonth;
 
-        console.log("Right Click Month:", currentMonth);
+console.log("Right Click Month:", selectedMonth);
 
     });
 
