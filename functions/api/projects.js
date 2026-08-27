@@ -120,7 +120,7 @@ teaserSong: {
 },
 
 monthLocked:
-    monthLocks[`${year}_${month}`] || false
+    monthLocks[`${year}_${monthNames[month]}`] || false
 
 }));
 
