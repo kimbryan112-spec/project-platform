@@ -1657,15 +1657,13 @@ button.addEventListener("contextmenu", (e) => {
 
     activeWatchButton = button;
 
-    const rect = button.getBoundingClientRect();
-
     watchContextMenu.style.display = "block";
 
-    watchContextMenu.style.left =
-        `${rect.left + window.scrollX}px`;
+watchContextMenu.style.position = "fixed";
 
-    watchContextMenu.style.top =
-        `${rect.bottom + window.scrollY + 2}px`;
+watchContextMenu.style.left = `${e.clientX}px`;
+
+watchContextMenu.style.top = `${e.clientY}px`;
 
 });
 
@@ -1705,8 +1703,12 @@ document.querySelectorAll(".get-files-btn").forEach(button => {
         activeFilesButton = button;
 
         filesContextMenu.style.display = "block";
-        filesContextMenu.style.left = `${e.pageX}px`;
-        filesContextMenu.style.top = `${e.pageY}px`;
+
+filesContextMenu.style.position = "fixed";
+
+filesContextMenu.style.left = `${e.clientX}px`;
+
+filesContextMenu.style.top = `${e.clientY}px`;
 
     });
 
@@ -2905,23 +2907,6 @@ document.querySelectorAll(".get-files-btn").forEach(btn => {
         window.open(link, "_blank");
 
     });
-
-// ==================================
-// RIGHT CLICK = CUSTOM MODAL
-// ==================================
-
-btn.addEventListener("contextmenu", (e) => {
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    activeFilesButton = btn;
-
-    filesContextMenu.style.display = "block";
-    filesContextMenu.style.left = `${e.pageX}px`;
-    filesContextMenu.style.top = `${e.pageY}px`;
-
-});
 
 });
 
