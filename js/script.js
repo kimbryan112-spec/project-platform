@@ -794,121 +794,134 @@ async function loadProjects() {
 
     try {
 
-    console.log(
+        console.log(
 
-        `[LOAD] Fetching projects (${currentYear}-${currentMonth})...`
+            `[LOAD] Fetching projects (${currentYear}-${currentMonth})...`
 
-    );
+        );
 
-    const response = await fetch(
+        const response = await fetch(
 
-    `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
+            `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
 
-    {
+            {
 
-        cache: "no-store",
+                cache: "no-store",
 
-        headers: {
+                headers: {
 
-            "Cache-Control": "no-cache"
+                    "Cache-Control": "no-cache"
+
+                }
+
+            }
+
+        );
+
+        if (!response.ok) {
+
+            console.error(
+
+                "[LOAD] API returned error:",
+
+                response.status
+
+            );
+
+            return;
 
         }
 
-    }
+        const projectsData = await response.json();
 
-);
+        // ==================================
+        // RESTORE MONTH LOCK FROM D1
+        // ==================================
 
-    if (!response.ok) {
+        monthLocks = {};
 
-        console.error(
+        if (
+            Array.isArray(projectsData) &&
+            projectsData.length > 0 &&
+            projectsData[0].monthLocked
+        ) {
+            monthLocks[getMonthKey(currentYear, currentMonth)] = true;
+        }
 
-            "[LOAD] API returned error:",
+        updateMonthLockUI();
 
-            response.status
+        console.log(
+
+            `[LOAD] Loaded ${projectsData.length} record(s) for ${currentYear}-${currentMonth}`
 
         );
 
-        return;
+        console.log(
 
-    }
+            "[LOAD] API Response:",
 
-    const projectsData = await response.json();
+            projectsData
 
-    console.log(
-
-        `[LOAD] Loaded ${projectsData.length} record(s) for ${currentYear}-${currentMonth}`
-
-    );
-
-    console.log(
-
-        "[LOAD] API Response:",
-
-        projectsData
-
-    );
-
-    console.log(
-        "[LOAD] Total records from DB:",
-        projectsData.length
-    );
-
-    const rows =
-        document.querySelectorAll(
-            ".project-table tbody tr"
         );
 
-    console.log(
-        "[LOAD] Total rows in HTML:",
-        rows.length
-    );
+        console.log(
+            "[LOAD] Total records from DB:",
+            projectsData.length
+        );
 
-    if (
-        Array.isArray(projectsData) &&
-        projectsData.length > 0
-    ) {
-
-        let matchedCount = 0;
-
-        rows.forEach((row) => {
-
-            const rowId = parseInt(
-                row.getAttribute("data-row-id"),
-                10
+        const rows =
+            document.querySelectorAll(
+                ".project-table tbody tr"
             );
 
-            console.log(
-                `[LOAD] Processing row ${rowId}`
-            );
+        console.log(
+            "[LOAD] Total rows in HTML:",
+            rows.length
+        );
 
-            const data =
-                projectsData.find(
-                    p => p.rowId === rowId
+        if (
+            Array.isArray(projectsData) &&
+            projectsData.length > 0
+        ) {
+
+            let matchedCount = 0;
+
+            rows.forEach((row) => {
+
+                const rowId = parseInt(
+                    row.getAttribute("data-row-id"),
+                    10
                 );
 
-            if (data) {
+                console.log(
+                    `[LOAD] Processing row ${rowId}`
+                );
 
-    populateRow(row, data);
+                const data =
+                    projectsData.find(
+                        p => p.rowId === rowId
+                    );
+
+                if (data) {
+
+                    populateRow(row, data);
 
         // ==========================
 // RESTORE MONTH LOCK BORDER
 // ==========================
-const locks = getMonthLocks();
-const isAdmin = typeof IS_ADMIN !== "undefined" && IS_ADMIN;
 
 document.querySelectorAll(".month-btn").forEach(btn => {
 
     const key = getMonthKey(currentYear, btn.dataset.month);
 
-    if (isAdmin && locks[key]) {
-        btn.classList.add("locked");
-    } else {
-        btn.classList.remove("locked");
-    }
+    btn.classList.toggle(
+        "locked",
+        !!monthLocks[key]
+    );
 
 });
 
-    matchedCount++;
+matchedCount++;
 
 } else {
 
@@ -979,21 +992,19 @@ function saveProjects() {
         const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
 
-        const monthLocked = isMonthLocked();
-
         rows.forEach(row => {
 
-            const rowData = collectRowData(row);
+    const rowData = collectRowData(row);
 
-            if (rowData) {
+    if (rowData) {
 
-                rowData.monthLocked = monthLocked;
+        rowData.monthLocked = !!monthLocks[getMonthKey()];
 
-                projectsData.push(rowData);
+        projectsData.push(rowData);
 
-            }
+    }
 
-        });
+});
 
         console.log("[API SAVE]");
 console.log("[SAVE] API Payload");
@@ -1076,15 +1087,13 @@ localSaveTimeout = setTimeout(() => {
 
         const projectsData = [];
 
-        const monthLocked = isMonthLocked();
-
-rows.forEach(row => {
+        rows.forEach(row => {
 
     const rowData = collectRowData(row);
 
     if (rowData) {
 
-        rowData.monthLocked = monthLocked;
+        rowData.monthLocked = !!monthLocks[getMonthKey()];
 
         projectsData.push(rowData);
 
@@ -1118,12 +1127,14 @@ console.log(
 // MONTH LOCK HELPERS
 // ==================================
 
+let monthLocks = {};
+
 function getMonthLocks() {
-    return JSON.parse(localStorage.getItem("monthLocks") || "{}");
+    return monthLocks;
 }
 
 function saveMonthLocks(locks) {
-    localStorage.setItem("monthLocks", JSON.stringify(locks));
+    monthLocks = locks;
 }
 
 function getMonthKey(year = currentYear, month = currentMonth) {
@@ -1132,7 +1143,7 @@ function getMonthKey(year = currentYear, month = currentMonth) {
 
 function isMonthLocked() {
 
-    return !!getMonthLocks()[getMonthKey()];
+    return !!monthLocks[getMonthKey()];
 
 }
 
@@ -1426,24 +1437,24 @@ document.querySelectorAll(".month-btn").forEach(button => {
         currentMonth = button.dataset.month;
 
         const lockBtn = document.getElementById("lockMonthBtn");
-const unlockBtn = document.getElementById("unlockMonthBtn");
+        const unlockBtn = document.getElementById("unlockMonthBtn");
 
-const key = getMonthKey(currentYear, currentMonth);
-const locked = !!getMonthLocks()[key];
+        const key = getMonthKey(currentYear, currentMonth);
+        const locked = !!getMonthLocks()[key];
 
-if (locked) {
-    lockBtn.style.display = "none";
-    unlockBtn.style.display = "flex";   // o "block" depende sa CSS mo
-} else {
-    lockBtn.style.display = "flex";
-    unlockBtn.style.display = "none";
-}
+        if (locked) {
+            lockBtn.style.display = "none";
+            unlockBtn.style.display = "flex";
+        } else {
+            lockBtn.style.display = "flex";
+            unlockBtn.style.display = "none";
+        }
 
-monthContextMenu.style.display = "block";
-monthContextMenu.style.left = `${e.pageX}px`;
-monthContextMenu.style.top = `${e.pageY}px`;
+        monthContextMenu.style.display = "block";
+        monthContextMenu.style.left = `${e.pageX}px`;
+        monthContextMenu.style.top = `${e.pageY}px`;
 
-monthContextMenu.dataset.month = currentMonth;
+        monthContextMenu.dataset.month = currentMonth;
 
         console.log("Right Click Month:", currentMonth);
 
@@ -1451,32 +1462,47 @@ monthContextMenu.dataset.month = currentMonth;
 
 });
 
+// Hide context menu
 document.addEventListener("click", () => {
+
     if (monthContextMenu) {
         monthContextMenu.style.display = "none";
     }
+
 });
+
+/* ==================================
+   LOCK MONTH
+================================== */
 
 document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
 
     const month = monthContextMenu.dataset.month;
 
-    const button = document.querySelector(`.month-btn[data-month="${month}"]`);
+    const button = document.querySelector(
+        `.month-btn[data-month="${month}"]`
+    );
 
-    if (button) {
+    if (!button) return;
 
-        // Save lock state
-        const locks = getMonthLocks();
-        locks[getMonthKey(currentYear, month)] = true;
-        saveMonthLocks(locks);
+    // Save local (optional)
+    const locks = getMonthLocks();
+    locks[getMonthKey(currentYear, month)] = true;
+    saveMonthLocks(locks);
 
-        // UI
-        button.classList.add("locked");
+    // Save to Cloudflare
+saveProjects();
 
-        // Refresh editable/read-only state
-        updateMonthLockUI();
-
+    if (!response.ok) {
+        alert("Failed to lock month.");
+        return;
     }
+
+    // UI
+    button.classList.add("locked");
+
+    // Refresh
+    updateMonthLockUI();
 
     console.log("LOCK:", `${currentYear}_${month}`);
 
@@ -1484,26 +1510,38 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", () => {
 
 });
 
+/* ==================================
+   UNLOCK MONTH
+================================== */
+
 document.getElementById("unlockMonthBtn")?.addEventListener("click", () => {
 
     const month = monthContextMenu.dataset.month;
 
-    const button = document.querySelector(`.month-btn[data-month="${month}"]`);
+    const button = document.querySelector(
+        `.month-btn[data-month="${month}"]`
+    );
 
-    if (button) {
+    if (!button) return;
 
-        // Remove lock state
-        const locks = getMonthLocks();
-        delete locks[getMonthKey(currentYear, month)];
-        saveMonthLocks(locks);
+    // Remove local
+    const locks = getMonthLocks();
+    delete locks[getMonthKey(currentYear, month)];
+    saveMonthLocks(locks);
 
-        // UI
-        button.classList.remove("locked");
+    // Save to Cloudflare D1
+    saveProjects();
 
-        // Refresh editable/read-only state
-        updateMonthLockUI();
-
+    if (!response.ok) {
+        alert("Failed to unlock month.");
+        return;
     }
+
+    // UI
+    button.classList.remove("locked");
+
+    // Refresh
+    updateMonthLockUI();
 
     console.log("UNLOCK:", `${currentYear}_${month}`);
 
