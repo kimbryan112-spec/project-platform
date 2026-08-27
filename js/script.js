@@ -154,7 +154,9 @@ document.querySelector(`.month-btn[data-month="${currentMonth}"]`)
 
     loadProjects();
 
-    const nextYearBtn = document.querySelector(".next-year-btn");
+updateTimelineProgress();
+
+const nextYearBtn = document.querySelector(".next-year-btn");
 
     if (nextYearBtn) {
 
@@ -202,8 +204,12 @@ const tableBody = document.querySelector('.project-table tbody');
     saveProjects();
 
     if (e.target.classList.contains('status-select')) {
-        updateStatusColor(e.target);
-    }
+
+    updateStatusColor(e.target);
+
+    updateTimelineProgress();
+
+}
 
     if (e.target.classList.contains('type-select')) {
         updateTypeColor(e.target);
@@ -314,8 +320,13 @@ function collectRowData(row) {
     status:
     cells[1]?.querySelector(".status-select")?.value || "PLANNED",
 
-    type:
-        cells[2]?.querySelector(".type-select")?.value || "",
+progress:
+    Number(
+        cells[1]?.querySelector(".progress-slider")?.value || 0
+    ),
+
+type:
+    cells[2]?.querySelector(".type-select")?.value || "",
 
     rawFiles:
         cells[3]?.querySelector(".dashboard-raw-input")?.value || "",
@@ -332,7 +343,13 @@ song3: getSongData(7),
 teaserSong: getSongData(8),
 
 watchLink:
-    cells[0]?.querySelector(".watch-btn")?.dataset.watchLink || ""
+    cells[0]?.querySelector(".watch-btn")?.dataset.watchLink || "",
+
+progress:
+    parseInt(
+        row.querySelector(".progress-slider")?.value || 0,
+        10
+    )
 };
     } catch (err) {
         console.error("Error collecting row data for row:", row, err);
@@ -379,19 +396,32 @@ function populateRow(row, data) {
 
         const savedStatus = (data.status || "").trim();
 
-console.log("Saved:", JSON.stringify(savedStatus));
-console.log(
-    "Available:",
-    [...statusSelect.options].map(o => JSON.stringify(o.value))
-);
+        console.log("Saved:", JSON.stringify(savedStatus));
+        console.log(
+            "Available:",
+            [...statusSelect.options].map(o => JSON.stringify(o.value))
+        );
 
-statusSelect.value = savedStatus;
+        statusSelect.value = savedStatus;
 
-console.log("After:", JSON.stringify(statusSelect.value));
+        console.log("After:", JSON.stringify(statusSelect.value));
 
         console.log("Select value after assign:", statusSelect.value);
 
         updateStatusColor(statusSelect);
+
+    }
+
+    const slider =
+        cells[1].querySelector(".progress-slider");
+
+    if (slider) {
+
+        slider.value = data.progress || 0;
+
+        updateRowProgress(
+            slider.closest("tr")
+        );
 
     }
 
@@ -480,6 +510,18 @@ const setSongData = (cellIndex, songData = {}) => {
     if (watchBtn) {
         watchBtn.dataset.watchLink = data.watchLink || "";
     }
+
+    const slider =
+    row.querySelector(".progress-slider");
+
+if (slider) {
+
+    slider.value =
+        data.progress || 0;
+
+}
+
+updateRowProgress(row);
 
    // Apply colors
 updateStatusColor(cells[1]?.querySelector('.status-select'));
@@ -1029,16 +1071,35 @@ function isMonthLocked() {
 function setMonthEditable(editable) {
 
     // Inputs / Selects
-    document.querySelectorAll(`
-        .status-select,
-        .type-select,
-        .dashboard-raw-input,
-        .song-link,
-        .dashboard-song-status,
-        .song-notes
-    `).forEach(input => {
-        input.disabled = !editable;
-    });
+document.querySelectorAll(`
+    .status-select,
+    .type-select,
+    .dashboard-raw-input,
+    .song-link,
+    .dashboard-song-status,
+    .song-notes
+`).forEach(input => {
+    input.disabled = !editable;
+});
+
+// Progress Slider
+document.querySelectorAll(".progress-slider").forEach(slider => {
+
+    if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
+
+    slider.disabled = false;
+    slider.style.pointerEvents = "auto";
+    slider.style.opacity = "1";
+
+} else {
+
+    slider.disabled = false;           // huwag i-disable
+    slider.style.pointerEvents = "none"; // hindi mahihila
+    slider.style.opacity = "1";          // hindi magiging gray
+
+}
+
+});
 
     // Couple Name (contenteditable)
     document.querySelectorAll(".couple-name").forEach(el => {
@@ -1155,6 +1216,33 @@ function updateStatusColor(select){
             select.classList.add("status-delivered");
             break;
     }
+
+    // Show timeline only while IN PROGRESS
+    const row = select.closest("tr");
+
+    const timeline = row?.querySelector(".timeline");
+    const percent = row?.querySelector(".timeline-percent");
+
+    if (timeline) {
+
+        timeline.style.display =
+            select.value === "IN PROGRESS"
+                ? "block"
+                : "none";
+
+    }
+
+    if (percent) {
+
+        percent.style.display =
+            select.value === "IN PROGRESS"
+                ? "block"
+                : "none";
+
+    }
+
+    // Refresh timeline progress
+    updateTimelineProgress();
 
 }
 
@@ -2323,6 +2411,90 @@ document.addEventListener("dblclick", (e) => {
     if (!link) return;
 
     window.open(link, "_blank");
+
+});
+
+/* ==================================
+   PROJECT TIMELINE PROGRESS
+================================== */
+
+function updateTimelineProgress() {
+
+    document.querySelectorAll(".project-table tbody tr").forEach(row => {
+
+        updateRowProgress(row);
+
+    });
+
+}
+
+/* ==================================
+   ROW PROGRESS
+================================== */
+
+function updateRowProgress(row) {
+
+    if (!row) return;
+
+    const status =
+        row.querySelector(".status-select");
+
+    const slider =
+        row.querySelector(".progress-slider");
+
+    const label =
+        row.querySelector(".timeline-percent");
+
+    if (
+        !status ||
+        !slider ||
+        !label
+    ) return;
+
+    // Show only while IN PROGRESS
+    const show =
+        status.value === "IN PROGRESS";
+
+    slider.style.display =
+        show ? "block" : "none";
+
+    label.style.display =
+        show ? "block" : "none";
+
+    // Percentage
+    label.textContent =
+        slider.value + "%";
+
+    // Dynamic color
+    const value =
+        Number(slider.value);
+
+    const hue = value * 1.2;
+
+slider.style.accentColor =
+    `hsl(${hue}, 90%, 50%)`;
+
+}
+
+/* ==================================
+   PROGRESS SLIDER
+================================== */
+
+document.querySelectorAll(".progress-slider").forEach(slider => {
+
+    updateRowProgress(
+        slider.closest("tr")
+    );
+
+    slider.addEventListener("input", () => {
+
+        updateRowProgress(
+            slider.closest("tr")
+        );
+
+        saveProjects();
+
+    });
 
 });
 
