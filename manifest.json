@@ -1,0 +1,20 @@
+{
+  "name": "KBHFILMS Project Platform",
+  "short_name": "KBHFILMS",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/assets/images/kbhfilms-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/kbhfilms-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
