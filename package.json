@@ -1,8 +1,12 @@
 {
-    "name": "wedding-dashboard",
-    "version": "1.0.0",
-    "private": true,
-    "scripts": {
-        "generate-playlist": "node scripts/generate-playlist.js"
-    }
+  "name": "wedding-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "generate-playlist": "node scripts/generate-playlist.js",
+    "generate-icons": "node scripts/generate-icons.js"
+  },
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
 }
