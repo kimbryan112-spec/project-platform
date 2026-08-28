@@ -42,13 +42,15 @@ CREATE TABLE IF NOT EXISTS projects (
 
     raw_files TEXT NOT NULL DEFAULT '',
 
-    drone TEXT NOT NULL DEFAULT '',
+drone TEXT NOT NULL DEFAULT '',
 
-    instruction TEXT NOT NULL DEFAULT '',
+instruction TEXT NOT NULL DEFAULT '',
 
-    watch_link TEXT NOT NULL DEFAULT '',
+concerns TEXT NOT NULL DEFAULT '',
 
-    files_link TEXT NOT NULL DEFAULT '',
+watch_link TEXT NOT NULL DEFAULT '',
+
+files_link TEXT NOT NULL DEFAULT '',
 
     song1_title TEXT NOT NULL DEFAULT '',
     song1_link TEXT NOT NULL DEFAULT '',

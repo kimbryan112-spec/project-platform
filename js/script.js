@@ -343,6 +343,9 @@ type:
 instruction:
     cells[0]?.querySelector(".instruction-btn")?.dataset.notes || "",
 
+concerns:
+    cells[1]?.querySelector(".concerns-btn")?.dataset.notes || "",
+
     song1: getSongData(5),
 song2: getSongData(6),
 song3: getSongData(7),
@@ -400,29 +403,45 @@ function populateRow(row, data) {
 
     if (statusSelect) {
 
-        console.log("Row:", data.rowId);
-        console.log("Saved status:", `"${data.status}"`);
+    console.log("Row:", data.rowId);
+    console.log("Saved status:", `"${data.status}"`);
 
-        const savedStatus = (data.status || "").trim();
+    const savedStatus = (data.status || "").trim();
 
-        console.log("Saved:", JSON.stringify(savedStatus));
-        console.log(
-            "Available:",
-            [...statusSelect.options].map(o => JSON.stringify(o.value))
-        );
+    console.log("Saved:", JSON.stringify(savedStatus));
+    console.log(
+        "Available:",
+        [...statusSelect.options].map(o => JSON.stringify(o.value))
+    );
 
-        statusSelect.value = savedStatus;
+    statusSelect.value = savedStatus;
 
-        console.log("After:", JSON.stringify(statusSelect.value));
+    console.log("After:", JSON.stringify(statusSelect.value));
 
-        console.log("Select value after assign:", statusSelect.value);
+    console.log("Select value after assign:", statusSelect.value);
 
-        updateStatusColor(statusSelect);
+    updateStatusColor(statusSelect);
 
-    }
+}
 
-    const slider =
-        cells[1].querySelector(".progress-slider");
+const concernsBtn =
+    cells[1].querySelector(".concerns-btn");
+
+if (concernsBtn) {
+
+    const concernText = data.concerns || "";
+
+    concernsBtn.dataset.notes = concernText;
+
+    concernsBtn.classList.toggle(
+        "has-comments",
+        concernText.trim() !== ""
+    );
+
+}
+
+const slider =
+    cells[1].querySelector(".progress-slider");
 
     if (slider) {
 
@@ -1353,11 +1372,12 @@ function updateStatusColor(select){
         case "YONG'S RATINGS":
             select.classList.add("status-ratings");
             break;
+
     }
 
-    // Show timeline only while IN PROGRESS
     const row = select.closest("tr");
 
+    // Show timeline only while IN PROGRESS
     const timeline = row?.querySelector(".timeline");
     const percent = row?.querySelector(".timeline-percent");
 
@@ -1374,6 +1394,18 @@ function updateStatusColor(select){
 
         percent.style.display =
             select.value === "IN PROGRESS"
+                ? "block"
+                : "none";
+
+    }
+
+    // Show CONCERNS button only while PROJECT CONCERNS
+    const concernsBtn = row?.querySelector(".concerns-btn");
+
+    if (concernsBtn) {
+
+        concernsBtn.style.display =
+            select.value === "PROJECT CONCERNS"
                 ? "block"
                 : "none";
 
@@ -2176,55 +2208,72 @@ instructionTextarea.addEventListener("input", () => {
 });
 
 // ===============================
-// COMMENTS MODAL
+// COMMENTS / CONCERNS MODAL
 // ===============================
 
-let activeCommentsButton = null;
+let activeNotesButton = null;
 
 const commentsModal = document.getElementById("commentsModal");
 const commentsTextarea = document.getElementById("commentsTextarea");
 const closeCommentsModal = document.getElementById("closeCommentsModal");
 
-document.querySelectorAll(".comments-btn").forEach(button => {
+// Open modal
+document.addEventListener("click", (e) => {
 
-    button.addEventListener("click", () => {
+    const button = e.target.closest(".comments-btn, .concerns-btn");
 
-        activeCommentsButton = button;
+    if (!button) return;
 
-        commentsTextarea.value =
-            button.dataset.notes || "";
+    activeNotesButton = button;
 
-        commentsModal.classList.add("show");
+    commentsTextarea.value =
+        button.dataset.notes || "";
 
-        commentsTextarea.focus();
+    // Switch modal theme
+    if (button.classList.contains("concerns-btn")) {
 
-    });
+        commentsModal.classList.add("concerns-mode");
+
+    } else {
+
+        commentsModal.classList.remove("concerns-mode");
+
+    }
+
+    commentsModal.classList.add("show");
+
+    commentsTextarea.focus();
 
 });
 
+// Close button
 closeCommentsModal?.addEventListener("click", () => {
 
     commentsModal.classList.remove("show");
+    commentsModal.classList.remove("concerns-mode");
 
 });
 
+// Click outside
 commentsModal?.addEventListener("click", (e) => {
 
     if (e.target === commentsModal) {
 
         commentsModal.classList.remove("show");
+        commentsModal.classList.remove("concerns-mode");
 
     }
 
 });
 
+// Auto save
 commentsTextarea?.addEventListener("input", () => {
 
-    if (!activeCommentsButton) return;
+    if (!activeNotesButton) return;
 
-    activeCommentsButton.dataset.notes = commentsTextarea.value;
+    activeNotesButton.dataset.notes = commentsTextarea.value;
 
-    activeCommentsButton.classList.toggle(
+    activeNotesButton.classList.toggle(
         "has-comments",
         commentsTextarea.value.trim() !== ""
     );

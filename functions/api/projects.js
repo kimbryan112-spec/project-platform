@@ -87,7 +87,9 @@ type: row.type || "NOT SET",
 
             instruction: row.instruction || "",
 
-            watchLink: row.watch_link || "",
+concerns: row.concerns || "",
+
+watchLink: row.watch_link || "",
 
 filesLink: row.files_link || "",
 
@@ -196,8 +198,9 @@ type,
 
     raw_files,
     drone,
-    instruction,
-    watch_link,
+instruction,
+concerns,
+watch_link,
 files_link,
 
 song1_title,
@@ -230,7 +233,7 @@ VALUES (
 
     ?, ?, ?, ?,       -- couple_name, status, progress, type
 
-    ?, ?, ?, ?, ?,    -- raw_files, drone, instruction, watch_link, files_link
+    ?, ?, ?, ?, ?, ?,    -- raw_files, drone, instruction, concerns, watch_link, files_link
 
     ?, ?, ?, ?,       -- song1_title, song1_link, song1_status, song1_notes
 
@@ -255,8 +258,9 @@ type = excluded.type,
 
     raw_files = excluded.raw_files,
     drone = excluded.drone,
-    instruction = excluded.instruction,
-    watch_link = excluded.watch_link,
+instruction = excluded.instruction,
+concerns = excluded.concerns,
+watch_link = excluded.watch_link,
 files_link = excluded.files_link,
 
     song1_title = excluded.song1_title,
@@ -296,6 +300,7 @@ row.type || "NOT SET",
     row.rawFiles || "",
 row.drone || "",
 row.instruction || "",
+row.concerns || "",
 row.watchLink || "",
 row.filesLink || "",
 
