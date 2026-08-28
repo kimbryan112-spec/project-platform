@@ -797,8 +797,13 @@ document.querySelectorAll(".dashboard-song-status")
     document.querySelectorAll(".drone-select")
     .forEach(updateDroneColor);
 
+    updateMonthHasDataUI();
+
 // Apply editable/read-only state
 updateMonthLockUI();
+
+// Update month buttons that have data
+updateMonthHasDataUI();
 
 console.log("[LOCAL LOAD] Loaded from localStorage.");
 
@@ -806,6 +811,9 @@ console.log("[LOCAL LOAD] Loaded from localStorage.");
 
 // ONLINE LOAD FUNCTION (MAY ANTI-CACHE PARAMETER)
 async function loadProjects() {
+    console.log("========== LOAD START ==========");
+console.log("currentYear :", currentYear);
+console.log("currentMonth:", currentMonth);
 
     if (LOCAL_MODE) {
 
@@ -816,7 +824,18 @@ async function loadProjects() {
 
     clearProjectTable();
 
-    updateMonthLockUI();
+// Siguraduhing hindi nagbabago ang month habang naglo-load
+const selectedMonth = currentMonth;
+
+updateMonthLockUI();
+
+updateMonthHasDataUI();
+
+console.log("========== LOAD END ==========");
+console.log("currentYear :", currentYear);
+console.log("currentMonth:", currentMonth);
+
+currentMonth = selectedMonth;
 
     try {
 
@@ -948,10 +967,10 @@ console.log("monthLocks:", monthLocks);
     });
 
     // ==========================
-    // RESTORE MONTH LOCK BORDER
-    // ==========================
+// RESTORE MONTH LOCK BORDER
+// ==========================
 
-    document.querySelectorAll(".month-btn").forEach(btn => {
+document.querySelectorAll(".month-btn").forEach(btn => {
 
     const key = getMonthKey(currentYear, btn.dataset.month);
 
@@ -977,9 +996,9 @@ console.log("monthLocks:", monthLocks);
 
 updateMonthLockUI();
 
-    console.log(
-        `[LOAD] Successfully matched ${matchedCount} rows`
-    );
+console.log(
+    `[LOAD] Successfully matched ${matchedCount} rows`
+);
 
 } else {
 
@@ -989,7 +1008,7 @@ updateMonthLockUI();
 
 }
 
-    } catch (e) {
+} catch (e) {
 
     console.error(
         "[LOAD] Error loading projects:",
@@ -997,6 +1016,10 @@ updateMonthLockUI();
     );
 
 }
+
+// ==================================
+// RESTORE UI COLORS
+// ==================================
 
 document.querySelectorAll(".status-select")
     .forEach(updateStatusColor);
@@ -1010,9 +1033,18 @@ document.querySelectorAll(".dashboard-song-status")
 document.querySelectorAll(".drone-select")
     .forEach(updateDroneColor);
 
+// ==================================
+// UPDATE MONTH BUTTON COLOR
+// ==================================
+
+updateMonthHasDataUI();
+
 }
 
+// ==================================
 // ONLINE SAVE FUNCTION
+// ==================================
+
 let localSaveTimeout;
 let apiSaveTimeout;
 
@@ -1029,29 +1061,31 @@ function saveProjects() {
     updateMonthLockUI();
 
     const saveYear = currentYear;
-const saveMonth = currentMonth;
+    const saveMonth = currentMonth;
 
-clearTimeout(apiSaveTimeout);
+    clearTimeout(apiSaveTimeout);
 
-apiSaveTimeout = setTimeout(async () => {
+    apiSaveTimeout = setTimeout(async () => {
 
         const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
 
         rows.forEach(row => {
 
-    const rowData = collectRowData(row);
+            const rowData = collectRowData(row);
 
-    if (rowData) {
+            if (rowData) {
 
-        rowData.monthLocked =
-    !!monthLocks[getMonthKey(saveYear, saveMonth)];
+                rowData.monthLocked =
+                    !!monthLocks[getMonthKey(saveYear, saveMonth)];
 
-        projectsData.push(rowData);
+                projectsData.push(rowData);
 
-    }
+            }
 
-});
+        });
+
+        // ... (tuloy ang existing save code mo)
 
         console.log("[API SAVE]");
 console.log("[SAVE] API Payload");
@@ -1090,6 +1124,8 @@ try {
         console.log(
     `[SAVE] Successfully synced (${saveYear}-${saveMonth}) to Cloudflare backend!`
 );
+
+updateMonthHasDataUI();
 
     } else {
 
@@ -1165,6 +1201,8 @@ console.log(
 
 );
 
+updateMonthHasDataUI();
+
 }, 500);
 
 }
@@ -1185,6 +1223,91 @@ function saveMonthLocks(locks) {
 
 function getMonthKey(year = currentYear, month = currentMonth) {
     return `${year}_${month}`;
+}
+
+// ==================================
+// MONTH HAS DATA HELPERS
+// ==================================
+
+function monthHasData() {
+
+    const rows = document.querySelectorAll(".project-table tbody tr");
+
+    return [...rows].some(row => {
+
+        const data = collectRowData(row);
+
+        if (!data) return false;
+
+        return (
+
+            data.coupleName.trim() ||
+            data.rawFiles.trim() ||
+            data.instruction.trim() ||
+            data.concerns.trim() ||
+            data.watchLink.trim() ||
+            data.filesLink.trim() ||
+
+            data.song1.title.trim() ||
+            data.song1.link.trim() ||
+            data.song1.notes.trim() ||
+
+            data.song2.title.trim() ||
+            data.song2.link.trim() ||
+            data.song2.notes.trim() ||
+
+            data.song3.title.trim() ||
+            data.song3.link.trim() ||
+            data.song3.notes.trim() ||
+
+            data.teaserSong.title.trim() ||
+            data.teaserSong.link.trim() ||
+            data.teaserSong.notes.trim()
+
+        );
+
+    });
+
+}
+
+function updateMonthHasDataUI() {
+
+    document.querySelectorAll(".month-btn").forEach(btn => {
+
+        const month = btn.dataset.month;
+        const key = `projects_${currentYear}_${month}`;
+
+        let hasData = false;
+
+        const saved = localStorage.getItem(key);
+
+        if (saved) {
+
+            try {
+
+                const projects = JSON.parse(saved);
+
+                hasData = projects.some(project => {
+
+                    return (
+                        (project.coupleName || "").trim() !== "" ||
+                        (project.rawFiles || "").trim() !== ""
+                    );
+
+                });
+
+            } catch (err) {
+
+                console.error(err);
+
+            }
+
+        }
+
+        btn.classList.toggle("has-data", hasData);
+
+    });
+
 }
 
 function isMonthLocked() {

@@ -1120,7 +1120,9 @@ select{
 
 .month-btn{
 
-    padding:10px 18px;
+    padding:13px 24px;
+    min-width:78px;
+    min-height:46px;
 
     border:1px solid #2563eb;
     border-radius:8px;
@@ -1133,6 +1135,7 @@ select{
     );
 
     color:#fff;
+    font-size:15px;
     font-weight:700;
     cursor:pointer;
 
@@ -1140,7 +1143,7 @@ select{
 
 .month-btn.has-data{
 
-    border-color:#15803d;
+    border-color:transparent !important;
 
     background:linear-gradient(
         to bottom,
@@ -1148,6 +1151,23 @@ select{
         #22c55e 55%,
         #16a34a 100%
     );
+
+}
+
+.month-btn.has-data::after{
+
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    border:3px solid #22c55e;
+
+    border-radius:8px;
+
+    box-sizing:border-box;
+
+    pointer-events:none;
 
 }
 
