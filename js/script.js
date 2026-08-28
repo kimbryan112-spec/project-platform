@@ -1270,43 +1270,79 @@ function monthHasData() {
 
 }
 
-function updateMonthHasDataUI() {
+async function updateMonthHasDataUI() {
 
     document.querySelectorAll(".month-btn").forEach(btn => {
+        btn.classList.remove("has-data");
+    });
 
-        const month = btn.dataset.month;
-        const key = `projects_${currentYear}_${month}`;
+    if (LOCAL_MODE) {
 
-        let hasData = false;
+        document.querySelectorAll(".month-btn").forEach(btn => {
 
-        const saved = localStorage.getItem(key);
+            const key = `projects_${currentYear}_${btn.dataset.month}`;
 
-        if (saved) {
+            let hasData = false;
 
-            try {
+            const saved = localStorage.getItem(key);
 
-                const projects = JSON.parse(saved);
+            if (saved) {
 
-                hasData = projects.some(project => {
+                try {
 
-                    return (
+                    const projects = JSON.parse(saved);
+
+                    hasData = projects.some(project =>
                         (project.coupleName || "").trim() !== "" ||
                         (project.rawFiles || "").trim() !== ""
                     );
 
-                });
+                } catch (err) {
 
-            } catch (err) {
+                    console.error(err);
 
-                console.error(err);
+                }
 
             }
 
+            btn.classList.toggle("has-data", hasData);
+
+        });
+
+        return;
+
+    }
+
+    // ===== CLOUD/D1 =====
+    for (const btn of document.querySelectorAll(".month-btn")) {
+
+        try {
+
+            const response = await fetch(
+                `/api/projects?year=${currentYear}&month=${monthMap[btn.dataset.month]}&t=${Date.now()}`,
+                {
+                    cache: "no-store"
+                }
+            );
+
+            if (!response.ok) continue;
+
+            const data = await response.json();
+
+            const hasData = (data.projects || []).some(project =>
+                (project.coupleName || "").trim() !== "" ||
+                (project.rawFiles || "").trim() !== ""
+            );
+
+            btn.classList.toggle("has-data", hasData);
+
+        } catch (err) {
+
+            console.error(err);
+
         }
 
-        btn.classList.toggle("has-data", hasData);
-
-    });
+    }
 
 }
 
