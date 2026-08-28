@@ -758,11 +758,15 @@ document.querySelectorAll(".month-btn").forEach(btn => {
 
     const locked = !!monthLocks[key];
 
-    if (IS_ADMIN) {
-        btn.classList.toggle("locked", locked);
-    } else {
-        btn.classList.remove("locked");
-    }
+    if (CAN_EDIT_PROJECTS) {
+
+    btn.classList.toggle("locked", locked);
+
+} else {
+
+    btn.classList.remove("locked");
+
+}
 
 });
 
@@ -944,15 +948,15 @@ console.log("monthLocks:", monthLocks);
 
     const locked = !!monthLocks[key];
 
-    if (IS_ADMIN) {
+    if (CAN_EDIT_PROJECTS) {
 
-        btn.classList.toggle("locked", locked);
+    btn.classList.toggle("locked", locked);
 
-    } else {
+} else {
 
-        btn.classList.remove("locked");
+    btn.classList.remove("locked");
 
-    }
+}
 
 });
 
@@ -1201,7 +1205,7 @@ document.querySelectorAll(`
 // Progress Slider
 document.querySelectorAll(".progress-slider").forEach(slider => {
 
-    if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
+    if (CAN_EDIT_PROJECTS) {
 
     slider.disabled = false;
     slider.style.pointerEvents = "auto";
@@ -1209,9 +1213,9 @@ document.querySelectorAll(".progress-slider").forEach(slider => {
 
 } else {
 
-    slider.disabled = false;           // huwag i-disable
-    slider.style.pointerEvents = "none"; // hindi mahihila
-    slider.style.opacity = "1";          // hindi magiging gray
+    slider.disabled = false;
+    slider.style.pointerEvents = "none";
+    slider.style.opacity = "1";
 
 }
 
@@ -1264,15 +1268,15 @@ function updateMonthLockUI() {
 
     const locked = !!monthLocks[key];
 
-    if (IS_ADMIN) {
+    if (CAN_EDIT_PROJECTS) {
 
-        btn.classList.toggle("locked", locked);
+    btn.classList.toggle("locked", locked);
 
-    } else {
+} else {
 
-        btn.classList.remove("locked");
+    btn.classList.remove("locked");
 
-    }
+}
 
 });
 
@@ -1291,19 +1295,14 @@ function updateMonthLockUI() {
     console.log("Locked:", locked);
 
     // Safety check
-    if (typeof IS_ADMIN === "undefined") {
-        console.warn("IS_ADMIN is not defined.");
-        return;
-    }
+    if (CAN_EDIT_PROJECTS) {
 
-    if (IS_ADMIN) {
-        // Admin = always editable
-        setMonthEditable(true);
-        return;
-    }
+    setMonthEditable(true);
+    return;
 
-    // Dashboard users
-    setMonthEditable(!locked);
+}
+
+setMonthEditable(!locked);
 
 }
 
@@ -1521,10 +1520,13 @@ document.querySelectorAll(".month-btn").forEach(button => {
 
     button.addEventListener("contextmenu", (e) => {
 
-        e.preventDefault();
+    // Manager = walang context menu
+    if (!CAN_EDIT_PROJECTS) return;
 
-        // HUWAG BAGUHIN ANG currentMonth
-        const selectedMonth = button.dataset.month;
+    e.preventDefault();
+
+    // HUWAG BAGUHIN ANG currentMonth
+    const selectedMonth = button.dataset.month;
 
         const lockBtn = document.getElementById("lockMonthBtn");
         const unlockBtn = document.getElementById("unlockMonthBtn");
@@ -1575,6 +1577,8 @@ document.addEventListener("click", () => {
 
 document.getElementById("lockMonthBtn")?.addEventListener("click", async () => {
 
+    if (!CAN_EDIT_PROJECTS) return;
+
     const month = monthContextMenu.dataset.month;
 
     const button = document.querySelector(
@@ -1609,6 +1613,8 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", async () => {
 ================================== */
 
 document.getElementById("unlockMonthBtn")?.addEventListener("click", async () => {
+
+    if (!CAN_EDIT_PROJECTS) return;
 
     const month = monthContextMenu.dataset.month;
 
