@@ -92,7 +92,7 @@ document
     .addEventListener("click", function () {
 
         alert(
-            "Create Account is not available in Local Mode yet."
+            "Account creation is available for KBHFILMS team members only."
         );
 
     });
