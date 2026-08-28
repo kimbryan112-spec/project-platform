@@ -341,7 +341,7 @@ select{
 
 .project-table th:nth-child(2),
 .project-table td:nth-child(2){
-    width:160px;
+    width:170px;
 }
 
 .project-table th:nth-child(3),
@@ -2019,39 +2019,63 @@ border-bottom: 1px solid #e7d8b4;
 ================================== */
 
 .status-planned{
+
     background:#e5e7eb !important;
+
     color:#374151 !important;
+
     font-weight:1000;
+
 }
 
 .status-progress{
+
     background:#dbeafe !important;
+
     color:#1d4ed8 !important;
+
     font-weight:1000;
+
+}
+
+.status-concerns{
+
+    background:#fee2e2 !important;
+
+    color:#b91c1c !important;
+
+    font-weight:1000;
+
 }
 
 .status-review{
+
     background:#fef3c7 !important;
+
     color:#92400e !important;
-    font-weight:1000;
-}
 
-.status-feedback{
-    background:#f3e8ff !important;
-    color:#7e22ce !important;
     font-weight:1000;
-}
 
-.status-approved{
-    background:#dcfce7 !important;
-    color:#15803d !important;
-    font-weight:1000;
 }
 
 .status-delivered{
-    background:#eee797 !important;
-    color:#755e04 !important;
+
+    background:#dcfce7 !important;
+
+    color:#15803d !important;
+
     font-weight:1000;
+
+}
+
+.status-ratings{
+
+    background:#ede9fe !important;
+
+    color:#6d28d9 !important;
+
+    font-weight:1000;
+
 }
 
 /* ==================================

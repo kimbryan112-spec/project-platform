@@ -1315,14 +1315,17 @@ function updateStatusColor(select){
 
     if(!select) return;
 
+    // Always bold
+    select.style.fontWeight = "700";
+
     // alisin muna lahat ng class
     select.classList.remove(
         "status-planned",
         "status-progress",
+        "status-concerns",
         "status-review",
-        "status-feedback",
-        "status-approved",
-        "status-delivered"
+        "status-delivered",
+        "status-ratings"
     );
 
     switch(select.value){
@@ -1335,20 +1338,20 @@ function updateStatusColor(select){
             select.classList.add("status-progress");
             break;
 
+        case "PROJECT CONCERNS":
+            select.classList.add("status-concerns");
+            break;
+
         case "FOR REVIEW":
             select.classList.add("status-review");
             break;
 
-        case "YONG'S FEEDBACK":
-            select.classList.add("status-feedback");
-            break;
-
-        case "APPROVED PROJ":
-            select.classList.add("status-approved");
-            break;
-
         case "DELIVERED":
             select.classList.add("status-delivered");
+            break;
+
+        case "YONG'S RATINGS":
+            select.classList.add("status-ratings");
             break;
     }
 
