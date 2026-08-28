@@ -1429,21 +1429,41 @@ function updateTypeColor(select){
 }
 
 function updateSongStatusColor(select) {
+
     if (!select) return;
+
     const value = select.value;
-    if (value === 'APPROVED') {
-        select.style.backgroundColor = '#dcfce7';
-        select.style.color = '#15803d';
-    } else if (value === 'REJECT') {
-        select.style.backgroundColor = '#fee2e2';
-        select.style.color = '#b91c1c';
-    } else if (value === 'RESERVED') {
-        select.style.backgroundColor = '#fef3c7';
-        select.style.color = '#b45309';
+
+    // Always bold
+    select.style.fontWeight = "700";
+
+    if (value === "APPROVED") {
+
+        select.style.backgroundColor = "#dcfce7";
+        select.style.color = "#15803d";
+
+    } else if (value === "REJECT") {
+
+        select.style.backgroundColor = "#fee2e2";
+        select.style.color = "#b91c1c";
+
+    } else if (value === "RESERVED") {
+
+        select.style.backgroundColor = "#fef3c7";
+        select.style.color = "#b45309";
+
+    } else if (value === "REQUESTED") {
+
+        select.style.backgroundColor = "#fdba74";
+        select.style.color = "#7c2d12";
+
     } else {
-        select.style.backgroundColor = '#ffffff';
-        select.style.color = 'inherit';
+
+        select.style.backgroundColor = "#ffffff";
+        select.style.color = "#374151";
+
     }
+
 }
 /* ==================================
    MONTH RIGHT-CLICK MENU (ADMIN)
