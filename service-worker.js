@@ -1,10 +1,9 @@
-const CACHE_NAME = "kbhfilms-v2";
+const CACHE_NAME = "kbhfilms-v3";
 
 const FILES_TO_CACHE = [
 
     "/",
     "/index.html",
-    "/login.html",
     "/manifest.json",
 
     "/css/style.css",
@@ -38,15 +37,9 @@ self.addEventListener("activate", event => {
 
             Promise.all(
 
-                keys.map(key => {
-
-                    if (key !== CACHE_NAME) {
-
-                        return caches.delete(key);
-
-                    }
-
-                })
+                keys
+                    .filter(key => key !== CACHE_NAME)
+                    .map(key => caches.delete(key))
 
             )
 
