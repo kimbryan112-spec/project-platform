@@ -1451,66 +1451,120 @@ function updateSongStatusColor(select) {
 
 const monthContextMenu = document.getElementById("monthContextMenu");
 
+/* ==================================
+   SAVE MONTH LOCK ONLY
+================================== */
+
+async function saveMonthLock(year, monthName, locked) {
+
+    if (LOCAL_MODE) return;
+
+    const monthNumber = monthMap[monthName];
+
+    try {
+
+        const response = await fetch("/api/month-lock", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                year: year,
+                month: monthNumber,
+                locked: locked
+
+            })
+
+        });
+
+        const result = await response.json();
+
+        console.log("[MONTH LOCK]", result);
+
+    } catch (err) {
+
+        console.error("[MONTH LOCK ERROR]", err);
+
+    }
+
+}
+
 document.querySelectorAll(".month-btn").forEach(button => {
 
-    // LEFT CLICK = Select Month
+    /* ==============================
+       LEFT CLICK = CHANGE MONTH
+    ============================== */
+
     button.addEventListener("click", () => {
 
-        // Alisin ang active sa lahat
         document.querySelectorAll(".month-btn")
             .forEach(btn => btn.classList.remove("active"));
 
-        // I-set ang active month
         button.classList.add("active");
 
-        // Update current month
+        // Ito lang ang dapat magpalit ng currentMonth
         currentMonth = button.dataset.month;
 
         console.log("Current Month:", currentMonth);
 
-        // Load projects ng napiling month
         loadProjects();
 
     });
 
-    // RIGHT CLICK = Context Menu
+    /* ==============================
+       RIGHT CLICK = CONTEXT MENU
+    ============================== */
+
     button.addEventListener("contextmenu", (e) => {
 
         e.preventDefault();
 
+        // HUWAG BAGUHIN ANG currentMonth
         const selectedMonth = button.dataset.month;
 
-const lockBtn = document.getElementById("lockMonthBtn");
-const unlockBtn = document.getElementById("unlockMonthBtn");
+        const lockBtn = document.getElementById("lockMonthBtn");
+        const unlockBtn = document.getElementById("unlockMonthBtn");
 
-const key = getMonthKey(currentYear, selectedMonth);
-const locked = !!getMonthLocks()[key];
+        const key = getMonthKey(currentYear, selectedMonth);
+
+        const locked = !!getMonthLocks()[key];
 
         if (locked) {
+
             lockBtn.style.display = "none";
             unlockBtn.style.display = "flex";
+
         } else {
+
             lockBtn.style.display = "flex";
             unlockBtn.style.display = "none";
+
         }
+
+        monthContextMenu.dataset.month = selectedMonth;
 
         monthContextMenu.style.display = "block";
         monthContextMenu.style.left = `${e.pageX}px`;
         monthContextMenu.style.top = `${e.pageY}px`;
 
-        monthContextMenu.dataset.month = selectedMonth;
-
-console.log("Right Click Month:", selectedMonth);
+        console.log("Right Click Month:", selectedMonth);
 
     });
 
 });
 
-// Hide context menu
+/* Hide Context Menu */
+
 document.addEventListener("click", () => {
 
     if (monthContextMenu) {
+
         monthContextMenu.style.display = "none";
+
     }
 
 });
@@ -1529,15 +1583,15 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", async () => {
 
     if (!button) return;
 
-    // Save local
+    // Update local memory
     const locks = getMonthLocks();
 
     locks[getMonthKey(currentYear, month)] = true;
 
     saveMonthLocks(locks);
 
-    // Save to D1
-    saveProjects();
+    // Save only the month lock
+    await saveMonthLock(currentYear, month, true);
 
     // Update UI
     button.classList.add("locked");
@@ -1564,15 +1618,15 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", async () =>
 
     if (!button) return;
 
-    // Remove local
+    // Update local memory
     const locks = getMonthLocks();
 
     delete locks[getMonthKey(currentYear, month)];
 
     saveMonthLocks(locks);
 
-    // Save to D1
-    saveProjects();
+    // Save only the month lock
+    await saveMonthLock(currentYear, month, false);
 
     // Update UI
     button.classList.remove("locked");

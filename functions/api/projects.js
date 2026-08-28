@@ -324,41 +324,6 @@ row.song1?.title || "",
 
         }
 
-        const monthLocked =
-            projects.length > 0 && projects[0].monthLocked ? 1 : 0;
-
-        await context.env.DB.prepare(`
-
-INSERT INTO month_locks (
-
-    project_year,
-    project_month,
-    locked,
-    updated_at
-
-)
-
-VALUES (
-
-    ?, ?, ?, CURRENT_TIMESTAMP
-
-)
-
-ON CONFLICT(project_year, project_month)
-
-DO UPDATE SET
-
-    locked = excluded.locked,
-    updated_at = CURRENT_TIMESTAMP
-
-`)
-        .bind(
-            year,
-            month,
-            monthLocked
-        )
-        .run();
-
         return new Response(
             JSON.stringify({
                 success: true
