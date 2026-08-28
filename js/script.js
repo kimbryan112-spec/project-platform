@@ -2571,10 +2571,28 @@ document.addEventListener("keydown", (e) => {
    BACKGROUND MUSIC
 ================================== */
 
-const musicPlaylist = [];
+let musicPlaylist = [];
 
-for (let i = 1; i <= 29; i++) {
-    musicPlaylist.push(`../assets/Music/${i}.mp3`);
+async function loadPlaylist() {
+
+    try {
+
+        const response = await fetch("../assets/Music/playlist.json");
+
+        musicPlaylist = await response.json();
+
+        musicPlaylist = musicPlaylist.map(file =>
+            `../assets/Music/${file}`
+        );
+
+        playRandomMusic();
+
+    } catch (err) {
+
+        console.error("Unable to load playlist.", err);
+
+    }
+
 }
 
 const bgMusic = new Audio();
@@ -2583,6 +2601,8 @@ bgMusic.volume = 0.25;
 let lastSongIndex = -1;
 
 function playRandomMusic() {
+
+    if (!musicPlaylist.length) return;
 
     let randomIndex;
 
@@ -2625,8 +2645,8 @@ bgMusic.addEventListener("ended", () => {
 
 });
 
-// Start playlist
-playRandomMusic();
+// Load playlist then start music
+loadPlaylist();
 
 /* ==================================
    MUSIC PLAYER CONTROLS
