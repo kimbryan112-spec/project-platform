@@ -886,7 +886,10 @@ const projectsData = responseData.projects || [];
 
 monthLocks = responseData.lockedMonths || {};
 
-clearProjectTable();
+// Clear ONLY kapag walang record
+if (!projectsData.length) {
+    clearProjectTable();
+}
 
 console.log("========== API RESPONSE ==========");
 
@@ -1142,7 +1145,7 @@ try {
 
 }
 
-}, 500);
+}, 1500);
 
 }
 
@@ -1194,7 +1197,7 @@ console.log(
 
 updateMonthHasDataUI();
 
-}, 500);
+}, 1500);
 
 }
 
