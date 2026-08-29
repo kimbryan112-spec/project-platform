@@ -1265,6 +1265,21 @@ function monthHasData() {
 
 }
 
+function updateCurrentMonthHasData() {
+
+    const activeBtn = document.querySelector(
+        `.month-btn[data-month="${currentMonth}"]`
+    );
+
+    if (!activeBtn) return;
+
+    activeBtn.classList.toggle(
+        "has-data",
+        monthHasData()
+    );
+
+}
+
 async function updateMonthHasDataUI(hasDataMonths = null) {
 
     console.log("updateMonthHasDataUI() CALLED");
@@ -3056,9 +3071,14 @@ function updateSongLinkStyle(input){
 
 document.addEventListener("input", (e) => {
 
-    if(!e.target.classList.contains("song-title")) return;
+    if (
+        e.target.closest(".couple-name") ||
+        e.target.closest(".dashboard-raw-input")
+    ) {
 
-    updateSongLinkStyle(e.target);
+        updateCurrentMonthHasData();
+
+    }
 
 });
 
