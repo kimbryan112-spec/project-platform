@@ -1120,6 +1120,8 @@ select{
 
 .month-btn{
 
+    position:relative;
+
     padding:13px 24px;
     min-width:78px;
     min-height:46px;
@@ -1139,11 +1141,21 @@ select{
     font-weight:700;
     cursor:pointer;
 
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease,
+        transform .08s ease;
+
 }
+
+/* ==========================
+   HAS DATA (GREEN)
+========================== */
 
 .month-btn.has-data{
 
-    border-color:transparent !important;
+    border-color:#16a34a;
 
     background:linear-gradient(
         to bottom,
@@ -1154,26 +1166,37 @@ select{
 
 }
 
-.month-btn.has-data::after{
-
-    content:"";
-
-    position:absolute;
-    inset:0;
-
-    border:3px solid #22c55e;
-
-    border-radius:8px;
-
-    box-sizing:border-box;
-
-    pointer-events:none;
-
-}
+/* ==========================
+   ACTIVE
+   (Huwag baguhin ang kulay)
+========================== */
 
 .month-btn.active{
 
     outline:3px solid #ef4444;
+    outline-offset:0;
+
+}
+
+/* Kapag active + has-data,
+   manatiling green */
+.month-btn.has-data.active{
+
+    background:linear-gradient(
+        to bottom,
+        #4ade80 0%,
+        #22c55e 55%,
+        #16a34a 100%
+    );
+
+    border-color:#16a34a;
+
+}
+
+/* Optional click animation lang */
+.month-btn:active{
+
+    transform:scale(.98);
 
 }
 
@@ -1183,7 +1206,9 @@ select{
     margin-bottom:5px;
     font-size:14px;
     color:#666;
-}/* ==========================================
+}
+
+/* ==========================================
    MONTH RIGHT-CLICK CONTEXT MENU
 ========================================== */
 
