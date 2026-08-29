@@ -822,14 +822,8 @@ console.log("currentMonth:", currentMonth);
 
     }
 
-    clearProjectTable();
-
-// Siguraduhing hindi nagbabago ang month habang naglo-load
+    // Siguraduhing hindi nagbabago ang month habang naglo-load
 const selectedMonth = currentMonth;
-
-updateMonthLockUI();
-
-updateMonthHasDataUI();
 
 console.log("========== LOAD END ==========");
 console.log("currentYear :", currentYear);
