@@ -734,12 +734,17 @@ if (!savedData && currentYear === "2026") {
 
 }
 
-    if (!savedData) {
-        console.log("[LOCAL LOAD] No saved data.");
-        return;
-    }
+    let projectsData = [];
 
-    const projectsData = JSON.parse(savedData);
+if (!savedData) {
+
+    console.log("[LOCAL LOAD] No saved data.");
+
+} else {
+
+    projectsData = JSON.parse(savedData);
+
+}
 
 const rows = document.querySelectorAll(".project-table tbody tr");
 
@@ -801,7 +806,8 @@ document.querySelectorAll(".drone-select")
 // Apply editable/read-only state
 updateMonthLockUI();
 
-// Update month buttons that have data
+// Update month buttons
+console.log("Calling updateMonthHasDataUI...");
 updateMonthHasDataUI();
 
 console.log("[LOCAL LOAD] Loaded from localStorage.");
@@ -887,8 +893,10 @@ clearProjectTable();
 const projectsData = responseData.projects || [];
 
 monthLocks = responseData.lockedMonths || {};
-console.log("LOCKS FROM API:", responseData.lockedMonths);
-console.log("monthLocks:", monthLocks);
+console.log("========== API RESPONSE ==========");
+console.log(responseData);
+console.log("hasDataMonths:", responseData.hasDataMonths);
+console.log("projects:", responseData.projects);
 
         // ==================================
         // RESTORE MONTH LOCK FROM D1
@@ -1270,6 +1278,8 @@ function monthHasData() {
 
 async function updateMonthHasDataUI() {
 
+    console.log("updateMonthHasDataUI() CALLED");
+
     document.querySelectorAll(".month-btn").forEach(btn => {
         btn.classList.remove("has-data");
     });
@@ -1284,26 +1294,54 @@ async function updateMonthHasDataUI() {
 
             const saved = localStorage.getItem(key);
 
+console.log(
+    key,
+    saved ? "FOUND" : "NOT FOUND"
+);
+
             if (saved) {
 
-                try {
+    console.log(
+        key,
+        saved ? "FOUND" : "NOT FOUND"
+    );
 
-                    const projects = JSON.parse(saved);
+    try {
 
-                    hasData = projects.some(project =>
-                        (project.coupleName || "").trim() !== "" ||
-                        (project.rawFiles || "").trim() !== ""
-                    );
+        const projects = JSON.parse(saved);
 
-                } catch (err) {
+        console.log(
+            btn.dataset.month,
+            projects
+        );
 
-                    console.error(err);
+        hasData = projects.some(project =>
+            (project.coupleName || "").trim() !== "" ||
+            (project.rawFiles || "").trim() !== ""
+        );
 
-                }
+        console.log(
+            btn.dataset.month,
+            "hasData =",
+            hasData
+        );
 
-            }
+    } catch (err) {
 
-            btn.classList.toggle("has-data", hasData);
+        console.error(err);
+
+    }
+
+} else {
+
+    console.log(
+        key,
+        "NOT FOUND"
+    );
+
+}
+
+btn.classList.toggle("has-data", hasData);
 
         });
 
@@ -1314,6 +1352,10 @@ async function updateMonthHasDataUI() {
     // ===== CLOUD/D1 (ONE REQUEST ONLY) =====
 
     try {
+
+        console.log("[HAS DATA]");
+        console.log("currentYear:", currentYear);
+        console.log("currentMonth:", currentMonth);
 
         const response = await fetch(
             `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
@@ -1326,16 +1368,30 @@ async function updateMonthHasDataUI() {
 
         const data = await response.json();
 
-        const hasDataMonths = data.hasDataMonths || {};
+console.log("========== HAS DATA API ==========");
+console.log("currentYear :", currentYear);
+console.log("currentMonth:", currentMonth);
+console.log("API Response:", data);
+console.log("hasDataMonths:", data.hasDataMonths);
+console.log("monthMap:", monthMap);
+console.log("Requested Month:", monthMap[currentMonth]);
 
-        document.querySelectorAll(".month-btn").forEach(btn => {
+const hasDataMonths = data.hasDataMonths || {};
 
-            btn.classList.toggle(
-                "has-data",
-                !!hasDataMonths[btn.dataset.month]
-            );
+document.querySelectorAll(".month-btn").forEach(btn => {
 
-        });
+    console.log(
+        btn.dataset.month,
+        "=>",
+        hasDataMonths[btn.dataset.month]
+    );
+
+    btn.classList.toggle(
+        "has-data",
+        !!hasDataMonths[btn.dataset.month]
+    );
+
+});
 
     } catch (err) {
 

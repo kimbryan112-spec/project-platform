@@ -1112,10 +1112,12 @@ select{
 }
 
 .month-buttons{
+
     display:flex;
     flex-wrap:wrap;
     gap:10px;
     margin-bottom:10px;
+
 }
 
 .month-btn{
@@ -1123,6 +1125,7 @@ select{
     position:relative;
 
     padding:13px 24px;
+
     min-width:78px;
     min-height:46px;
 
@@ -1139,6 +1142,7 @@ select{
     color:#fff;
     font-size:15px;
     font-weight:700;
+
     cursor:pointer;
 
     transition:
@@ -1168,7 +1172,6 @@ select{
 
 /* ==========================
    ACTIVE
-   (Huwag baguhin ang kulay)
 ========================== */
 
 .month-btn.active{
@@ -1178,9 +1181,11 @@ select{
 
 }
 
-/* Kapag active + has-data,
-   manatiling green */
+/* Active + Has Data */
+
 .month-btn.has-data.active{
+
+    border-color:#16a34a;
 
     background:linear-gradient(
         to bottom,
@@ -1189,11 +1194,10 @@ select{
         #16a34a 100%
     );
 
-    border-color:#16a34a;
-
 }
 
-/* Optional click animation lang */
+/* Click animation */
+
 .month-btn:active{
 
     transform:scale(.98);
@@ -1201,11 +1205,14 @@ select{
 }
 
 .month-legend{
+
     display:flex;
     gap:20px;
     margin-bottom:5px;
+
     font-size:14px;
     color:#666;
+
 }
 
 /* ==========================================
