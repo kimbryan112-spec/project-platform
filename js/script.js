@@ -794,10 +794,9 @@ document.querySelectorAll(".type-select")
 
 document.querySelectorAll(".dashboard-song-status")
     .forEach(updateSongStatusColor);
-    document.querySelectorAll(".drone-select")
-    .forEach(updateDroneColor);
 
-    updateMonthHasDataUI();
+document.querySelectorAll(".drone-select")
+    .forEach(updateDroneColor);
 
 // Apply editable/read-only state
 updateMonthLockUI();
@@ -807,13 +806,16 @@ updateMonthHasDataUI();
 
 console.log("[LOCAL LOAD] Loaded from localStorage.");
 
-}
+} // <-- ISARADO ANG loadProjectsLocal()
 
+// ==================================
 // ONLINE LOAD FUNCTION (MAY ANTI-CACHE PARAMETER)
+// ==================================
 async function loadProjects() {
+
     console.log("========== LOAD START ==========");
-console.log("currentYear :", currentYear);
-console.log("currentMonth:", currentMonth);
+    console.log("currentYear :", currentYear);
+    console.log("currentMonth:", currentMonth);
 
     if (LOCAL_MODE) {
 
