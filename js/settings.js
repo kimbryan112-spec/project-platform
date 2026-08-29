@@ -853,19 +853,50 @@ if (!isLocalBackup && !isCloudBackup) {
     throw new Error("Invalid backup file.");
 }
 
-        // ==================================
-// LOCAL STORAGE
-// ==================================
-
 if (LOCAL_MODE) {
 
-    // Burahin muna lahat ng existing localStorage
-    localStorage.clear();
+    // ==========================
+    // ONLINE BACKUP -> LOCAL
+    // ==========================
+    if (isCloudBackup) {
 
-    // Ibalik lahat ng keys mula sa backup
-    Object.keys(backupData).forEach(key => {
-        localStorage.setItem(key, backupData[key]);
-    });
+        const now = new Date();
+
+        const year = now.getFullYear();
+
+        const monthNamesShort = [
+            "jan", "feb", "mar", "apr", "may", "jun",
+            "jul", "aug", "sep", "oct", "nov", "dec"
+        ];
+
+        const month =
+            monthNamesShort[now.getMonth()];
+
+        const key =
+            `projects_${year}_${month}`;
+
+        localStorage.setItem(
+            key,
+            JSON.stringify(backupData.projects)
+        );
+
+    }
+
+    // ==========================
+    // LOCAL BACKUP -> LOCAL
+    // ==========================
+    else {
+
+        localStorage.clear();
+
+        Object.keys(backupData).forEach(key => {
+            localStorage.setItem(
+                key,
+                backupData[key]
+            );
+        });
+
+    }
 
     alert("Database restored successfully.");
 
