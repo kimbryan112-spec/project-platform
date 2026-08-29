@@ -1108,7 +1108,9 @@ select{
 }
 
 .next-year-btn:hover{
+
     background:#1d4ed8;
+
 }
 
 .month-buttons{
@@ -1119,6 +1121,10 @@ select{
     margin-bottom:10px;
 
 }
+
+/* ==========================
+   MONTH BUTTON (DEFAULT)
+========================== */
 
 .month-btn{
 
@@ -1140,6 +1146,7 @@ select{
     );
 
     color:#fff;
+
     font-size:15px;
     font-weight:700;
 
@@ -1149,6 +1156,7 @@ select{
         background .15s ease,
         border-color .15s ease,
         box-shadow .15s ease,
+        outline .15s ease,
         transform .08s ease;
 
 }
@@ -1181,9 +1189,11 @@ select{
 
 }
 
-/* Active + Has Data */
+/* ==========================
+   ACTIVE + HAS DATA
+========================== */
 
-.month-btn.has-data.active{
+.month-btn.active.has-data{
 
     border-color:#16a34a;
 
@@ -1199,7 +1209,68 @@ select{
 
 }
 
-/* Click animation */
+/* ==========================
+   LOCKED
+========================== */
+
+.month-btn.locked{
+
+    box-shadow:
+        inset 0 0 0 2px #f59e0b;
+
+}
+
+/* ==========================
+   LOCKED + HAS DATA
+========================== */
+
+.month-btn.locked.has-data{
+
+    box-shadow:
+        inset 0 0 0 2px #f59e0b;
+
+}
+
+/* ==========================
+   ACTIVE + LOCKED
+========================== */
+
+.month-btn.active.locked{
+
+    outline:3px solid #ef4444;
+    outline-offset:0;
+
+    box-shadow:
+        inset 0 0 0 2px #f59e0b;
+
+}
+
+/* ==========================
+   ACTIVE + LOCKED + HAS DATA
+========================== */
+
+.month-btn.active.locked.has-data{
+
+    border-color:#16a34a;
+
+    background:linear-gradient(
+        to bottom,
+        #4ade80 0%,
+        #22c55e 55%,
+        #16a34a 100%
+    );
+
+    outline:3px solid #ef4444;
+    outline-offset:0;
+
+    box-shadow:
+        inset 0 0 0 2px #f59e0b;
+
+}
+
+/* ==========================
+   CLICK ANIMATION
+========================== */
 
 .month-btn:active{
 
@@ -1211,9 +1282,11 @@ select{
 
     display:flex;
     gap:20px;
+
     margin-bottom:5px;
 
     font-size:14px;
+
     color:#666;
 
 }
