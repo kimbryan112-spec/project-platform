@@ -20,7 +20,7 @@ const users = [
         password: "yong2023",
         role: "dashboard",
         displayRole: "Manager",
-        name: "Yong Zhi"
+        name: "Yong Zhi Ng"
     },
 
 ];
