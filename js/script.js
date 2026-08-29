@@ -880,6 +880,8 @@ currentMonth = selectedMonth;
 
         const responseData = await response.json();
 
+clearProjectTable();
+
 const projectsData = responseData.projects || [];
 
 monthLocks = responseData.lockedMonths || {};
