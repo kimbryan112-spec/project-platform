@@ -1773,8 +1773,6 @@ document.querySelectorAll(".month-btn").forEach(button => {
 
     await loadProjects();
 
-    await updateMonthHasDataUI();
-
 });
 
     /* ==============================
