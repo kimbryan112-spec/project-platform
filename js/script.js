@@ -1756,11 +1756,11 @@ async function saveMonthLock(year, monthName, locked) {
 
 document.querySelectorAll(".month-btn").forEach(button => {
 
-    /* ==============================
-       LEFT CLICK = CHANGE MONTH
-    ============================== */
+   /* ==============================
+   LEFT CLICK = CHANGE MONTH
+============================== */
 
-    button.addEventListener("click", async () => {
+button.addEventListener("click", async () => {
 
     document.querySelectorAll(".month-btn")
         .forEach(btn => btn.classList.remove("active"));
@@ -1769,9 +1769,17 @@ document.querySelectorAll(".month-btn").forEach(button => {
 
     currentMonth = button.dataset.month;
 
-    console.log("Current Month:", currentMonth);
+    console.log("========== MONTH CLICK ==========");
+    console.log("Clicked:", currentMonth);
+    console.log("Before Load:", button.className);
 
     await loadProjects();
+
+    console.log("After Load:", button.className);
+
+    setTimeout(() => {
+        console.log("After 500ms:", button.className);
+    }, 500);
 
 });
 
