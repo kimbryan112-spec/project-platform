@@ -1056,8 +1056,6 @@ function saveProjects() {
         return;
     }
 
-    updateMonthLockUI();
-
     const saveYear = currentYear;
     const saveMonth = currentMonth;
 
