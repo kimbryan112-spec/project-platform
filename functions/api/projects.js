@@ -69,57 +69,92 @@ lockRows.forEach(row => {
 
 });
 
-        const data = results.map(row => ({
+// ========================================
+// LOAD MONTHS WITH DATA
+// ========================================
 
-            rowId: row.row_index,
+const { results: hasDataRows } =
+    await context.env.DB.prepare(`
 
-            coupleName: row.couple_name || "",
+        SELECT
+            project_month
+        FROM projects
+        WHERE project_year = ?
+          AND (
+                TRIM(COALESCE(couple_name,'')) <> ''
+             OR TRIM(COALESCE(raw_files,'')) <> ''
+          )
+        GROUP BY project_month
 
-            status: row.status || "PLANNED",
+    `)
+    .bind(year)
+    .all();
 
-progress: row.progress || 0,
+const hasDataMonths = {};
 
-type: row.type || "NOT SET",
+hasDataRows.forEach(row => {
 
-            rawFiles: row.raw_files || "",
+    const monthName = monthNames[row.project_month];
 
-            drone: row.drone || "",
+    if (monthName) {
 
-            instruction: row.instruction || "",
+        hasDataMonths[monthName] = true;
 
-concerns: row.concerns || "",
+    }
 
-watchLink: row.watch_link || "",
+});
 
-filesLink: row.files_link || "",
+const data = results.map(row => ({
 
-song1: {
-    title: row.song1_title || "",
-    link: row.song1_link || "",
-    status: row.song1_status || "",
-    notes: row.song1_notes || ""
-},
+    rowId: row.row_index,
 
-song2: {
-    title: row.song2_title || "",
-    link: row.song2_link || "",
-    status: row.song2_status || "",
-    notes: row.song2_notes || ""
-},
+    coupleName: row.couple_name || "",
 
-song3: {
-    title: row.song3_title || "",
-    link: row.song3_link || "",
-    status: row.song3_status || "",
-    notes: row.song3_notes || ""
-},
+    status: row.status || "PLANNED",
 
-teaserSong: {
-    title: row.teaser_title || "",
-    link: row.teaser_link || "",
-    status: row.teaser_status || "",
-    notes: row.teaser_notes || ""
-},
+    progress: row.progress || 0,
+
+    type: row.type || "NOT SET",
+
+    rawFiles: row.raw_files || "",
+
+    drone: row.drone || "",
+
+    instruction: row.instruction || "",
+
+    concerns: row.concerns || "",
+
+    watchLink: row.watch_link || "",
+
+    filesLink: row.files_link || "",
+
+    song1: {
+        title: row.song1_title || "",
+        link: row.song1_link || "",
+        status: row.song1_status || "",
+        notes: row.song1_notes || ""
+    },
+
+    song2: {
+        title: row.song2_title || "",
+        link: row.song2_link || "",
+        status: row.song2_status || "",
+        notes: row.song2_notes || ""
+    },
+
+    song3: {
+        title: row.song3_title || "",
+        link: row.song3_link || "",
+        status: row.song3_status || "",
+        notes: row.song3_notes || ""
+    },
+
+    teaserSong: {
+        title: row.teaser_title || "",
+        link: row.teaser_link || "",
+        status: row.teaser_status || "",
+        notes: row.teaser_notes || ""
+    },
 
 monthLocked:
     monthLocks[`${year}_${monthNames[month]}`] || false
@@ -129,7 +164,8 @@ monthLocked:
         return new Response(
     JSON.stringify({
         projects: data,
-        lockedMonths: monthLocks
+        lockedMonths: monthLocks,
+        hasDataMonths
     }),
     {
         headers: {

@@ -1313,34 +1313,35 @@ async function updateMonthHasDataUI() {
 
     }
 
-    // ===== CLOUD/D1 =====
-    for (const btn of document.querySelectorAll(".month-btn")) {
+    // ===== CLOUD/D1 (ONE REQUEST ONLY) =====
 
-        try {
+    try {
 
-            const response = await fetch(
-                `/api/projects?year=${currentYear}&month=${monthMap[btn.dataset.month]}&t=${Date.now()}`,
-                {
-                    cache: "no-store"
-                }
+        const response = await fetch(
+            `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        const hasDataMonths = data.hasDataMonths || {};
+
+        document.querySelectorAll(".month-btn").forEach(btn => {
+
+            btn.classList.toggle(
+                "has-data",
+                !!hasDataMonths[btn.dataset.month]
             );
 
-            if (!response.ok) continue;
+        });
 
-            const data = await response.json();
+    } catch (err) {
 
-            const hasData = (data.projects || []).some(project =>
-                (project.coupleName || "").trim() !== "" ||
-                (project.rawFiles || "").trim() !== ""
-            );
-
-            btn.classList.toggle("has-data", hasData);
-
-        } catch (err) {
-
-            console.error(err);
-
-        }
+        console.error(err);
 
     }
 
