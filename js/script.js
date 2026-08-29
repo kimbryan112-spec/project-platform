@@ -1272,19 +1272,13 @@ function monthHasData() {
 
 async function updateMonthHasDataUI() {
 
-    const buttons = [...document.querySelectorAll(".month-btn")];
-
-    // Reset muna
-    buttons.forEach(btn => {
+    document.querySelectorAll(".month-btn").forEach(btn => {
         btn.classList.remove("has-data");
     });
 
-    // =========================
-    // LOCAL STORAGE
-    // =========================
     if (LOCAL_MODE) {
 
-        buttons.forEach(btn => {
+        document.querySelectorAll(".month-btn").forEach(btn => {
 
             const key = `projects_${currentYear}_${btn.dataset.month}`;
 
@@ -1319,67 +1313,36 @@ async function updateMonthHasDataUI() {
 
     }
 
-    // =========================
-    // CLOUD/D1 (PARALLEL)
-    // =========================
+    // ===== CLOUD/D1 =====
+    for (const btn of document.querySelectorAll(".month-btn")) {
 
-    const results = await Promise.all(
+        try {
 
-        buttons.map(async (btn) => {
-
-            try {
-
-                const response = await fetch(
-                    `/api/projects?year=${currentYear}&month=${monthMap[btn.dataset.month]}&t=${Date.now()}`,
-                    {
-                        cache: "no-store"
-                    }
-                );
-
-                if (!response.ok) {
-
-                    return {
-                        btn,
-                        hasData: false
-                    };
-
+            const response = await fetch(
+                `/api/projects?year=${currentYear}&month=${monthMap[btn.dataset.month]}&t=${Date.now()}`,
+                {
+                    cache: "no-store"
                 }
+            );
 
-                const data = await response.json();
+            if (!response.ok) continue;
 
-                return {
+            const data = await response.json();
 
-                    btn,
+            const hasData = (data.projects || []).some(project =>
+                (project.coupleName || "").trim() !== "" ||
+                (project.rawFiles || "").trim() !== ""
+            );
 
-                    hasData: (data.projects || []).some(project =>
-                        (project.coupleName || "").trim() !== "" ||
-                        (project.rawFiles || "").trim() !== ""
-                    )
+            btn.classList.toggle("has-data", hasData);
 
-                };
+        } catch (err) {
 
-            } catch (err) {
+            console.error(err);
 
-                console.error(err);
+        }
 
-                return {
-
-                    btn,
-                    hasData: false
-
-                };
-
-            }
-
-        })
-
-    );
-
-    results.forEach(result => {
-
-        result.btn.classList.toggle("has-data", result.hasData);
-
-    });
+    }
 
 }
 
