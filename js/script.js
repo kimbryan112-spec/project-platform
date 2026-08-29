@@ -831,13 +831,7 @@ async function loadProjects() {
     }
 
     // Siguraduhing hindi nagbabago ang month habang naglo-load
-const selectedMonth = currentMonth;
 
-console.log("========== LOAD END ==========");
-console.log("currentYear :", currentYear);
-console.log("currentMonth:", currentMonth);
-
-currentMonth = selectedMonth;
 
     try {
 
@@ -893,16 +887,18 @@ clearProjectTable();
 const projectsData = responseData.projects || [];
 
 monthLocks = responseData.lockedMonths || {};
+
 console.log("========== API RESPONSE ==========");
 console.log(responseData);
 console.log("hasDataMonths:", responseData.hasDataMonths);
 console.log("projects:", responseData.projects);
 
-        // ==================================
-        // RESTORE MONTH LOCK FROM D1
-        // ==================================
+// ==================================
+// RESTORE MONTH LOCK FROM D1
+// ==================================
 
-        updateMonthLockUI();
+updateMonthLockUI();
+await updateMonthHasDataUI();
 
         console.log(
 
@@ -1039,11 +1035,7 @@ document.querySelectorAll(".dashboard-song-status")
 document.querySelectorAll(".drone-select")
     .forEach(updateDroneColor);
 
-// ==================================
-// UPDATE MONTH BUTTON COLOR
-// ==================================
 
-updateMonthHasDataUI();
 
 }
 
@@ -1768,21 +1760,22 @@ document.querySelectorAll(".month-btn").forEach(button => {
        LEFT CLICK = CHANGE MONTH
     ============================== */
 
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
 
-        document.querySelectorAll(".month-btn")
-            .forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".month-btn")
+        .forEach(btn => btn.classList.remove("active"));
 
-        button.classList.add("active");
+    button.classList.add("active");
 
-        // Ito lang ang dapat magpalit ng currentMonth
-        currentMonth = button.dataset.month;
+    currentMonth = button.dataset.month;
 
-        console.log("Current Month:", currentMonth);
+    console.log("Current Month:", currentMonth);
 
-        loadProjects();
+    await loadProjects();
 
-    });
+    await updateMonthHasDataUI();
+
+});
 
     /* ==============================
        RIGHT CLICK = CONTEXT MENU
