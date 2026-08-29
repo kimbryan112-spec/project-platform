@@ -825,10 +825,22 @@ async function loadProjects() {
 
     if (LOCAL_MODE) {
 
-        loadProjectsLocal();
-        return;
+    const restored = restoreProjectsLocal(
+        currentYear,
+        currentMonth
+    );
 
+    if (!restored) {
+        clearProjectTable();
     }
+
+    await updateMonthHasDataUI();
+
+    updateMonthLockUI();
+
+    return;
+
+}
 
     // Siguraduhing hindi nagbabago ang month habang naglo-load
 
@@ -1121,14 +1133,19 @@ try {
 
     if (response.ok) {
 
-        console.log(
-            `[SAVE] Successfully synced (${saveYear}-${saveMonth}) to Cloudflare backend!`
-        );
+    console.log(
+        `[SAVE] Successfully synced (${saveYear}-${saveMonth}) to Cloudflare backend!`
+    );
 
-        // Huwag nang i-refresh ang month buttons kada autosave.
-        // Magre-refresh lang sila kapag nag-load o nagpalit ng month.
+    // =====================================
+    // UPDATE LOCAL CACHE AFTER API SAVE
+    // =====================================
+    localStorage.setItem(
+        `projects_${saveYear}_${saveMonth}`,
+        JSON.stringify(projectsData)
+    );
 
-    } else {
+} else {
 
         console.error(
             "[SAVE] API error:",
@@ -1183,11 +1200,8 @@ console.log("[LOCAL SAVE]");
         // Save to selected Year + Month
 
 localStorage.setItem(
-
     `projects_${currentYear}_${currentMonth}`,
-
     JSON.stringify(projectsData)
-
 );
 
 console.log(
@@ -3311,13 +3325,13 @@ document.querySelectorAll(".get-files-btn").forEach(btn => {
 
         if (!link) {
 
-    alert(
-        "📂 Project Files Coming Soon!\n\nPlease wait while the administrator attaches the project folder."
-    );
+            alert(
+                "📂 Project Files Coming Soon!\n\nPlease wait while the administrator attaches the project folder."
+            );
 
-    return;
+            return;
 
-}
+        }
 
         window.open(link, "_blank");
 
@@ -3327,3 +3341,63 @@ document.querySelectorAll(".get-files-btn").forEach(btn => {
 
 // Start playlist
 playRandomMusic();
+
+
+// ==================================
+// RESTORE PROJECTS (LOCAL CACHE)
+// ==================================
+
+function restoreProjectsLocal(year = currentYear, month = currentMonth) {
+
+    const key = `projects_${year}_${month}`;
+
+    const saved = localStorage.getItem(key);
+
+    if (!saved) {
+
+        console.log(`[LOCAL RESTORE] No cache found for ${key}`);
+
+        return false;
+
+    }
+
+    try {
+
+        const projects = JSON.parse(saved);
+
+        const rows = document.querySelectorAll(".project-table tbody tr");
+
+        rows.forEach(row => {
+
+            const rowId = Number(
+                row.dataset.rowId ||
+                row.getAttribute("data-row-id")
+            );
+
+            const data = projects.find(
+                p => Number(p.rowId) === rowId
+            );
+
+            if (data) {
+
+                populateRow(row, data);
+
+            }
+
+        });
+
+        console.log(
+            `[LOCAL RESTORE] Restored ${projects.length} project(s) from ${key}`
+        );
+
+        return true;
+
+    } catch (e) {
+
+        console.error("[LOCAL RESTORE]", e);
+
+        return false;
+
+    }
+
+}
