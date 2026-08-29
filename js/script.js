@@ -965,7 +965,8 @@ console.log("projects:", responseData.projects);
     });
 
     updateMonthLockUI();
-await updateMonthHasDataUI();
+
+await updateMonthHasDataUI(responseData.hasDataMonths);
 
     // ==========================
 // RESTORE MONTH LOCK BORDER
@@ -1267,7 +1268,7 @@ function monthHasData() {
 
 }
 
-async function updateMonthHasDataUI() {
+async function updateMonthHasDataUI(hasDataMonths = null) {
 
     console.log("updateMonthHasDataUI() CALLED");
 
@@ -1340,13 +1341,11 @@ btn.classList.toggle("has-data", hasData);
 
     }
 
-    // ===== CLOUD/D1 (ONE REQUEST ONLY) =====
+    // ===== CLOUD / D1 =====
+
+if (!hasDataMonths) {
 
     try {
-
-        console.log("[HAS DATA]");
-        console.log("currentYear:", currentYear);
-        console.log("currentMonth:", currentMonth);
 
         const response = await fetch(
             `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
@@ -1359,23 +1358,18 @@ btn.classList.toggle("has-data", hasData);
 
         const data = await response.json();
 
-console.log("========== HAS DATA API ==========");
-console.log("currentYear :", currentYear);
-console.log("currentMonth:", currentMonth);
-console.log("API Response:", data);
-console.log("hasDataMonths:", data.hasDataMonths);
-console.log("monthMap:", monthMap);
-console.log("Requested Month:", monthMap[currentMonth]);
+        hasDataMonths = data.hasDataMonths || {};
 
-const hasDataMonths = data.hasDataMonths || {};
+    } catch (err) {
+
+        console.error(err);
+        return;
+
+    }
+
+}
 
 document.querySelectorAll(".month-btn").forEach(btn => {
-
-    console.log(
-        btn.dataset.month,
-        "=>",
-        hasDataMonths[btn.dataset.month]
-    );
 
     btn.classList.toggle(
         "has-data",
@@ -1383,12 +1377,6 @@ document.querySelectorAll(".month-btn").forEach(btn => {
     );
 
 });
-
-    } catch (err) {
-
-        console.error(err);
-
-    }
 
 }
 
