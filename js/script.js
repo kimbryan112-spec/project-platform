@@ -882,23 +882,19 @@ async function loadProjects() {
 
         const responseData = await response.json();
 
-clearProjectTable();
-
 const projectsData = responseData.projects || [];
 
 monthLocks = responseData.lockedMonths || {};
 
+clearProjectTable();
+
 console.log("========== API RESPONSE ==========");
+
 console.log(responseData);
+
 console.log("hasDataMonths:", responseData.hasDataMonths);
+
 console.log("projects:", responseData.projects);
-
-// ==================================
-// RESTORE MONTH LOCK FROM D1
-// ==================================
-
-updateMonthLockUI();
-await updateMonthHasDataUI();
 
         console.log(
 
@@ -967,6 +963,9 @@ await updateMonthHasDataUI();
         }
 
     });
+
+    updateMonthLockUI();
+await updateMonthHasDataUI();
 
     // ==========================
 // RESTORE MONTH LOCK BORDER
