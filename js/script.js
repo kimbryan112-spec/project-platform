@@ -1039,6 +1039,8 @@ document.querySelectorAll(".dashboard-song-status")
 document.querySelectorAll(".drone-select")
     .forEach(updateDroneColor);
 
+
+
 }
 
 // ==================================
@@ -1365,9 +1367,6 @@ document.querySelectorAll(".month-btn").forEach(btn => {
     );
 
 });
-
-// Laging i-sync ang current month sa actual table data
-updateCurrentMonthHasData();
 
 }
 
