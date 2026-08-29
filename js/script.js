@@ -1039,7 +1039,7 @@ document.querySelectorAll(".dashboard-song-status")
 document.querySelectorAll(".drone-select")
     .forEach(updateDroneColor);
 
-} // <-- END loadProjects()
+}
 
 // ==================================
 // ONLINE SAVE FUNCTION
@@ -1083,15 +1083,17 @@ function saveProjects() {
 
         });
 
+        // ... (tuloy ang existing save code mo)
+
         console.log("[API SAVE]");
-        console.log("[SAVE] API Payload");
-        console.table(projectsData.map(r => ({
-            row: r.rowId,
-            song1: r.song1?.link,
-            song2: r.song2?.link,
-            song3: r.song3?.link,
-            teaser: r.teaserSong?.link
-        })));
+console.log("[SAVE] API Payload");
+console.table(projectsData.map(r => ({
+    row: r.rowId,
+    song1: r.song1?.link,
+    song2: r.song2?.link,
+    song3: r.song3?.link,
+    teaser: r.teaserSong?.link
+})));
 
 try {
 
