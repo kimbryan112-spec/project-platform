@@ -1099,40 +1099,38 @@ try {
 
     const response = await fetch(
 
-    `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
+        `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
 
-    {
+        {
 
-        method: "POST",
+            method: "POST",
 
-        headers: {
+            headers: {
 
-            "Content-Type": "application/json"
+                "Content-Type": "application/json"
 
-        },
+            },
 
-        body: JSON.stringify(projectsData)
+            body: JSON.stringify(projectsData)
 
-    }
+        }
 
-);
+    );
 
     if (response.ok) {
 
         console.log(
-    `[SAVE] Successfully synced (${saveYear}-${saveMonth}) to Cloudflare backend!`
-);
+            `[SAVE] Successfully synced (${saveYear}-${saveMonth}) to Cloudflare backend!`
+        );
 
-updateMonthHasDataUI();
+        // Huwag nang i-refresh ang month buttons kada autosave.
+        // Magre-refresh lang sila kapag nag-load o nagpalit ng month.
 
     } else {
 
         console.error(
-
             "[SAVE] API error:",
-
             response.status
-
         );
 
     }
@@ -1140,11 +1138,8 @@ updateMonthHasDataUI();
 } catch (e) {
 
     console.error(
-
         "[SAVE] Error saving projects to Cloudflare backend:",
-
         e
-
     );
 
 }
