@@ -1368,6 +1368,9 @@ document.querySelectorAll(".month-btn").forEach(btn => {
 
 });
 
+// Laging i-sync ang current month sa actual table data
+updateCurrentMonthHasData();
+
 }
 
 function isMonthLocked() {
