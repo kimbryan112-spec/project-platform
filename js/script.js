@@ -885,6 +885,7 @@ async function loadProjects() {
 const projectsData = responseData.projects || [];
 
 monthLocks = responseData.lockedMonths || {};
+cachedHasDataMonths = responseData.hasDataMonths || {};
 
 // Clear ONLY kapag walang record
 if (!projectsData.length) {
@@ -969,7 +970,7 @@ console.log("projects:", responseData.projects);
 
     updateMonthLockUI();
 
-await updateMonthHasDataUI(responseData.hasDataMonths);
+await updateMonthHasDataUI(cachedHasDataMonths);
 
     // ==========================
 // RESTORE MONTH LOCK BORDER
@@ -1340,29 +1341,7 @@ btn.classList.toggle("has-data", hasData);
     // ===== CLOUD / D1 =====
 
 if (!hasDataMonths) {
-
-    try {
-
-        const response = await fetch(
-            `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
-            {
-                cache: "no-store"
-            }
-        );
-
-        if (!response.ok) return;
-
-        const data = await response.json();
-
-        hasDataMonths = data.hasDataMonths || {};
-
-    } catch (err) {
-
-        console.error(err);
-        return;
-
-    }
-
+    hasDataMonths = cachedHasDataMonths;
 }
 
 document.querySelectorAll(".month-btn").forEach(btn => {
