@@ -897,7 +897,7 @@ const response = await fetch("/api/restore", {
         "Content-Type": "application/json"
     },
 
-    body: JSON.stringify(backupData.projects)
+    body: JSON.stringify(backupData)
 
 });
 
