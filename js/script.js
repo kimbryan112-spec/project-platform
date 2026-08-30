@@ -117,53 +117,69 @@ document.querySelectorAll(".month-btn").forEach(btn => {
 document.querySelector(`.month-btn[data-month="${currentMonth}"]`)
     ?.classList.add("active");
 
-    // ==========================
-    // YEAR DROPDOWN
-    // ==========================
+// ==========================
+// YEAR DROPDOWN
+// ==========================
 
-    const yearSelect = document.getElementById("yearSelect");
+const yearSelect = document.getElementById("yearSelect");
 
-    if (yearSelect) {
+if (yearSelect) {
 
-        const current = new Date().getFullYear();
+    const current = new Date().getFullYear();
 
-        // Clear existing options
-        yearSelect.innerHTML = "";
+    // Clear existing options
+    yearSelect.innerHTML = "";
 
-        // Generate years automatically
-        for (let y = 2023; y <= current + 5; y++) {
+    // Generate years automatically
+    for (let y = 2023; y <= current + 5; y++) {
 
-            const option = document.createElement("option");
+        const option = document.createElement("option");
 
-            option.value = y;
-            option.textContent = y;
+        option.value = y;
+        option.textContent = y;
 
-            if (y === current) {
-                option.selected = true;
-            }
-
-            yearSelect.appendChild(option);
-
+        if (y === current) {
+            option.selected = true;
         }
 
-        currentYear = String(current);
-
-        document.getElementById("currentYearTitle").textContent = currentYear;
-
-        // Kapag nagpalit ng year
-        yearSelect.addEventListener("change", () => {
-
-    currentYear = yearSelect.value;
-
-    document.getElementById("currentYearTitle").textContent = currentYear;
-
-    loadProjects();
-
-});
+        yearSelect.appendChild(option);
 
     }
 
-    loadProjects();
+    currentYear = String(current);
+
+    document.getElementById("currentYearTitle").textContent = currentYear;
+
+    // ==========================
+    // CHANGE YEAR
+    // ==========================
+
+    yearSelect.addEventListener("change", async () => {
+
+        currentYear = yearSelect.value;
+
+        document.getElementById("currentYearTitle").textContent = currentYear;
+
+        // Clear old month indicators immediately
+        cachedHasDataMonths = {};
+
+        await updateMonthHasDataUI(cachedHasDataMonths);
+
+        // Clear old table habang naglo-load
+        clearProjectTable();
+
+        // Load selected year
+        await loadProjects();
+
+    });
+
+}
+
+// ==========================
+// INITIAL LOAD
+// ==========================
+
+loadProjects();
 
 updateTimelineProgress();
 
