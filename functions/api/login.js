@@ -10,14 +10,14 @@ export async function onRequestPost(context) {
             password
         } = await context.request.json();
 
-        // INCONSISTENCY FIXED: Changed 'password' to 'password_hash' and 'fullname' to 'fullname' based on schema.sql
+        // Naitugma na ang full_name ayon sa schema.sql at D1 Studio
         const user = await context.env.DB.prepare(`
             SELECT
                 id,
                 email,
                 password_hash,
                 role,
-                fullname,
+                full_name,
                 active
             FROM users
             WHERE email = ?
@@ -52,7 +52,7 @@ export async function onRequestPost(context) {
             );
         }
 
-        // Tandaan: Kung gumagamit ka ng plain text comparison (tulad ng nasa original code mo):
+        // Plain text password comparison base sa database mo
         if (user.password_hash !== password) {
             return new Response(
                 JSON.stringify({
@@ -100,7 +100,7 @@ export async function onRequestPost(context) {
                 id: user.id,
                 email: user.email,
                 role: user.role,
-                name: user.fullname // Itinugma sa fullname galing sa database
+                name: user.full_name // Naka-ayos na sa full_name
             }
         };
 
