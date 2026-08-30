@@ -1,7 +1,10 @@
 name = "wedding-dashboard-api"
 compatibility_date = "2026-01-01"
 
+[pages_build_output_dir]
+output_dir = "."
+
 [[d1_databases]]
 binding = "DB"
 database_name = "wedding-db"
-database_id = "78cd1cea-5376-4ce6-bb51-e56c678bf658"
+database_id = "d5da608f-9f23-4bd7-a500-29235a6e063a"
