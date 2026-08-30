@@ -279,7 +279,6 @@ async function loadDatabaseStatus() {
 
         const data = await response.json();
 
-        // ITINAMA: Binasa ang data.projects dahil object ang ibinabalik ng /api/projects
         const projectsArray = data.projects || (Array.isArray(data) ? data : []);
 
         if (dbTotalRecords) {
@@ -513,15 +512,22 @@ async function restoreDatabase() {
         const text = await file.text();
         const backupData = JSON.parse(text);
 
-        const isLocalBackup = backupData && typeof backupData === "object" && !Array.isArray(backupData);
+        const isNewDynamicBackup = backupData && backupData.data && typeof backupData.data === "object";
         const isCloudBackup = Array.isArray(backupData.projects);
+        const isLocalBackup = backupData && typeof backupData === "object" && !Array.isArray(backupData) && !backupData.data;
 
-        if (!isLocalBackup && !isCloudBackup) {
-            throw new Error("Invalid backup file.");
+        if (!isNewDynamicBackup && !isCloudBackup && !isLocalBackup) {
+            throw new Error("Invalid backup file format.");
         }
 
         if (LOCAL_MODE) {
-            if (isCloudBackup) {
+            if (isNewDynamicBackup) {
+                localStorage.clear();
+                const tables = backupData.data;
+                Object.keys(tables).forEach(tableName => {
+                    localStorage.setItem(`table_${tableName}`, JSON.stringify(tables[tableName]));
+                });
+            } else if (isCloudBackup) {
                 const now = new Date();
                 const year = now.getFullYear();
                 const monthNamesShort = [
@@ -545,14 +551,19 @@ async function restoreDatabase() {
             return;
         }
 
-        if (!isCloudBackup) {
-            throw new Error("This backup file is for Local Storage only.");
+        let payload = backupData;
+        if (isCloudBackup && !isNewDynamicBackup) {
+            payload = {
+                data: {
+                    projects: backupData.projects
+                }
+            };
         }
 
         const response = await fetch("/api/restore", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(backupData)
+            body: JSON.stringify(payload)
         });
 
         const result = await response.json();
