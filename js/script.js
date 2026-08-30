@@ -156,22 +156,29 @@ if (yearSelect) {
 
     yearSelect.addEventListener("change", async () => {
 
-        currentYear = yearSelect.value;
+    currentYear = yearSelect.value;
 
-        document.getElementById("currentYearTitle").textContent = currentYear;
+    document.getElementById("currentYearTitle").textContent = currentYear;
 
-        // Clear old month indicators immediately
-        cachedHasDataMonths = {};
-
-        await updateMonthHasDataUI(cachedHasDataMonths);
-
-        // Clear old table habang naglo-load
-        clearProjectTable();
-
-        // Load selected year
-        await loadProjects();
-
+    // 1. Opsyonal: I-reset ang currentMonth sa "jan" o panatilihin pero i-clear ang table agad
+    currentMonth = "jan"; 
+    
+    // I-update ang active class sa UI ng mga buwan para lumipat sa 'jan'
+    document.querySelectorAll(".month-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.month === currentMonth);
     });
+
+    // 2. Clear old month indicators immediately
+    cachedHasDataMonths = {};
+    await updateMonthHasDataUI({});
+
+    // 3. Clear old table habang naglo-load
+    clearProjectTable();
+
+    // 4. Load selected year and month
+    await loadProjects();
+
+});
 
 }
 
@@ -921,6 +928,11 @@ const projectsData = responseData.projects || [];
 monthLocks = responseData.lockedMonths || {};
 cachedHasDataMonths = responseData.hasDataMonths || {};
 
+// ==========================================
+// AGAD NA I-UPDATE ANG UI KAHIT HINDI PA TAPOS MAG-POPULATE NG TABLE
+// ==========================================
+await updateMonthHasDataUI(cachedHasDataMonths);
+
 // Clear ONLY kapag walang record
 if (!projectsData.length) {
     clearProjectTable();
@@ -1016,6 +1028,7 @@ document.querySelectorAll(".month-btn").forEach(btn => {
     );
 });
 
+// Note: Na-call na sa taas, pero panatilihin din dito para ligtas ang state sync
 await updateMonthHasDataUI(cachedHasDataMonths);
 
 console.log("========== AFTER UPDATE ==========");
