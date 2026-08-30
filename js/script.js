@@ -1000,7 +1000,7 @@ console.log("projects:", responseData.projects);
 
 await updateMonthHasDataUI(cachedHasDataMonths);
 
-    // ==========================
+// ==========================
 // RESTORE MONTH LOCK BORDER
 // ==========================
 
@@ -1042,12 +1042,25 @@ console.log(
 
 }
 
+document.querySelectorAll(".month-btn").forEach(btn => {
+
+    const key = getMonthKey(currentYear, btn.dataset.month);
+
+    const locked = !!monthLocks[key];
+
+    if (IS_ADMIN) {
+        btn.classList.toggle("locked", locked);
+    } else {
+        btn.classList.remove("locked");
+    }
+
+}); // <-- close ng forEach
+
+updateMonthLockUI();
+
 } catch (e) {
 
-    console.error(
-        "[LOAD] Error loading projects:",
-        e
-    );
+    console.error("[LOAD] Error loading projects:", e);
 
 }
 
