@@ -909,7 +909,12 @@ async function loadProjects() {
         }
 
         const responseData = await response.json();
-        console.log("API returned:", responseData.hasDataMonths);
+
+console.log("========== API RESPONSE ==========");
+console.log("Requested Year :", currentYear);
+console.log("Requested Month:", currentMonth);
+console.log("hasDataMonths :", responseData.hasDataMonths);
+console.log("Projects Count:", responseData.projects?.length);
 
 const projectsData = responseData.projects || [];
 
@@ -1000,8 +1005,16 @@ console.log("projects:", responseData.projects);
     updateMonthLockUI();
 
 console.log("========== BEFORE UPDATE ==========");
-console.log("currentYear:", currentYear);
-console.log("cachedHasDataMonths:", cachedHasDataMonths);
+console.log("Current Year:", currentYear);
+console.log("Current Month:", currentMonth);
+console.log("Cached Months:", cachedHasDataMonths);
+
+document.querySelectorAll(".month-btn").forEach(btn => {
+    console.log(
+        btn.dataset.month,
+        btn.className
+    );
+});
 
 await updateMonthHasDataUI(cachedHasDataMonths);
 
