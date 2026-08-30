@@ -2,6 +2,7 @@ import { onRequestGet as __api_backup_js_onRequestGet } from "C:\\Users\\yang\\D
 import { onRequestDelete as __api_delete_all_js_onRequestDelete } from "C:\\Users\\yang\\Documents\\project-platform\\functions\\api\\delete-all.js"
 import { onRequestPost as __api_login_js_onRequestPost } from "C:\\Users\\yang\\Documents\\project-platform\\functions\\api\\login.js"
 import { onRequestPost as __api_month_lock_js_onRequestPost } from "C:\\Users\\yang\\Documents\\project-platform\\functions\\api\\month-lock.js"
+import { onRequestPost as __api_music_recommend_js_onRequestPost } from "C:\\Users\\yang\\Documents\\project-platform\\functions\\api\\music-recommend.js"
 import { onRequestGet as __api_projects_js_onRequestGet } from "C:\\Users\\yang\\Documents\\project-platform\\functions\\api\\projects.js"
 import { onRequestPost as __api_projects_js_onRequestPost } from "C:\\Users\\yang\\Documents\\project-platform\\functions\\api\\projects.js"
 import { onRequestPost as __api_reset_month_js_onRequestPost } from "C:\\Users\\yang\\Documents\\project-platform\\functions\\api\\reset-month.js"
@@ -36,6 +37,13 @@ export const routes = [
       method: "POST",
       middlewares: [],
       modules: [__api_month_lock_js_onRequestPost],
+    },
+  {
+      routePath: "/api/music-recommend",
+      mountPath: "/api",
+      method: "POST",
+      middlewares: [],
+      modules: [__api_music_recommend_js_onRequestPost],
     },
   {
       routePath: "/api/projects",

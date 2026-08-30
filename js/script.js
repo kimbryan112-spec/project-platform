@@ -238,6 +238,195 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+/* ==========================================
+   AI MUSIC MODAL
+========================================== */
+const musicModal = document.getElementById("musicModal");
+const closeMusicModal = document.getElementById("closeMusicModal");
+const musicLoading = document.getElementById("musicLoading");
+const musicList = document.getElementById("musicList");
+
+let activeRowForMusic = null;
+
+/* OPEN */
+function openMusicModal(){
+    if (musicModal) musicModal.classList.add("show");
+}
+
+/* CLOSE */
+function closeMusicPopup(){
+    if (musicModal) musicModal.classList.remove("show");
+}
+
+if (closeMusicModal) {
+    closeMusicModal.addEventListener("click", closeMusicPopup);
+}
+
+if (musicModal) {
+    musicModal.addEventListener("click",(e)=>{
+        if(e.target===musicModal){
+            closeMusicPopup();
+        }
+    });
+}
+
+/* ==================================
+   AI MUSIC DIRECTOR WORKFLOW (RECOMMEND & REGENERATE)
+================================== */
+
+// Buksan ang Modal kapag pinindot ang AI Music Director button sa row
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".generate-btn");
+    if (!btn) return;
+
+    activeRowForMusic = btn.closest("tr");
+    if (!activeRowForMusic) return;
+
+    // I-reset ang view ng modal bago buksan
+    const analysisSection = document.getElementById("weddingAnalysisSection");
+    const whySection = document.getElementById("whySongsSection");
+    if (analysisSection) analysisSection.style.display = "none";
+    if (whySection) whySection.style.display = "none";
+    if (musicList) musicList.innerHTML = "";
+    if (musicLoading) musicLoading.style.display = "none";
+
+    openMusicModal();
+});
+
+// Function para tawagin ang /api/music-recommend
+async function fetchMusicRecommendations() {
+    if (!activeRowForMusic) {
+        alert("Please select a project row first.");
+        return;
+    }
+
+    try {
+        if (musicLoading) musicLoading.style.display = "block";
+        if (musicList) musicList.innerHTML = "";
+
+        // Kunin ang mga opsyon mula sa modal filters
+        const selectedMood = document.getElementById("musicMood")?.value || "Romantic";
+        const selectedEnergy = document.getElementById("musicEnergy")?.value || "Medium";
+
+        // Kolektahin ang row data kasama ang preferences
+        const project = collectRowData(activeRowForMusic);
+        project.preferredMood = selectedMood;
+        project.preferredEnergy = selectedEnergy;
+
+        const response = await fetch("/api/music-recommend", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(project)
+        });
+
+        const result = await response.json();
+
+        if (musicLoading) musicLoading.style.display = "none";
+
+        if (!result.success) {
+            throw new Error(result.message || "Failed to generate recommendations.");
+        }
+
+        // 1. Render Wedding Analysis Badges
+        const analysisSection = document.getElementById("weddingAnalysisSection");
+        const analysisBadges = document.getElementById("analysisBadges");
+        if (analysisSection && analysisBadges && result.analysis) {
+            analysisBadges.innerHTML = result.analysis.map(item => `
+                <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; color: #334155;">
+                    ${item}
+                </span>
+            `).join("");
+            analysisSection.style.display = "block";
+        }
+
+        // 2. Render 5 Songs List (kasama ang Scene, Confidence, at Artist)
+        if (musicList && result.songs) {
+            musicList.innerHTML = "";
+            result.songs.forEach((song, index) => {
+                musicList.innerHTML += `
+                    <div class="music-card" style="background: #fff; border: 1px solid #e2e8f0; padding: 14px; border-radius: 8px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <h3 style="margin: 0; font-size: 15px; color: #1e293b;">${index + 1}. ${song.title} <span style="font-size: 12px; color: #64748b; font-weight: normal;">(${song.scene || "Highlight"})</span></h3>
+                            <span style="background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold;">${song.confidence || 95}% Match</span>
+                        </div>
+                        <div class="music-artist" style="font-size: 13px; color: #64748b; margin-bottom: 6px;">
+                            Artist: <strong>${song.artist}</strong> | Mood: <em>${song.mood}</em> | Energy: <em>${song.energy}</em>
+                        </div>
+                        <div class="music-reason" style="font-size: 13px; color: #475569; margin-bottom: 10px;">
+                            ${song.reason}
+                        </div>
+                        <div class="music-actions" style="display: flex; gap: 8px;">
+                            <a href="${song.url}" target="_blank" class="music-link-btn" style="padding: 6px 12px; background: #f1f5f9; border-radius: 4px; font-size: 12px; text-decoration: none; color: #334155;">
+                                Open Musicbed
+                            </a>
+                            <button class="music-use-btn btn-3d" data-title="${song.title}" data-link="${song.url}" style="padding: 6px 12px; background: #2563eb; color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                                Use Song
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 3. Render Why These Songs Section
+        const whySection = document.getElementById("whySongsSection");
+        const whyText = document.getElementById("whySongsText");
+        if (whySection && whyText && result.whyText) {
+            whyText.textContent = result.whyText;
+            whySection.style.display = "block";
+        }
+
+    } catch (err) {
+        console.error("[AI MUSIC ERROR]", err);
+        if (musicLoading) musicLoading.style.display = "none";
+        if (musicList) {
+            musicList.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`;
+        }
+    }
+}
+
+// Event Listeners para sa Recommend at Regenerate Buttons sa Modal
+document.getElementById("generateSongsBtn")?.addEventListener("click", fetchMusicRecommendations);
+document.getElementById("regenerateSongsBtn")?.addEventListener("click", fetchMusicRecommendations);
+
+// Auto-fill feature kapag pinindot ang "Use Song" button sa loob ng modal
+document.addEventListener("click", (e) => {
+    const useBtn = e.target.closest(".music-use-btn");
+    if (!useBtn || !activeRowForMusic) return;
+
+    const title = useBtn.dataset.title;
+    const link = useBtn.dataset.link;
+
+    // Hanapin ang unang song input cell (song1) o ang pinakamalapit na bakanteng song cell sa row
+    const songInputs = activeRowForMusic.querySelectorAll(".song-link");
+    let targetInput = null;
+
+    for (const input of songInputs) {
+        if (!input.value.trim()) {
+            targetInput = input;
+            break;
+        }
+    }
+
+    // Kung puno na lahat, gamitin na lang ang unang song cell by default
+    if (!targetInput && songInputs.length > 0) {
+        targetInput = songInputs[0];
+    }
+
+    if (targetInput) {
+        targetInput.value = title;
+        targetInput.dataset.songLink = link;
+        updateSongLinkStyle(targetInput);
+        saveProjects();
+
+        // Isara ang modal pagkatapos mag-auto fill
+        closeMusicPopup();
+        console.log(`[AI MUSIC] Auto-filled song: ${title} -> ${link}`);
+    }
+});
+
 /* ==================================
    CORE LOGIC: SAVE & LOAD (REST API)
 ================================== */
@@ -676,7 +865,6 @@ function saveProjectsLocal() {
             JSON.stringify(projectsData)
         );
 
-        // Agad i-update ang UI habang nagti-type para hindi mawala ang kulay green
         updateCurrentMonthHasData();
 
     }, 300);
@@ -728,7 +916,6 @@ function updateCurrentMonthHasData() {
     const hasData = monthHasData();
     activeBtn.classList.toggle("has-data", hasData);
 
-    // I-sync din ang cache para hindi mawala kapag nagpalit ng buwan at bumalik
     if (!LOCAL_MODE) {
         cachedHasDataMonths[currentMonth] = hasData;
     }
@@ -1748,15 +1935,14 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
 
     const tbody = document.querySelector(".project-table tbody");
     if (tbody) {
-        tbody.style.opacity = "0"; // Pansamantalang itago para walang visual flash
+        tbody.style.opacity = "0";
     }
 
     if (!saved) {
         console.log(`[LOCAL RESTORE] No cache found for ${key}`);
-        // Linisin ang mga rows kung walang cache para hindi mag-iwan ng lumang data
         const rows = document.querySelectorAll(".project-table tbody tr");
         rows.forEach(row => {
-            const emptyData = {}; // Clear fields logic mo dito kung meron
+            const emptyData = {};
             populateRow(row, emptyData);
         });
         if (tbody) {
@@ -1780,7 +1966,6 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
 
         console.log(`[LOCAL RESTORE] Restored ${projects.length} project(s) from ${key}`);
         
-        // Ibalik agad nang smooth ang opacity
         if (tbody) {
             requestAnimationFrame(() => {
                 tbody.style.transition = "opacity 0.15s ease-in-out";

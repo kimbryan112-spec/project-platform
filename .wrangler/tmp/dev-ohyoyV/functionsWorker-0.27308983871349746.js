@@ -253,6 +253,156 @@ async function onRequestPost2(context) {
 }
 __name(onRequestPost2, "onRequestPost2");
 __name2(onRequestPost2, "onRequestPost");
+async function askOpenAI(prompt, apiKey) {
+  const response = await fetch(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        // O ang tamang production model na gagamitin mo
+        messages: [
+          {
+            role: "system",
+            content: "You are the AI Music Director of KBHFILMS. Return ONLY valid JSON."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7
+      })
+    }
+  );
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+  const data = await response.json();
+  return JSON.parse(data.choices[0].message.content);
+}
+__name(askOpenAI, "askOpenAI");
+__name2(askOpenAI, "askOpenAI");
+async function onRequestPost3(context) {
+  try {
+    const { request, env } = context;
+    const project = await request.json();
+    console.log("[AI MUSIC DIRECTOR REQUEST]", project);
+    const apiKey = env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OPENAI_API_KEY is not configured in Cloudflare environment variables.");
+    }
+    const musicbedCatalog = [
+      { title: "Bloom", artist: "The Light The Heat", mood: "Romantic", url: "https://www.musicbed.com/songs/bloom-the-light-the-heat/28451" },
+      { title: "Forever", artist: "Leif Vollebekk", mood: "Emotional", url: "https://www.musicbed.com/songs/forever-leif-vollebekk/15234" },
+      { title: "Golden Sky", artist: "Salt Of The Sound", mood: "Cinematic", url: "https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821" },
+      { title: "Home", artist: "Tony Anderson", mood: "Luxury", url: "https://www.musicbed.com/songs/home-tony-anderson/10492" },
+      { title: "Anchor", artist: "Ryan Taubert", mood: "Elegant", url: "https://www.musicbed.com/songs/anchor-ryan-taubert/11203" },
+      { title: "Rise", artist: "The Hunts", mood: "Happy", url: "https://www.musicbed.com/songs/rise-the-hunts/14892" },
+      { title: "Wildflower", artist: "The Gray Havens", mood: "Romantic", url: "https://www.musicbed.com/songs/wildflower-the-gray-havens/22104" }
+    ];
+    const prompt = `
+You are the Head Music Director of KBHFILMS.
+Your job is to recommend cinematic Musicbed songs for professional wedding films.
+
+Wedding Information:
+- Couple: ${project.coupleName || "Not Specified"}
+- Wedding Type: ${project.type || "Not Specified"}
+- Current Status: ${project.status || "Planned"}
+- Instructions: ${project.instruction || "None"}
+- Concerns: ${project.concerns || "None"}
+- Drone: ${project.drone || "NO DRONE"}
+- Raw Files: ${project.rawFiles || "None"}
+
+Requirements:
+Recommend EXACTLY 5 songs.
+For each recommendation provide:
+- title
+- artist
+- mood
+- energy (Slow, Medium, or Epic)
+- scene (e.g., Preparation, Ceremony, Drone, Reception, Outro)
+- reason (why it fits)
+- confidence (Confidence Score between 1 to 100)
+
+Return ONLY a valid JSON object with this exact structure:
+{
+  "analysis": {
+    "style": "Luxury Emotional",
+    "editingStyle": "Slow Cinematic",
+    "drone": ${project.drone !== "NO DRONE"},
+    "notes": "Custom tailored notes based on instructions."
+  },
+  "songs": [
+    {
+      "title": "Bloom",
+      "artist": "The Light The Heat",
+      "mood": "Romantic",
+      "energy": "Medium",
+      "scene": "Preparation",
+      "reason": "Soft build-up ideal for bridal prep.",
+      "confidence": 98
+    }
+  ],
+  "whyText": "Overall explanation of why these songs fit the wedding narrative."
+}
+`;
+    const aiResult = await askOpenAI(prompt, apiKey);
+    const analysisData = aiResult.analysis || {};
+    const rawSongs = aiResult.songs || [];
+    const verifiedSongs = rawSongs.map((song) => {
+      const foundInCatalog = musicbedCatalog.find(
+        (cat) => cat.title.toLowerCase() === song.title.toLowerCase()
+      );
+      return {
+        title: song.title,
+        artist: song.artist,
+        mood: song.mood || "Cinematic",
+        energy: song.energy || "Medium",
+        scene: song.scene || "Highlight",
+        reason: song.reason,
+        confidence: song.confidence || 95,
+        url: foundInCatalog ? foundInCatalog.url : "https://www.musicbed.com"
+      };
+    });
+    const analysisBadges = [
+      `\u2714 ${analysisData.style || project.type || "Cinematic Wedding"}`,
+      `\u2714 Editing: ${analysisData.editingStyle || "Professional"}`,
+      project.drone !== "NO DRONE" ? `\u2714 Drone: ${project.drone}` : "\u2714 Standard Coverage",
+      project.instruction ? "\u2714 Custom Instructions Applied" : "\u2714 Standard Flow"
+    ];
+    return new Response(
+      JSON.stringify({
+        success: true,
+        analysis: analysisBadges,
+        songs: verifiedSongs,
+        whyText: aiResult.whyText || `Curated specifically for ${project.coupleName || "this project"} matching professional wedding standards.`
+      }),
+      {
+        headers: { "Content-Type": "application/json" }
+      }
+    );
+  } catch (err) {
+    console.error("[AI MUSIC ERROR]", err);
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: err.message
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      }
+    );
+  }
+}
+__name(onRequestPost3, "onRequestPost3");
+__name2(onRequestPost3, "onRequestPost");
 async function onRequestGet2(context) {
   try {
     const url = new URL(context.request.url);
@@ -377,7 +527,7 @@ async function onRequestGet2(context) {
 }
 __name(onRequestGet2, "onRequestGet2");
 __name2(onRequestGet2, "onRequestGet");
-async function onRequestPost3(context) {
+async function onRequestPost4(context) {
   try {
     const url = new URL(context.request.url);
     const year = Number(url.searchParams.get("year")) || (/* @__PURE__ */ new Date()).getFullYear();
@@ -494,9 +644,9 @@ async function onRequestPost3(context) {
     );
   }
 }
-__name(onRequestPost3, "onRequestPost3");
-__name2(onRequestPost3, "onRequestPost");
-async function onRequestPost4(context) {
+__name(onRequestPost4, "onRequestPost4");
+__name2(onRequestPost4, "onRequestPost");
+async function onRequestPost5(context) {
   try {
     const { month, year } = await context.request.json();
     console.log(`[RESET MONTH] ${month}/${year}`);
@@ -544,9 +694,9 @@ async function onRequestPost4(context) {
     );
   }
 }
-__name(onRequestPost4, "onRequestPost4");
-__name2(onRequestPost4, "onRequestPost");
-async function onRequestPost5(context) {
+__name(onRequestPost5, "onRequestPost5");
+__name2(onRequestPost5, "onRequestPost");
+async function onRequestPost6(context) {
   try {
     const { year } = await context.request.json();
     console.log(`[RESET YEAR] ${year}`);
@@ -590,9 +740,9 @@ async function onRequestPost5(context) {
     );
   }
 }
-__name(onRequestPost5, "onRequestPost5");
-__name2(onRequestPost5, "onRequestPost");
-async function onRequestPost6(context) {
+__name(onRequestPost6, "onRequestPost6");
+__name2(onRequestPost6, "onRequestPost");
+async function onRequestPost7(context) {
   try {
     console.log("[RESTORE] Starting full system restore...");
     const backup = await context.request.json();
@@ -655,8 +805,8 @@ async function onRequestPost6(context) {
     );
   }
 }
-__name(onRequestPost6, "onRequestPost6");
-__name2(onRequestPost6, "onRequestPost");
+__name(onRequestPost7, "onRequestPost7");
+__name2(onRequestPost7, "onRequestPost");
 var routes = [
   {
     routePath: "/api/backup",
@@ -687,6 +837,13 @@ var routes = [
     modules: [onRequestPost2]
   },
   {
+    routePath: "/api/music-recommend",
+    mountPath: "/api",
+    method: "POST",
+    middlewares: [],
+    modules: [onRequestPost3]
+  },
+  {
     routePath: "/api/projects",
     mountPath: "/api",
     method: "GET",
@@ -698,28 +855,28 @@ var routes = [
     mountPath: "/api",
     method: "POST",
     middlewares: [],
-    modules: [onRequestPost3]
+    modules: [onRequestPost4]
   },
   {
     routePath: "/api/reset-month",
     mountPath: "/api",
     method: "POST",
     middlewares: [],
-    modules: [onRequestPost4]
+    modules: [onRequestPost5]
   },
   {
     routePath: "/api/reset-year",
     mountPath: "/api",
     method: "POST",
     middlewares: [],
-    modules: [onRequestPost5]
+    modules: [onRequestPost6]
   },
   {
     routePath: "/api/restore",
     mountPath: "/api",
     method: "POST",
     middlewares: [],
-    modules: [onRequestPost6]
+    modules: [onRequestPost7]
   }
 ];
 function lexer(str) {
