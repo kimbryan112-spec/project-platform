@@ -1,130 +1,81 @@
-/* ==================================
-   RESTORE API
-   POST /api/restore
-================================== */
+// ==================================
+// DYNAMIC RESTORE API (All Tables)
+// POST /api/restore
+// ==================================
 
 export async function onRequestPost(context) {
     try {
-        console.log("[RESTORE] Starting restore...");
+        console.log("[RESTORE] Starting full system restore...");
 
         const backup = await context.request.json();
 
-        if (
-            !backup ||
-            !Array.isArray(backup.projects)
-        ) {
+        // 1. Siguraduhing tama ang format ng file at may 'data' object
+        if (!backup || !backup.data || typeof backup.data !== "object") {
             return new Response(
                 JSON.stringify({
                     success: false,
-                    message: "Invalid backup file."
+                    message: "Invalid backup file format."
                 }),
                 {
                     status: 400,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                    headers: { "Content-Type": "application/json" }
                 }
             );
         }
 
-        // ==================================
-        // CLEAR DATABASE
-        // ==================================
-        await context.env.DB.prepare(`
-            DELETE FROM projects
-        `).run();
+        const tablesData = backup.data;
+        const tableNames = Object.keys(tablesData);
 
-        // ==================================
-        // RESTORE PROJECTS (Fixed to match schema.sql & backup.js completely)
-        // ==================================
-        for (const row of backup.projects) {
-            await context.env.DB.prepare(`
-                INSERT INTO projects (
-                    project_year,
-                    project_month,
-                    row_index,
-                    couple_name,
-                    status,
-                    progress,
-                    type,
-                    raw_files,
-                    drone,
-                    instruction,
-                    concerns,
-                    watch_link,
-                    files_link,
-                    song1_title,
-                    song1_link,
-                    song1_status,
-                    song1_notes,
-                    song2_title,
-                    song2_link,
-                    song2_status,
-                    song2_notes,
-                    song3_title,
-                    song3_link,
-                    song3_status,
-                    song3_notes,
-                    teaser_title,
-                    teaser_link,
-                    teaser_status,
-                    teaser_notes,
-                    updated_at
-                )
-                VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    CURRENT_TIMESTAMP
-                )
-            `).bind(
-                row.project_year,
-                row.project_month,
-                row.row_index,
-                row.couple_name || "",
-                row.status || "PLANNED",
-                row.progress || 0,
-                row.type || "NOT SET",
-                row.raw_files || "",
-                row.drone || "",
-                row.instruction || "",
-                row.concerns || "",
-                row.watch_link || "",
-                row.files_link || "",
-                row.song1_title || "",
-                row.song1_link || "",
-                row.song1_status || "",
-                row.song1_notes || "",
-                row.song2_title || "",
-                row.song2_link || "",
-                row.song2_status || "",
-                row.song2_notes || "",
-                row.song3_title || "",
-                row.song3_link || "",
-                row.song3_status || "",
-                row.song3_notes || "",
-                row.teaser_title || "",
-                row.teaser_link || "",
-                row.teaser_status || "",
-                row.teaser_notes || ""
-            ).run();
+        // 2. I-off muna ang foreign key checks para maiwasan ang conflict habang nagbubura at nagpapasok
+        await context.env.DB.prepare(`PRAGMA foreign_keys = OFF;`).run();
+
+        // 3. Linisin ang mga lumang laman ng bawat table (baliktad o diretso)
+        for (const tableName of tableNames) {
+            await context.env.DB.prepare(`DELETE FROM "${tableName}";`).run();
         }
+
+        // 4. I-insert pabalik ang mga records para sa bawat table
+        for (const tableName of tableNames) {
+            const rows = tablesData[tableName];
+            
+            if (!Array.isArray(rows) || rows.length === 0) continue;
+
+            for (const row of rows) {
+                const columns = Object.keys(row);
+                const values = Object.values(row);
+                
+                // Gumawa ng dynamic placeholders (?, ?, ?) base sa dami ng columns
+                const placeholders = columns.map(() => "?").join(", ");
+                const quotedColumns = columns.map(col => `"${col}"`).join(", ");
+
+                const query = `INSERT INTO "${tableName}" (${quotedColumns}) VALUES (${placeholders})`;
+                
+                await context.env.DB.prepare(query).bind(...values).run();
+            }
+            console.log(`[RESTORE] Restored ${rows.length} record(s) to table: ${tableName}`);
+        }
+
+        // 5. I-on ulit ang foreign keys
+        await context.env.DB.prepare(`PRAGMA foreign_keys = ON;`).run();
 
         return new Response(
             JSON.stringify({
                 success: true,
-                message: "Database restored successfully."
+                message: "Full system restored successfully."
             }),
             {
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: { "Content-Type": "application/json" }
             }
         );
 
     }
     catch (err) {
-        console.error("[RESTORE]", err);
+        console.error("[RESTORE] Error:", err);
+
+        // Siguraduhing ibabalik ang foreign keys kahit magka-error
+        try {
+            await context.env.DB.prepare(`PRAGMA foreign_keys = ON;`).run();
+        } catch (e) {}
 
         return new Response(
             JSON.stringify({
@@ -133,9 +84,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: { "Content-Type": "application/json" }
             }
         );
     }

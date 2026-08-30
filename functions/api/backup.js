@@ -1,33 +1,44 @@
-/* ==================================
-   BACKUP API
-   GET /api/backup
-================================== */
+// ==================================
+// DYNAMIC BACKUP API (All Tables)
+// GET /api/backup
+// ==================================
 
 export async function onRequestGet(context) {
     try {
-        console.log("[BACKUP] Creating backup...");
+        console.log("[BACKUP] Starting full system backup...");
 
-        const { results } = await context.env.DB.prepare(`
-            SELECT *
-            FROM projects
-            ORDER BY row_index ASC
+        // 1. Kunin ang lahat ng table names sa database nang awtomatiko
+        const tablesResult = await context.env.DB.prepare(`
+            SELECT name FROM sqlite_master 
+            WHERE type='table' 
+            AND name NOT LIKE 'sqlite_%' 
+            AND name NOT LIKE '_cf_%'
         `).all();
 
-        console.log(`[BACKUP] ${results.length} project(s) exported.`);
+        const tables = tablesResult.results;
+        const backupData = {};
+
+        // 2. I-loop ang bawat table para makuha ang lahat ng records nito
+        for (const t of tables) {
+            const tableName = t.name;
+            const tableRecords = await context.env.DB.prepare(`SELECT * FROM "${tableName}"`).all();
+            backupData[tableName] = tableRecords.results;
+            console.log(`[BACKUP] Exported ${tableRecords.results.length} record(s) from table: ${tableName}`);
+        }
 
         const backup = {
-            version: "1.0",
+            version: "2.0",
             exportedAt: new Date().toISOString(),
-            totalRecords: results.length,
-            projects: results
+            data: backupData
         };
 
+        // 3. I-download bilang JSON file
         return new Response(
             JSON.stringify(backup, null, 2),
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "Content-Disposition": `attachment; filename="backup-${Date.now()}.json"`,
+                    "Content-Disposition": `attachment; filename="kbhfilms-full-backup-${Date.now()}.json"`,
                     "Cache-Control": "no-cache, no-store, must-revalidate"
                 }
             }
