@@ -1,6 +1,6 @@
 // ===============================
 // PROJECT PLATFORM
-// SERVER LOGIN (Connected to D1 via API)
+// SERVER LOGIN (Offline & API Supported)
 // ===============================
 
 const loginForm = document.getElementById("loginForm");
@@ -19,11 +19,41 @@ loginForm.addEventListener("submit", async function (e) {
         .getElementById("password")
         .value;
 
-    // Linisin muna ang lumang error message kung meron man
     if (errorText) {
         errorText.textContent = "";
     }
 
+    // OFFLINE / LOCAL TESTING FALLBACK (Para gumagana kahit sa Live Server 127.0.0.1:5500)
+    if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
+        if (email === "adminyang@kbhfilms.com" && password === "Yangyang#12") {
+            const offlineUser = {
+                id: 1,
+                fullname: "Kim Bryan Hernandez",
+                email: email,
+                role: "admin"
+            };
+            localStorage.setItem("currentUser", JSON.stringify(offlineUser));
+            window.location.href = "pages/admin.html";
+            return;
+        } else if (email === "yongzhi@kbhfilms.com" && password === "yong2023") {
+            const offlineUser = {
+                id: 2,
+                fullname: "Yong Zhi Ng",
+                email: email,
+                role: "manager"
+            };
+            localStorage.setItem("currentUser", JSON.stringify(offlineUser));
+            window.location.href = "pages/dashboard.html";
+            return;
+        } else {
+            if (errorText) {
+                errorText.textContent = "Invalid email or password.";
+            }
+            return;
+        }
+    }
+
+    // ONLINE CLOUDFER / PRODUCTION API REQUEST
     try {
         const response = await fetch("/api/login", {
             method: "POST",
@@ -42,13 +72,11 @@ loginForm.addEventListener("submit", async function (e) {
             return;
         }
 
-        // Save Current User to localStorage (Tugma sa dashboard.html at script.js checks mo)
         localStorage.setItem(
             "currentUser",
             JSON.stringify(data.user)
         );
 
-        // Redirect base sa role ng user galing sa Database
         if (data.user.role === "admin") {
             window.location.href = "pages/admin.html";
         } else {
