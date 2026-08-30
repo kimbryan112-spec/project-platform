@@ -2,11 +2,8 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Admin Dashboard</title>
 
     <!-- Favicon -->
@@ -23,216 +20,116 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="../css/style.css">
-
 </head>
 
 <body>
 
 <div id="app">
 
-   <!-- Sidebar -->
-<aside class="sidebar">
-
-    <div class="logo">
-
-        <h2>PROJECT PLATFORM</h2>
-
-        <p><strong>KBHFILMS</strong></p>
-
-        <span class="app-version">
-            Version 1.2.8
-        </span>
-
-    </div>
-
-    <nav>
-
-    <a href="admin.html" class="btn-3d active">
-        📊 Admin Dashboard
-    </a>
-
-    <a href="dashboard.html" class="btn-3d">
-        📋 Dashboard
-    </a>
-
-    <a href="settings.html" class="btn-3d">
-        ⚙ Settings
-    </a>
-
-</nav>
-
-        <!-- Sidebar Footer -->
-
-    <div class="sidebar-footer">
-
-        <div class="user-info">
-
-            <div class="user-name">
-                Kim Bryan Hernandez
-            </div>
-
-            <div class="user-role">
-                Administrator
-            </div>
-
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>PROJECT PLATFORM</h2>
+            <p><strong>KBHFILMS</strong></p>
+            <span class="app-version">Version 1.2.8</span>
         </div>
 
-        <div class="logout-wrapper">
+        <nav>
+            <a href="admin.html" class="btn-3d active">📊 Admin Dashboard</a>
+            <a href="dashboard.html" class="btn-3d">📋 Dashboard</a>
+            <a href="settings.html" class="btn-3d">⚙ Settings</a>
+        </nav>
 
-    <button id="logoutBtn" class="logout-btn btn-3d">
-        🚪 Logout
-    </button>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-name">Kim Bryan Hernandez</div>
+                <div class="user-role">Administrator</div>
+            </div>
 
-    <div id="logoutConfirm" class="logout-confirm">
-
-        <p>Do you want to logout?</p>
-
-        <div class="logout-actions">
-
-            <button
-                id="confirmLogout"
-                class="yes-btn">
-                Yes
-            </button>
-
-            <button
-                id="cancelLogout"
-                class="no-btn">
-                No
-            </button>
-
+            <div class="logout-wrapper">
+                <button id="logoutBtn" class="logout-btn btn-3d">🚪 Logout</button>
+                <div id="logoutConfirm" class="logout-confirm">
+                    <p>Do you want to logout?</p>
+                    <div class="logout-actions">
+                        <button id="confirmLogout" class="yes-btn">Yes</button>
+                        <button id="cancelLogout" class="no-btn">No</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-    </div>
-
-</div>
-
-    </div>
-
-</aside>
+    </aside>
 
     <!-- Main -->
-
     <main class="main">
 
         <!-- Topbar -->
-
         <header class="topbar">
+            <div class="topbar-left">
+                <div class="page-title">
+                    <h1>Administrator</h1>
+                    <p>Wedding Project Overview</p>
+                </div>
 
-    <div class="topbar-left">
+                <div class="year-header">
+                    <div class="live-calendar">
+                        <div id="calendarMonth" class="calendar-month">AUG</div>
+                        <div id="calendarDay" class="calendar-day">21</div>
+                    </div>
+                    <h2><span id="currentYearTitle">2026</span> Wedding Highlights</h2>
+                </div>
+            </div>
 
-        <div class="page-title">
-            <h1>Administrator</h1>
-            <p>Wedding Project Overview</p>
+            <div class="topbar-right">
+                <select id="yearSelect"></select>
+                <button class="next-year-btn btn-3d">+ Next Year</button>
+                <div class="profile">
+                    <img src="../assets/images/kbhfilms-logo.png" alt="KBHFILMS Logo">
+                </div>
+            </div>
+        </header>
+
+        <!-- YEAR + MONTH NAVIGATION -->
+        <div class="year-month-panel">
+            <div class="month-buttons">
+                <button class="month-btn btn-3d" data-month="jan">Jan</button>
+                <button class="month-btn btn-3d" data-month="feb">Feb</button>
+                <button class="month-btn btn-3d" data-month="mar">Mar</button>
+                <button class="month-btn btn-3d" data-month="apr">Apr</button>
+                <button class="month-btn btn-3d" data-month="may">May</button>
+                <button class="month-btn btn-3d" data-month="jun">Jun</button>
+                <button class="month-btn btn-3d" data-month="jul">Jul</button>
+                <button class="month-btn btn-3d" data-month="aug">Aug</button>
+                <button class="month-btn btn-3d" data-month="sep">Sep</button>
+                <button class="month-btn btn-3d" data-month="oct">Oct</button>
+                <button class="month-btn btn-3d" data-month="nov">Nov</button>
+                <button class="month-btn btn-3d" data-month="dec">Dec</button>
+            </div>
+
+            <!-- MUSIC PLAYER -->
+            <div class="music-player">
+                <div class="music-controls">
+                    <button id="musicPrev" class="music-btn">⏮</button>
+                    <button id="musicPlay" class="music-btn play">⏯</button>
+                    <button id="musicNext" class="music-btn">⏭</button>
+                    <span class="volume-icon" id="volumeIcon">🔊</span>
+                </div>
+                <div class="volume-row">
+                    <input type="range" id="musicVolume" min="0" max="100" value="75">
+                    <span id="volumeValue">75%</span>
+                </div>
+            </div>
         </div>
 
-        <div class="year-header">
-
-    <div class="live-calendar">
-
-        <div id="calendarMonth" class="calendar-month">
-            AUG
+        <div class="month-legend">
+            <span>🔵 No data yet</span>
+            <span>🟢 Has data</span>
         </div>
 
-        <div id="calendarDay" class="calendar-day">
-            21
-        </div>
-
-    </div>
-
-    <h2>
-        <span id="currentYearTitle">2026</span> Wedding Highlights
-    </h2>
-
-</div>
-
-    </div>
-
-    <div class="topbar-right">
-
-        <select id="yearSelect"></select>
-
-        <button class="next-year-btn btn-3d">
-    + Next Year
-</button>
-
-        <div class="profile">
-    <img src="../assets/images/kbhfilms-logo.png" alt="KBHFILMS Logo">
-</div>
-
-    </div>
-
-</header>
-
-<!-- YEAR + MONTH NAVIGATION -->
-
-<div class="year-month-panel">
-
-    <div class="month-buttons">
-
-        <button class="month-btn btn-3d" data-month="jan">Jan</button>
-        <button class="month-btn btn-3d" data-month="feb">Feb</button>
-        <button class="month-btn btn-3d" data-month="mar">Mar</button>
-        <button class="month-btn btn-3d" data-month="apr">Apr</button>
-        <button class="month-btn btn-3d" data-month="may">May</button>
-        <button class="month-btn btn-3d" data-month="jun">Jun</button>
-        <button class="month-btn btn-3d" data-month="jul">Jul</button>
-        <button class="month-btn btn-3d" data-month="aug">Aug</button>
-        <button class="month-btn btn-3d" data-month="sep">Sep</button>
-        <button class="month-btn btn-3d" data-month="oct">Oct</button>
-        <button class="month-btn btn-3d" data-month="nov">Nov</button>
-        <button class="month-btn btn-3d" data-month="dec">Dec</button>
-
-    </div>
-
-    <!-- MUSIC PLAYER -->
-    <div class="music-player">
-
-        <div class="music-controls">
-
-            <button id="musicPrev" class="music-btn">⏮</button>
-
-            <button id="musicPlay" class="music-btn play">⏯</button>
-
-            <button id="musicNext" class="music-btn">⏭</button>
-
-            <span class="volume-icon" id="volumeIcon">🔊</span>
-
-        </div>
-
-        <div class="volume-row">
-
-            <input
-                type="range"
-                id="musicVolume"
-                min="0"
-                max="100"
-                value="75"
-            >
-
-            <span id="volumeValue">75%</span>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="month-legend">
-    <span>🔵 No data yet</span>
-    <span>🟢 Has data</span>
-</div>
-
-<!-- Table -->
-
-<div class="table-wrapper">
-
-    <table class="project-table">
-
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table class="project-table">
                 <thead>
-
                     <tr>
-
                         <th>COUPLE'S</th>
                         <th>STATUS</th>
                         <th>TYPE</th>
@@ -242,1591 +139,221 @@
                         <th>1ST SONG</th>
                         <th>2ND SONG</th>
                         <th>3RD SONG</th>
-
                     </tr>
-
                 </thead>
-
                 <tbody id="projectTableBody">
-    <!-- ROW 1 -->
-    <tr data-row-id="1">
-        <td class="couple-cell">
-
-    <div class="couple-name" contenteditable="true"></div>
-
-    <div class="couple-actions">
-
-        <button class="instruction-btn btn-3d">
-    📝 Special Instructions
-</button>
-
-        <button class="watch-btn btn-3d" data-watch-link="">
-    <span class="play-icon">▶</span>
-    <span>Watch</span>
-</button>
-
-    </div>
-
-<td class="status-cell">
-
-    <select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>PROJECT CONCERNS</option>
-    <option>FOR REVIEW</option>
-    <option>DELIVERED</option>
-    <option>YONG'S RATINGS</option>
-</select>
-
-    <input
-        type="range"
-        class="progress-slider"
-        min="0"
-        max="100"
-        value="0">
-
-    <div class="timeline-percent">
-
-        0%
-
-    </div>
-
-    <button
-        type="button"
-        class="get-files-btn btn-3d">
-
-        GET FILES
-
-    </button>
-
-    <button
-        type="button"
-        class="concerns-btn btn-3d"
-        style="display:none;">
-
-        ⚠️ CONCERNS
-
-    </button>
-
-</td>
-        <td>
-            <select class="type-select">
-                <option>BASIC HIGHLIGHTS</option>
-                <option>ROMANTIC CINEMATIC</option>
-                <option selected>UPBEAT CINEMATIC</option>
-                <option>SLOW CLASSICAL</option>
-                <option>NORMAL CLASSICAL</option>
-                <option>FAST CLASSICAL</option>
-                <option>NOT SET</option>
-            </select>
-        </td>
-        <td>
-    <div class="raw-files-actions">
-
-    <input
-    class="dashboard-raw-input"
-    type="url"
-    placeholder="Link here">
-
-    <button
-    type="button"
-    class="raw-check-btn btn-3d"
-    onclick="window.open(this.previousElementSibling.value, '_blank')">
-    Check
-</button>
-
-</div>
-</td>
-<td class="drone-cell">
-
-    <div class="drone-search-wrap">
-
-        <input
-            type="text"
-            class="drone-search"
-            placeholder="Search drone...">
-
-        <div class="drone-suggestions"></div>
-
-    </div>
-
-    <select class="drone-select">
-
-        <option value="NO DRONE">NO DRONE</option>
-<option value="CLIENT'S DRONE">CLIENT'S DRONE</option>
-
-        <option>AMARA SENTOSA</option>
-        <option>ANDAZ</option>
-        <option>ARMENIAN CHURCH_</option>
-        <option>BOTANIC GARDEN</option>
-        <option>CAPELLA</option>
-        <option>CATHERAL_</option>
-        <option>CHIMES</option>
-        <option>CONRAD MARINA</option>
-        <option>CONRAD ORCHARD</option>
-        <option>FAITH METHODIST CHURCH</option>
-        <option>FILLER DRONES</option>
-        <option>FOUR SEASON</option>
-        <option>FULLERTON BAY HOTEL</option>
-        <option>FULLERTON HOTEL</option>
-        <option>FURAMA</option>
-        <option>GALLOP EXTENSION</option>
-        <option>GRAND CORPTHONE</option>
-        <option>HILTON ORCHARD</option>
-        <option>HOTEL JEN</option>
-        <option>IFLY</option>
-        <option>INTERCONTI</option>
-        <option>JW MARRIOT</option>
-        <option>KIMBERLY TEMPLE</option>
-        <option>LIZ &amp; VALERIE CHURCH</option>
-        <option>MANDARIN ORIENTAL_</option>
-        <option>MBS</option>
-        <option>OASIA SENTOSA</option>
-        <option>ONE FARRER HOTEL</option>
-        <option>ORCHARD HOTEL</option>
-        <option>OUTPOST HOTEL</option>
-        <option>PAN PACIFIC MARINA</option>
-        <option>PAN PACIFIC ORCHARD</option>
-        <option>PARADOX_</option>
-        <option>PARK ROYAL MARINA BAY</option>
-        <option>PARKROYAL ON BEACH ROAD</option>
-        <option>PARKROYAL PICKERING</option>
-        <option>RAFFLES CITY_</option>
-        <option>RITZ CARLTON</option>
-        <option>SACRED HEART CHURCH</option>
-        <option>SAINT PETER AND PAUL</option>
-        <option>SENTOSA GOLF COURSE</option>
-        <option>SHANGRI-LA ORCHARD</option>
-        <option>SHANGRI-LA RASA SENTOSA</option>
-        <option>SHERATON TOWERS</option>
-        <option>SOFITEL SENTOSA</option>
-        <option>TANGS PLAZA</option>
-        <option>VOCO HOTEL</option>
-        <option>WESTIN</option>
-
-    </select>
-
-</td>
-<td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-    </tr>
-
-    <!-- ROW 2 -->
-    <tr data-row-id="2">
-        <td class="couple-cell">
-
-    <div class="couple-name" contenteditable="true"></div>
-
-    <div class="couple-actions">
-
-        <button class="instruction-btn btn-3d">
-    📝 Special Instructions
-</button>
-
-        <button class="watch-btn btn-3d" data-watch-link="">
-    <span class="play-icon">▶</span>
-    <span>Watch</span>
-</button>
-
-    </div>
-
-</td>
-
-<td class="status-cell">
-
-    <select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>PROJECT CONCERNS</option>
-    <option>FOR REVIEW</option>
-    <option>DELIVERED</option>
-    <option>YONG'S RATINGS</option>
-</select>
-
-    <input
-        type="range"
-        class="progress-slider"
-        min="0"
-        max="100"
-        value="0">
-
-    <div class="timeline-percent">
-
-        0%
-
-    </div>
-
-    <button
-        type="button"
-        class="get-files-btn btn-3d">
-
-        GET FILES
-
-    </button>
-
-    <button
-        type="button"
-        class="concerns-btn btn-3d"
-        style="display:none;">
-
-        ⚠️ CONCERNS
-
-    </button>
-
-</td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="raw-files-actions">
-
-    <input
-    class="dashboard-raw-input"
-    type="url"
-    placeholder="Link here">
-
-    <button
-    type="button"
-    class="raw-check-btn btn-3d"
-    onclick="window.open(this.previousElementSibling.value, '_blank')">
-    Check
-</button>
-
-</div>
-</td>
-        </td>
-<td class="drone-cell">
-
-    <div class="drone-search-wrap">
-
-        <input
-            type="text"
-            class="drone-search"
-            placeholder="Search drone...">
-
-        <div class="drone-suggestions"></div>
-
-    </div>
-
-    <select class="drone-select">
-
-        <option value="NO DRONE">NO DRONE</option>
-<option value="CLIENT'S DRONE">CLIENT'S DRONE</option>
-
-        <option>AMARA SENTOSA</option>
-        <option>ANDAZ</option>
-        <option>ARMENIAN CHURCH_</option>
-        <option>BOTANIC GARDEN</option>
-        <option>CAPELLA</option>
-        <option>CATHERAL_</option>
-        <option>CHIMES</option>
-        <option>CONRAD MARINA</option>
-        <option>CONRAD ORCHARD</option>
-        <option>FAITH METHODIST CHURCH</option>
-        <option>FILLER DRONES</option>
-        <option>FOUR SEASON</option>
-        <option>FULLERTON BAY HOTEL</option>
-        <option>FULLERTON HOTEL</option>
-        <option>FURAMA</option>
-        <option>GALLOP EXTENSION</option>
-        <option>GRAND CORPTHONE</option>
-        <option>HILTON ORCHARD</option>
-        <option>HOTEL JEN</option>
-        <option>IFLY</option>
-        <option>INTERCONTI</option>
-        <option>JW MARRIOT</option>
-        <option>KIMBERLY TEMPLE</option>
-        <option>LIZ &amp; VALERIE CHURCH</option>
-        <option>MANDARIN ORIENTAL_</option>
-        <option>MBS</option>
-        <option>OASIA SENTOSA</option>
-        <option>ONE FARRER HOTEL</option>
-        <option>ORCHARD HOTEL</option>
-        <option>OUTPOST HOTEL</option>
-        <option>PAN PACIFIC MARINA</option>
-        <option>PAN PACIFIC ORCHARD</option>
-        <option>PARADOX_</option>
-        <option>PARK ROYAL MARINA BAY</option>
-        <option>PARKROYAL ON BEACH ROAD</option>
-        <option>PARKROYAL PICKERING</option>
-        <option>RAFFLES CITY_</option>
-        <option>RITZ CARLTON</option>
-        <option>SACRED HEART CHURCH</option>
-        <option>SAINT PETER AND PAUL</option>
-        <option>SENTOSA GOLF COURSE</option>
-        <option>SHANGRI-LA ORCHARD</option>
-        <option>SHANGRI-LA RASA SENTOSA</option>
-        <option>SHERATON TOWERS</option>
-        <option>SOFITEL SENTOSA</option>
-        <option>TANGS PLAZA</option>
-        <option>VOCO HOTEL</option>
-        <option>WESTIN</option>
-
-    </select>
-
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-    </tr>
-
-    <!-- ROW 3 -->
-    <tr data-row-id="3">
-        <td class="couple-cell">
-
-    <div class="couple-name" contenteditable="true"></div>
-
-    <div class="couple-actions">
-
-        <button class="instruction-btn btn-3d">
-    📝 Special Instructions
-</button>
-
-        <button class="watch-btn btn-3d" data-watch-link="">
-    <span class="play-icon">▶</span> Watch
-</button>
-
-    </div>
-
-</td>
-
-<td class="status-cell">
-
-    <select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>PROJECT CONCERNS</option>
-    <option>FOR REVIEW</option>
-    <option>DELIVERED</option>
-    <option>YONG'S RATINGS</option>
-</select>
-
-    <input
-        type="range"
-        class="progress-slider"
-        min="0"
-        max="100"
-        value="0">
-
-    <div class="timeline-percent">
-
-        0%
-
-    </div>
-
-    <button
-        type="button"
-        class="get-files-btn btn-3d">
-
-        GET FILES
-
-    </button>
-
-    <button
-        type="button"
-        class="concerns-btn btn-3d"
-        style="display:none;">
-
-        ⚠️ CONCERNS
-
-    </button>
-
-</td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="raw-files-actions">
-
-    <input
-    class="dashboard-raw-input"
-    type="url"
-    placeholder="Link here">
-
-    <button
-    type="button"
-    class="raw-check-btn btn-3d"
-    onclick="window.open(this.previousElementSibling.value, '_blank')">
-    Check
-</button>
-
-</div>
-</td>
-        </td>
-<td class="drone-cell">
-
-    <div class="drone-search-wrap">
-
-        <input
-            type="text"
-            class="drone-search"
-            placeholder="Search drone...">
-
-        <div class="drone-suggestions"></div>
-
-    </div>
-
-    <select class="drone-select">
-
-        <option value="NO DRONE">NO DRONE</option>
-<option value="CLIENT'S DRONE">CLIENT'S DRONE</option>
-
-        <option>AMARA SENTOSA</option>
-        <option>ANDAZ</option>
-        <option>ARMENIAN CHURCH_</option>
-        <option>BOTANIC GARDEN</option>
-        <option>CAPELLA</option>
-        <option>CATHERAL_</option>
-        <option>CHIMES</option>
-        <option>CONRAD MARINA</option>
-        <option>CONRAD ORCHARD</option>
-        <option>FAITH METHODIST CHURCH</option>
-        <option>FILLER DRONES</option>
-        <option>FOUR SEASON</option>
-        <option>FULLERTON BAY HOTEL</option>
-        <option>FULLERTON HOTEL</option>
-        <option>FURAMA</option>
-        <option>GALLOP EXTENSION</option>
-        <option>GRAND CORPTHONE</option>
-        <option>HILTON ORCHARD</option>
-        <option>HOTEL JEN</option>
-        <option>IFLY</option>
-        <option>INTERCONTI</option>
-        <option>JW MARRIOT</option>
-        <option>KIMBERLY TEMPLE</option>
-        <option>LIZ &amp; VALERIE CHURCH</option>
-        <option>MANDARIN ORIENTAL_</option>
-        <option>MBS</option>
-        <option>OASIA SENTOSA</option>
-        <option>ONE FARRER HOTEL</option>
-        <option>ORCHARD HOTEL</option>
-        <option>OUTPOST HOTEL</option>
-        <option>PAN PACIFIC MARINA</option>
-        <option>PAN PACIFIC ORCHARD</option>
-        <option>PARADOX_</option>
-        <option>PARK ROYAL MARINA BAY</option>
-        <option>PARKROYAL ON BEACH ROAD</option>
-        <option>PARKROYAL PICKERING</option>
-        <option>RAFFLES CITY_</option>
-        <option>RITZ CARLTON</option>
-        <option>SACRED HEART CHURCH</option>
-        <option>SAINT PETER AND PAUL</option>
-        <option>SENTOSA GOLF COURSE</option>
-        <option>SHANGRI-LA ORCHARD</option>
-        <option>SHANGRI-LA RASA SENTOSA</option>
-        <option>SHERATON TOWERS</option>
-        <option>SOFITEL SENTOSA</option>
-        <option>TANGS PLAZA</option>
-        <option>VOCO HOTEL</option>
-        <option>WESTIN</option>
-
-    </select>
-
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-    </tr>
-
-    <!-- ROW 4 -->
-    <tr data-row-id="4">
-        <td class="couple-cell">
-
-    <div class="couple-name" contenteditable="true"></div>
-
-    <div class="couple-actions">
-
-        <button class="instruction-btn btn-3d">
-    📝 Special Instructions
-</button>
-
-        <button class="watch-btn btn-3d" data-watch-link="">
-    <span class="play-icon">▶</span> Watch
-</button>
-
-    </div>
-
-</td>
-
-<td class="status-cell">
-
-    <select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>PROJECT CONCERNS</option>
-    <option>FOR REVIEW</option>
-    <option>DELIVERED</option>
-    <option>YONG'S RATINGS</option>
-</select>
-
-    <input
-        type="range"
-        class="progress-slider"
-        min="0"
-        max="100"
-        value="0">
-
-    <div class="timeline-percent">
-
-        0%
-
-    </div>
-
-    <button
-        type="button"
-        class="get-files-btn btn-3d">
-
-        GET FILES
-
-    </button>
-
-    <button
-        type="button"
-        class="concerns-btn btn-3d"
-        style="display:none;">
-
-        ⚠️ CONCERNS
-
-    </button>
-
-</td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="raw-files-actions">
-
-    <input
-        class="dashboard-raw-input"
-        type="url"
-        placeholder="Link here">
-
-    <button
-    type="button"
-    class="raw-check-btn btn-3d"
-    onclick="window.open(this.previousElementSibling.value, '_blank')">
-    Check
-</button>
-
-</div>
-</td>
-        </td>
-<td class="drone-cell">
-
-    <div class="drone-search-wrap">
-
-        <input
-            type="text"
-            class="drone-search"
-            placeholder="Search drone...">
-
-        <div class="drone-suggestions"></div>
-
-    </div>
-
-    <select class="drone-select">
-
-        <option value="NO DRONE">NO DRONE</option>
-<option value="CLIENT'S DRONE">CLIENT'S DRONE</option>
-
-        <option>AMARA SENTOSA</option>
-        <option>ANDAZ</option>
-        <option>ARMENIAN CHURCH_</option>
-        <option>BOTANIC GARDEN</option>
-        <option>CAPELLA</option>
-        <option>CATHERAL_</option>
-        <option>CHIMES</option>
-        <option>CONRAD MARINA</option>
-        <option>CONRAD ORCHARD</option>
-        <option>FAITH METHODIST CHURCH</option>
-        <option>FILLER DRONES</option>
-        <option>FOUR SEASON</option>
-        <option>FULLERTON BAY HOTEL</option>
-        <option>FULLERTON HOTEL</option>
-        <option>FURAMA</option>
-        <option>GALLOP EXTENSION</option>
-        <option>GRAND CORPTHONE</option>
-        <option>HILTON ORCHARD</option>
-        <option>HOTEL JEN</option>
-        <option>IFLY</option>
-        <option>INTERCONTI</option>
-        <option>JW MARRIOT</option>
-        <option>KIMBERLY TEMPLE</option>
-        <option>LIZ &amp; VALERIE CHURCH</option>
-        <option>MANDARIN ORIENTAL_</option>
-        <option>MBS</option>
-        <option>OASIA SENTOSA</option>
-        <option>ONE FARRER HOTEL</option>
-        <option>ORCHARD HOTEL</option>
-        <option>OUTPOST HOTEL</option>
-        <option>PAN PACIFIC MARINA</option>
-        <option>PAN PACIFIC ORCHARD</option>
-        <option>PARADOX_</option>
-        <option>PARK ROYAL MARINA BAY</option>
-        <option>PARKROYAL ON BEACH ROAD</option>
-        <option>PARKROYAL PICKERING</option>
-        <option>RAFFLES CITY_</option>
-        <option>RITZ CARLTON</option>
-        <option>SACRED HEART CHURCH</option>
-        <option>SAINT PETER AND PAUL</option>
-        <option>SENTOSA GOLF COURSE</option>
-        <option>SHANGRI-LA ORCHARD</option>
-        <option>SHANGRI-LA RASA SENTOSA</option>
-        <option>SHERATON TOWERS</option>
-        <option>SOFITEL SENTOSA</option>
-        <option>TANGS PLAZA</option>
-        <option>VOCO HOTEL</option>
-        <option>WESTIN</option>
-
-    </select>
-
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-    </tr>
-
-    <!-- ROW 5 -->
-    <tr data-row-id="5">
-        <td class="couple-cell">
-
-    <div class="couple-name" contenteditable="true"></div>
-
-    <div class="couple-actions">
-
-        <button class="instruction-btn btn-3d">
-    📝 Special Instructions
-</button>
-
-        <button class="watch-btn btn-3d" data-watch-link="">
-    <span class="play-icon">▶</span> Watch
-</button>
-
-    </div>
-
-</td>
-
-<td class="status-cell">
-
-    <select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>PROJECT CONCERNS</option>
-    <option>FOR REVIEW</option>
-    <option>DELIVERED</option>
-    <option>YONG'S RATINGS</option>
-</select>
-
-    <input
-        type="range"
-        class="progress-slider"
-        min="0"
-        max="100"
-        value="0">
-
-    <div class="timeline-percent">
-
-        0%
-
-    </div>
-
-    <button
-        type="button"
-        class="get-files-btn btn-3d">
-
-        GET FILES
-
-    </button>
-
-    <button
-        type="button"
-        class="concerns-btn btn-3d"
-        style="display:none;">
-
-        ⚠️ CONCERNS
-
-    </button>
-
-</td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="raw-files-actions">
-
-    <input
-    class="dashboard-raw-input"
-    type="url"
-    placeholder="Link here">
-
-    <button
-    type="button"
-    class="raw-check-btn btn-3d"
-    onclick="window.open(this.previousElementSibling.value, '_blank')">
-    Check
-</button>
-
-</div>
-</td>
-        </td>
-<td class="drone-cell">
-
-    <div class="drone-search-wrap">
-
-        <input
-            type="text"
-            class="drone-search"
-            placeholder="Search drone...">
-
-        <div class="drone-suggestions"></div>
-
-    </div>
-
-    <select class="drone-select">
-
-        <option value="NO DRONE">NO DRONE</option>
-<option value="CLIENT'S DRONE">CLIENT'S DRONE</option>
-
-        <option>AMARA SENTOSA</option>
-        <option>ANDAZ</option>
-        <option>ARMENIAN CHURCH_</option>
-        <option>BOTANIC GARDEN</option>
-        <option>CAPELLA</option>
-        <option>CATHERAL_</option>
-        <option>CHIMES</option>
-        <option>CONRAD MARINA</option>
-        <option>CONRAD ORCHARD</option>
-        <option>FAITH METHODIST CHURCH</option>
-        <option>FILLER DRONES</option>
-        <option>FOUR SEASON</option>
-        <option>FULLERTON BAY HOTEL</option>
-        <option>FULLERTON HOTEL</option>
-        <option>FURAMA</option>
-        <option>GALLOP EXTENSION</option>
-        <option>GRAND CORPTHONE</option>
-        <option>HILTON ORCHARD</option>
-        <option>HOTEL JEN</option>
-        <option>IFLY</option>
-        <option>INTERCONTI</option>
-        <option>JW MARRIOT</option>
-        <option>KIMBERLY TEMPLE</option>
-        <option>LIZ &amp; VALERIE CHURCH</option>
-        <option>MANDARIN ORIENTAL_</option>
-        <option>MBS</option>
-        <option>OASIA SENTOSA</option>
-        <option>ONE FARRER HOTEL</option>
-        <option>ORCHARD HOTEL</option>
-        <option>OUTPOST HOTEL</option>
-        <option>PAN PACIFIC MARINA</option>
-        <option>PAN PACIFIC ORCHARD</option>
-        <option>PARADOX_</option>
-        <option>PARK ROYAL MARINA BAY</option>
-        <option>PARKROYAL ON BEACH ROAD</option>
-        <option>PARKROYAL PICKERING</option>
-        <option>RAFFLES CITY_</option>
-        <option>RITZ CARLTON</option>
-        <option>SACRED HEART CHURCH</option>
-        <option>SAINT PETER AND PAUL</option>
-        <option>SENTOSA GOLF COURSE</option>
-        <option>SHANGRI-LA ORCHARD</option>
-        <option>SHANGRI-LA RASA SENTOSA</option>
-        <option>SHERATON TOWERS</option>
-        <option>SOFITEL SENTOSA</option>
-        <option>TANGS PLAZA</option>
-        <option>VOCO HOTEL</option>
-        <option>WESTIN</option>
-
-    </select>
-
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-    </tr>
-
-    <!-- ROW 6 -->
-    <tr data-row-id="6">
-        <td class="couple-cell">
-
-    <div class="couple-name" contenteditable="true"></div>
-
-    <div class="couple-actions">
-
-        <button class="instruction-btn btn-3d">
-    📝 Special Instructions
-</button>
-
-        <button class="watch-btn btn-3d" data-watch-link="">
-    <span class="play-icon">▶</span> Watch
-</button>
-
-    </div>
-
-</td>
-
-<td class="status-cell">
-
-    <select class="status-select">
-    <option selected>PLANNED</option>
-    <option>IN PROGRESS</option>
-    <option>PROJECT CONCERNS</option>
-    <option>FOR REVIEW</option>
-    <option>DELIVERED</option>
-    <option>YONG'S RATINGS</option>
-</select>
-
-    <input
-        type="range"
-        class="progress-slider"
-        min="0"
-        max="100"
-        value="0">
-
-    <div class="timeline-percent">
-
-        0%
-
-    </div>
-
-    <button
-        type="button"
-        class="get-files-btn btn-3d">
-
-        GET FILES
-
-    </button>
-
-    <button
-        type="button"
-        class="concerns-btn btn-3d"
-        style="display:none;">
-
-        ⚠️ CONCERNS
-
-    </button>
-
-</td>
-        <td><select class="type-select"><option>BASIC HIGHLIGHTS</option><option>ROMANTIC CINEMATIC</option><option selected>UPBEAT CINEMATIC</option><option>SLOW CLASSICAL</option><option>NORMAL CLASSICAL</option><option>FAST CLASSICAL</option><option>NOT SET</option></select></td>
-        <td>
-    <div class="raw-files-actions">
-
-    <input
-        class="dashboard-raw-input"
-        type="url"
-        placeholder="Link here">
-
-    <button
-    type="button"
-    class="raw-check-btn btn-3d"
-    onclick="window.open(this.previousElementSibling.value, '_blank')">
-    Check
-</button>
-
-</div>
-</td>
-        </td>
-<td class="drone-cell">
-
-    <div class="drone-search-wrap">
-
-        <input
-            type="text"
-            class="drone-search"
-            placeholder="Search drone...">
-
-        <div class="drone-suggestions"></div>
-
-    </div>
-
-    <select class="drone-select">
-
-        <option value="NO DRONE">NO DRONE</option>
-<option value="CLIENT'S DRONE">CLIENT'S DRONE</option>
-
-        <option>AMARA SENTOSA</option>
-        <option>ANDAZ</option>
-        <option>ARMENIAN CHURCH_</option>
-        <option>BOTANIC GARDEN</option>
-        <option>CAPELLA</option>
-        <option>CATHERAL_</option>
-        <option>CHIMES</option>
-        <option>CONRAD MARINA</option>
-        <option>CONRAD ORCHARD</option>
-        <option>FAITH METHODIST CHURCH</option>
-        <option>FILLER DRONES</option>
-        <option>FOUR SEASON</option>
-        <option>FULLERTON BAY HOTEL</option>
-        <option>FULLERTON HOTEL</option>
-        <option>FURAMA</option>
-        <option>GALLOP EXTENSION</option>
-        <option>GRAND CORPTHONE</option>
-        <option>HILTON ORCHARD</option>
-        <option>HOTEL JEN</option>
-        <option>IFLY</option>
-        <option>INTERCONTI</option>
-        <option>JW MARRIOT</option>
-        <option>KIMBERLY TEMPLE</option>
-        <option>LIZ &amp; VALERIE CHURCH</option>
-        <option>MANDARIN ORIENTAL_</option>
-        <option>MBS</option>
-        <option>OASIA SENTOSA</option>
-        <option>ONE FARRER HOTEL</option>
-        <option>ORCHARD HOTEL</option>
-        <option>OUTPOST HOTEL</option>
-        <option>PAN PACIFIC MARINA</option>
-        <option>PAN PACIFIC ORCHARD</option>
-        <option>PARADOX_</option>
-        <option>PARK ROYAL MARINA BAY</option>
-        <option>PARKROYAL ON BEACH ROAD</option>
-        <option>PARKROYAL PICKERING</option>
-        <option>RAFFLES CITY_</option>
-        <option>RITZ CARLTON</option>
-        <option>SACRED HEART CHURCH</option>
-        <option>SAINT PETER AND PAUL</option>
-        <option>SENTOSA GOLF COURSE</option>
-        <option>SHANGRI-LA ORCHARD</option>
-        <option>SHANGRI-LA RASA SENTOSA</option>
-        <option>SHERATON TOWERS</option>
-        <option>SOFITEL SENTOSA</option>
-        <option>TANGS PLAZA</option>
-        <option>VOCO HOTEL</option>
-        <option>WESTIN</option>
-
-    </select>
-
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-        <td class="song-cell">
-    <div class="song-card">
-        <input type="url" class="song-link">
-        <div class="song-actions">
-            <select class="dashboard-song-status">
-                <option selected></option>
-                <option>APPROVED</option>
-                <option>REJECT</option>
-                <option>RESERVED</option>
-                <option>REQUESTED</option>
-            </select>
-            <button class="generate-btn btn-3d">
-                GENERATE
-            </button>
-        </div>
-    </div>
-</td>
-    </tr>
-
-</tbody>
-
+                    <!-- Template script para sa Rows 1 hanggang 6 -->
+                    <script>
+                        const droneOptionsHTML = `
+                            <option value="NO DRONE">NO DRONE</option>
+                            <option value="CLIENT'S DRONE">CLIENT'S DRONE</option>
+                            <option>AMARA SENTOSA</option><option>ANDAZ</option><option>ARMENIAN CHURCH_</option>
+                            <option>BOTANIC GARDEN</option><option>CAPELLA</option><option>CATHERAL_</option>
+                            <option>CHIMES</option><option>CONRAD MARINA</option><option>CONRAD ORCHARD</option>
+                            <option>FAITH METHODIST CHURCH</option><option>FILLER DRONES</option><option>FOUR SEASON</option>
+                            <option>FULLERTON BAY HOTEL</option><option>FULLERTON HOTEL</option><option>FURAMA</option>
+                            <option>GALLOP EXTENSION</option><option>GRAND CORPTHONE</option><option>HILTON ORCHARD</option>
+                            <option>HOTEL JEN</option><option>IFLY</option><option>INTERCONTI</option>
+                            <option>JW MARRIOT</option><option>KIMBERLY TEMPLE</option><option>LIZ &amp; VALERIE CHURCH</option>
+                            <option>MANDARIN ORIENTAL_</option><option>MBS</option><option>OASIA SENTOSA</option>
+                            <option>ONE FARRER HOTEL</option><option>ORCHARD HOTEL</option><option>OUTPOST HOTEL</option>
+                            <option>PAN PACIFIC MARINA</option><option>PAN PACIFIC ORCHARD</option><option>PARADOX_</option>
+                            <option>PARK ROYAL MARINA BAY</option><option>PARKROYAL ON BEACH ROAD</option><option>PARKROYAL PICKERING</option>
+                            <option>RAFFLES CITY_</option><option>RITZ CARLTON</option><option>SACRED HEART CHURCH</option>
+                            <option>SAINT PETER AND PAUL</option><option>SENTOSA GOLF COURSE</option><option>SHANGRI-LA ORCHARD</option>
+                            <option>SHANGRI-LA RASA SENTOSA</option><option>SHERATON TOWERS</option><option>SOFITEL SENTOSA</option>
+                            <option>TANGS PLAZA</option><option>VOCO HOTEL</option><option>WESTIN</option>
+                        `;
+
+                        const songCellHTML = `
+                            <td class="song-cell">
+                                <div class="song-card">
+                                    <input type="url" class="song-link">
+                                    <div class="song-actions">
+                                        <select class="dashboard-song-status">
+                                            <option selected></option>
+                                            <option>APPROVED</option>
+                                            <option>REJECT</option>
+                                            <option>RESERVED</option>
+                                            <option>REQUESTED</option>
+                                        </select>
+                                        <button class="generate-btn btn-3d">GENERATE</button>
+                                    </div>
+                                </div>
+                            </td>
+                        `;
+
+                        for (let i = 1; i <= 6; i++) {
+                            document.write(`
+                                <tr data-row-id="${i}">
+                                    <td class="couple-cell">
+                                        <div class="couple-name" contenteditable="true"></div>
+                                        <div class="couple-actions">
+                                            <button class="instruction-btn btn-3d">📝 Special Instructions</button>
+                                            <button class="watch-btn btn-3d" data-watch-link=""><span class="play-icon">▶</span> Watch</button>
+                                        </div>
+                                    </td>
+                                    <td class="status-cell">
+                                        <select class="status-select">
+                                            <option selected>PLANNED</option>
+                                            <option>IN PROGRESS</option>
+                                            <option>PROJECT CONCERNS</option>
+                                            <option>FOR REVIEW</option>
+                                            <option>DELIVERED</option>
+                                            <option>YONG'S RATINGS</option>
+                                        </select>
+                                        <input type="range" class="progress-slider" min="0" max="100" value="0">
+                                        <div class="timeline-percent">0%</div>
+                                        <button type="button" class="get-files-btn btn-3d">GET FILES</button>
+                                        <button type="button" class="concerns-btn btn-3d" style="display:none;">⚠️ CONCERNS</button>
+                                    </td>
+                                    <td>
+                                        <select class="type-select">
+                                            <option>BASIC HIGHLIGHTS</option>
+                                            <option>ROMANTIC CINEMATIC</option>
+                                            <option selected>UPBEAT CINEMATIC</option>
+                                            <option>SLOW CLASSICAL</option>
+                                            <option>NORMAL CLASSICAL</option>
+                                            <option>FAST CLASSICAL</option>
+                                            <option>NOT SET</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="raw-files-actions">
+                                            <input class="dashboard-raw-input" type="url" placeholder="Link here">
+                                            <button type="button" class="raw-check-btn btn-3d" onclick="window.open(this.previousElementSibling.value, '_blank')">Check</button>
+                                        </div>
+                                    </td>
+                                    <td class="drone-cell">
+                                        <div class="drone-search-wrap">
+                                            <input type="text" class="drone-search" placeholder="Search drone...">
+                                            <div class="drone-suggestions"></div>
+                                        </div>
+                                        <select class="drone-select">
+                                            ${droneOptionsHTML}
+                                        </select>
+                                    </td>
+                                    ${songCellHTML}
+                                    ${songCellHTML}
+                                    ${songCellHTML}
+                                    ${songCellHTML}
+                                </tr>
+                            `);
+                        }
+                    </script>
+                </tbody>
             </table>
-
         </div>
-
     </main>
-
 </div>
 
+<!-- Modals & Context Menus -->
 <div id="monthContextMenu" class="month-context-menu">
     <button id="lockMonthBtn">🔒 Lock Month</button>
     <button id="unlockMonthBtn">🔓 Unlock Month</button>
 </div>
-<!-- Special Instructions Modal -->
 
 <div id="instructionModal" class="modal">
     <div class="modal-content">
-
         <div class="modal-header">
             <h3>Special Instructions</h3>
             <button id="closeInstructionModal">&times;</button>
         </div>
-
         <textarea id="instructionTextarea"></textarea>
-
     </div>
 </div>
-
-<!-- WATCH MODAL -->
 
 <div id="watchModal" class="modal">
-
     <div id="watchBox" class="modal-content watch-box">
-
         <div id="watchHeader" class="modal-header">
-
             <h3>KBHFILMS</h3>
-
             <div class="watch-controls">
-
                 <button id="minimizeWatchBtn">➖</button>
-
                 <button id="maximizeWatchBtn" style="display:none;">🗖</button>
-
                 <button id="closeWatchModal">&times;</button>
-
             </div>
-
         </div>
-
-        <iframe
-            id="watchFrame"
-            src=""
-            allow="autoplay; fullscreen"
-            allowfullscreen>
-        </iframe>
-
+        <iframe id="watchFrame" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
-
 </div>
-
-<!-- WATCH CONTEXT MENU -->
 
 <div id="watchContextMenu" class="month-context-menu">
-
-    <button id="attachWatchLinkBtn">
-        📎 Attach Watch Link
-    </button>
-
+    <button id="attachWatchLinkBtn">📎 Attach Watch Link</button>
 </div>
-
-<!-- WATCH LINK MODAL -->
 
 <div id="watchLinkModal" class="modal">
-
     <div class="modal-content" style="max-width:600px;">
-
         <div class="modal-header">
-
             <h3>Attach Watch Link</h3>
-
             <button id="closeWatchLinkModal">&times;</button>
-
         </div>
-
         <div style="padding:20px;">
-
-            <input
-                id="watchLinkInput"
-                type="url"
-                placeholder="Paste Vimeo / Frame.io / YouTube link..."
-                style="width:100%;height:40px;padding:10px;">
-
-            <p style="margin-top:10px;font-size:13px;color:#666;">
-                Changes are saved automatically.
-            </p>
-
+            <input id="watchLinkInput" type="url" placeholder="Paste Vimeo / Frame.io / YouTube link..." style="width:100%;height:40px;padding:10px;">
+            <p style="margin-top:10px;font-size:13px;color:#666;">Changes are saved automatically.</p>
         </div>
-
     </div>
-
 </div>
-
-<!-- ==================================
-     GET FILES CONTEXT MENU
-================================== -->
 
 <div id="filesContextMenu" class="month-context-menu">
-
-    <button id="attachFilesLinkBtn">
-        📁 Attach Files Link
-    </button>
-
+    <button id="attachFilesLinkBtn">📁 Attach Files Link</button>
 </div>
-
-<!-- ==================================
-     GET FILES LINK MODAL
-================================== -->
 
 <div id="filesLinkModal" class="modal">
-
     <div class="modal-content" style="max-width:600px;">
-
         <div class="modal-header">
-
             <h3>Attach Files Link</h3>
-
             <button id="closeFilesLinkModal">&times;</button>
-
         </div>
-
         <div style="padding:20px;">
-
-            <input
-                id="filesLinkInput"
-                type="url"
-                placeholder="Paste Google Drive / Dropbox / OneDrive folder link..."
-                style="width:100%;height:40px;padding:10px;">
-
-            <p style="margin-top:10px;font-size:13px;color:#666;">
-                Changes are saved automatically.
-            </p>
-
+            <input id="filesLinkInput" type="url" placeholder="Paste Google Drive / Dropbox / OneDrive folder link..." style="width:100%;height:40px;padding:10px;">
+            <p style="margin-top:10px;font-size:13px;color:#666;">Changes are saved automatically.</p>
         </div>
-
     </div>
-
 </div>
-
-
-<!-- SONG CONTEXT MENU -->
 
 <div id="songContextMenu" class="context-menu">
-    <div id="attachSongLinkBtn">
-        📎 Attach Song Link
-    </div>
+    <div id="attachSongLinkBtn">📎 Attach Song Link</div>
 </div>
-
-<!-- SONG LINK MODAL -->
 
 <div id="songLinkModal" class="modal">
-
     <div class="modal-content">
-
         <div class="modal-header">
             <h3>🎵 Attach Song Link</h3>
-
-            <button
-                id="closeSongLinkModal"
-                class="close-modal">
-                ✕
-            </button>
+            <button id="closeSongLinkModal" class="close-modal">✕</button>
         </div>
-
         <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
-
             <div>
                 <label>Song Title</label>
-                <input
-                    id="songTitleInput"
-                    type="text"
-                    placeholder="Enter song title...">
+                <input id="songTitleInput" type="text" placeholder="Enter song title...">
             </div>
-
             <div>
                 <label>YouTube / Spotify Link</label>
-                <input
-                    id="songLinkInput"
-                    type="url"
-                    placeholder="Paste link...">
+                <input id="songLinkInput" type="url" placeholder="Paste link...">
             </div>
-
         </div>
-
     </div>
-
 </div>
 
-
-<!-- ==================================
-     CONCERNS MODAL
-================================== -->
-
 <div id="commentsModal" class="modal">
-
     <div class="modal-content">
-
         <div class="modal-header">
-
             <h2 id="commentsModalTitle">Comments</h2>
-
             <button id="closeCommentsModal">&times;</button>
-
         </div>
-
-        <textarea
-            id="commentsTextarea"
-            placeholder="Write comments here..."></textarea>
-
+        <textarea id="commentsTextarea" placeholder="Write comments here..."></textarea>
     </div>
-
 </div>
 
 <script>
-
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
 if (!currentUser) {
-
     window.location.href = "../login.html";
-
 }
-
 if (currentUser.role !== "admin") {
-
     alert("Access Denied.");
-
     window.location.href = "dashboard.html";
-
 }
-
 const IS_ADMIN = true;
-
 </script>
 
 <script src="../js/script.js?v=20260823-1"></script>
