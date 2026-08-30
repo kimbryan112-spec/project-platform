@@ -1192,7 +1192,7 @@ try {
 
 }
 
-}, 200);
+}, 500);
 
 }
 
@@ -1241,7 +1241,7 @@ console.log(
 
 updateMonthHasDataUI();
 
-}, 200);
+}, 500);
 
 }
 
@@ -1396,18 +1396,22 @@ btn.classList.toggle("has-data", hasData);
 
     }
 
-    // ===== CLOUD / D1 =====
+// ===== CLOUD / D1 =====
 
-if (!hasDataMonths) {
-    hasDataMonths = cachedHasDataMonths;
-}
+const months = hasDataMonths ?? cachedHasDataMonths ?? {};
+
+console.log("Month UI Refresh");
+console.log("Current Year:", currentYear);
+console.log("Months:", months);
 
 document.querySelectorAll(".month-btn").forEach(btn => {
 
-    btn.classList.toggle(
-        "has-data",
-        !!hasDataMonths[btn.dataset.month]
-    );
+    // Always clear first
+    btn.classList.remove("has-data");
+
+    if (months[btn.dataset.month] === true) {
+        btn.classList.add("has-data");
+    }
 
 });
 
