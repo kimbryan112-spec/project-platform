@@ -909,6 +909,7 @@ async function loadProjects() {
         }
 
         const responseData = await response.json();
+        console.log("API returned:", responseData.hasDataMonths);
 
 const projectsData = responseData.projects || [];
 
@@ -998,7 +999,13 @@ console.log("projects:", responseData.projects);
 
     updateMonthLockUI();
 
+console.log("========== BEFORE UPDATE ==========");
+console.log("currentYear:", currentYear);
+console.log("cachedHasDataMonths:", cachedHasDataMonths);
+
 await updateMonthHasDataUI(cachedHasDataMonths);
+
+console.log("========== AFTER UPDATE ==========");
 
 // ==========================
 // RESTORE MONTH LOCK BORDER
