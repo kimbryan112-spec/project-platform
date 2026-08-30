@@ -290,8 +290,8 @@ if (!currentUser) {
     window.location.href = "../login.html";
 }
 
-// Dashboard user at Admin lang ang pwede
-if (currentUser.role !== "admin" && currentUser.role !== "dashboard") {
+// Dashboard user, Manager, at Admin ang pwede
+if (currentUser.role !== "admin" && currentUser.role !== "dashboard" && currentUser.role !== "manager") {
     alert("Access Denied.");
     window.location.href = "../login.html";
 }

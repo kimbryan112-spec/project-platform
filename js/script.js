@@ -1740,14 +1740,28 @@ document.querySelectorAll(".progress-slider").forEach(slider => {
 });
 
 // ==================================
-// RESTORE PROJECTS (LOCAL CACHE)
+// RESTORE PROJECTS (LOCAL CACHE - Smooth No Flicker)
 // ==================================
 function restoreProjectsLocal(year = currentYear, month = currentMonth) {
     const key = `projects_${year}_${month}`;
     const saved = localStorage.getItem(key);
 
+    const tbody = document.querySelector(".project-table tbody");
+    if (tbody) {
+        tbody.style.opacity = "0"; // Pansamantalang itago para walang visual flash
+    }
+
     if (!saved) {
         console.log(`[LOCAL RESTORE] No cache found for ${key}`);
+        // Linisin ang mga rows kung walang cache para hindi mag-iwan ng lumang data
+        const rows = document.querySelectorAll(".project-table tbody tr");
+        rows.forEach(row => {
+            const emptyData = {}; // Clear fields logic mo dito kung meron
+            populateRow(row, emptyData);
+        });
+        if (tbody) {
+            setTimeout(() => { tbody.style.opacity = "1"; }, 50);
+        }
         return false;
     }
 
@@ -1765,9 +1779,20 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
         });
 
         console.log(`[LOCAL RESTORE] Restored ${projects.length} project(s) from ${key}`);
+        
+        // Ibalik agad nang smooth ang opacity
+        if (tbody) {
+            requestAnimationFrame(() => {
+                tbody.style.transition = "opacity 0.15s ease-in-out";
+                tbody.style.opacity = "1";
+            });
+        }
         return true;
     } catch (e) {
         console.error("[LOCAL RESTORE]", e);
+        if (tbody) {
+            tbody.style.opacity = "1";
+        }
         return false;
     }
 }

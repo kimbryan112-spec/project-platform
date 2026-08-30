@@ -43,7 +43,7 @@ loginForm.addEventListener("submit", async function (e) {
                 role: "manager"
             };
             localStorage.setItem("currentUser", JSON.stringify(offlineUser));
-            window.location.href = "pages/admin.html"; // Itinuro na rin sa admin.html kung sakaling may access ang manager
+            window.location.href = "pages/dashboard.html"; // Itinuro sa dashboard.html para sa manager
             return;
         } else {
             if (errorText) {
@@ -77,8 +77,7 @@ loginForm.addEventListener("submit", async function (e) {
             JSON.stringify(data.user)
         );
 
-        // Kung admin o manager, papasukin sa admin.html o dashboard base sa gusto mo
-        if (data.user.role === "admin" || data.user.role === "manager") {
+        if (data.user.role === "admin") {
             window.location.href = "pages/admin.html";
         } else {
             window.location.href = "pages/dashboard.html";

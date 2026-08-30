@@ -16,7 +16,7 @@ export async function onRequestPost(context) {
                     id,
                     fullname,
                     email,
-                    password,
+                    password_hash,
                     role,
                     active
                 FROM users
@@ -56,8 +56,8 @@ export async function onRequestPost(context) {
             );
         }
 
-        // Plain text comparison
-        if (user.password !== password) {
+        // Plain text comparison gamit ang password_hash
+        if (user.password_hash !== password) {
             return new Response(
                 JSON.stringify({
                     success: false,
