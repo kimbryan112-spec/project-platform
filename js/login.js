@@ -23,7 +23,7 @@ loginForm.addEventListener("submit", async function (e) {
         errorText.textContent = "";
     }
 
-    // OFFLINE / LOCAL TESTING FALLBACK (Para gumagana kahit sa Live Server 127.0.0.1:5500)
+    // OFFLINE / LOCAL TESTING FALLBACK
     if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
         if (email === "adminyang@kbhfilms.com" && password === "Yangyang#12") {
             const offlineUser = {
@@ -43,7 +43,7 @@ loginForm.addEventListener("submit", async function (e) {
                 role: "manager"
             };
             localStorage.setItem("currentUser", JSON.stringify(offlineUser));
-            window.location.href = "pages/dashboard.html";
+            window.location.href = "pages/admin.html"; // Itinuro na rin sa admin.html kung sakaling may access ang manager
             return;
         } else {
             if (errorText) {
@@ -53,7 +53,7 @@ loginForm.addEventListener("submit", async function (e) {
         }
     }
 
-    // ONLINE CLOUDFER / PRODUCTION API REQUEST
+    // ONLINE CLOUDFLARE / PRODUCTION API REQUEST
     try {
         const response = await fetch("/api/login", {
             method: "POST",
@@ -77,7 +77,8 @@ loginForm.addEventListener("submit", async function (e) {
             JSON.stringify(data.user)
         );
 
-        if (data.user.role === "admin") {
+        // Kung admin o manager, papasukin sa admin.html o dashboard base sa gusto mo
+        if (data.user.role === "admin" || data.user.role === "manager") {
             window.location.href = "pages/admin.html";
         } else {
             window.location.href = "pages/dashboard.html";
