@@ -177,7 +177,7 @@
                                             <option>RESERVED</option>
                                             <option>REQUESTED</option>
                                         </select>
-                                        <button class="generate-btn btn-3d">🎵 AI Music Director</button>
+                                        <button class="generate-btn btn-3d">GENERATE</button>
                                     </div>
                                 </div>
                             </td>
@@ -341,83 +341,6 @@
             <button id="closeCommentsModal">&times;</button>
         </div>
         <textarea id="commentsTextarea" placeholder="Write comments here..."></textarea>
-    </div>
-</div>
-
-<!-- =======================================
-    AI MUSIC DIRECTOR MODAL (FINAL DESIGN)
-======================================= -->
-<div id="musicModal" class="music-modal" style="display: none;">
-    <div class="music-modal-content" style="max-width: 750px;">
-        <div class="music-modal-header">
-            <h2>🎵 AI Music Director</h2>
-            <button id="closeMusicModal" class="music-close-btn">✕</button>
-        </div>
-        <div class="music-modal-body" style="padding: 20px;">
-            
-            <!-- STEP 1: Music Settings & Filters -->
-            <div class="music-options" style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                <h3 style="margin-top: 0; font-size: 16px; margin-bottom: 12px; color: #1e293b;">Recommendation Settings</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">Preferred Mood</label>
-                        <select id="musicMood" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                            <option value="Romantic">Romantic</option>
-                            <option value="Cinematic">Cinematic</option>
-                            <option value="Luxury">Luxury</option>
-                            <option value="Emotional">Emotional</option>
-                            <option value="Elegant">Elegant</option>
-                            <option value="Happy">Happy</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px;">Preferred Energy</label>
-                        <select id="musicEnergy" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                            <option value="Slow">Slow</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Epic">Epic</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 10px;">
-                    <button id="generateSongsBtn" class="btn-3d" style="flex: 2; padding: 10px; background: #2563eb; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">
-                        🎵 Recommend Songs
-                    </button>
-                    <button id="regenerateSongsBtn" class="btn-3d" style="flex: 1; padding: 10px; background: #475569; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">
-                        🔄 Regenerate
-                    </button>
-                </div>
-            </div>
-
-            <!-- WEDDING ANALYSIS SECTION -->
-            <div id="weddingAnalysisSection" style="margin-bottom: 20px; display: none;">
-                <h4 style="font-size: 14px; font-weight: bold; color: #475569; margin-bottom: 8px;">Wedding Analysis</h4>
-                <div id="analysisBadges" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <!-- Dynamically populated analysis badges -->
-                </div>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
-
-            <!-- LOADING STATE -->
-            <div id="musicLoading" class="music-loading" style="display: none; text-align: center; padding: 20px; color: #64748b;">
-                Analyzing wedding details & curating scene-by-scene Musicbed tracks...
-            </div>
-
-            <!-- RECOMMENDATIONS LIST -->
-            <div id="musicList" style="display: flex; flex-direction: column; gap: 12px; max-height: 45vh; overflow-y: auto;">
-                <!-- AI recommendations will populate here dynamically -->
-            </div>
-
-            <!-- WHY THESE SONGS SECTION -->
-            <div id="whySongsSection" style="margin-top: 20px; background: #f1f5f9; padding: 15px; border-radius: 8px; display: none;">
-                <h4 style="font-size: 14px; font-weight: bold; color: #334155; margin-top: 0; margin-bottom: 5px;">Why these songs?</h4>
-                <p id="whySongsText" style="font-size: 13px; color: #475569; margin: 0; line-height: 1.5;"></p>
-            </div>
-
-        </div>
     </div>
 </div>
 
