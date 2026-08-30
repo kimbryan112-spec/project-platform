@@ -10,30 +10,23 @@ export async function onRequestPost(context) {
         const { email, password } =
             await context.request.json();
 
-        // Load user from D1
         const user =
             await context.env.DB.prepare(`
-
                 SELECT
                     id,
                     fullname,
                     email,
-                    password_hash,
+                    password,
                     role,
                     active
-
                 FROM users
-
                 WHERE email = ?
-
                 LIMIT 1
-
             `)
             .bind(email.trim().toLowerCase())
             .first();
 
         if (!user) {
-
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -46,11 +39,9 @@ export async function onRequestPost(context) {
                     }
                 }
             );
-
         }
 
         if (!user.active) {
-
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -63,13 +54,10 @@ export async function onRequestPost(context) {
                     }
                 }
             );
-
         }
 
-        // Plain-text password comparison
-        // (Palitan ng password hashing sa future)
-        if (user.password_hash !== password) {
-
+        // Plain text comparison
+        if (user.password !== password) {
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -82,116 +70,68 @@ export async function onRequestPost(context) {
                     }
                 }
             );
-
         }
-
-        // ===============================
-        // CREATE SESSION
-        // ===============================
 
         const sessionId = crypto.randomUUID();
 
-        const expires =
-            new Date(
-                Date.now() + (7 * 24 * 60 * 60 * 1000)
-            ).toISOString();
+        const expires = new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000
+        ).toISOString();
 
         await context.env.DB.prepare(`
-
             INSERT INTO sessions (
-
                 id,
                 user_id,
                 expires_at
-
             )
-
-            VALUES (
-
-                ?, ?, ?
-
-            )
-
+            VALUES (?, ?, ?)
         `)
         .bind(
-
             sessionId,
             user.id,
             expires
-
         )
         .run();
 
-        // ===============================
-        // SUCCESS RESPONSE
-        // ===============================
-
         const response = new Response(
-
             JSON.stringify({
-
                 success: true,
-
                 user: {
-
                     id: user.id,
                     fullname: user.fullname,
                     email: user.email,
                     role: user.role
-
                 }
-
             }),
-
             {
-
                 headers: {
-
                     "Content-Type": "application/json"
-
                 }
-
             }
-
         );
 
         response.headers.append(
-
             "Set-Cookie",
-
             `session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=604800`
-
         );
 
         return response;
 
-    }
-
-    catch (err) {
+    } catch (err) {
 
         console.error("[LOGIN ERROR]", err);
 
         return new Response(
-
             JSON.stringify({
-
                 success: false,
                 message: err.message
-
             }),
-
             {
-
                 status: 500,
-
                 headers: {
-
                     "Content-Type": "application/json"
-
                 }
-
             }
-
         );
 
     }

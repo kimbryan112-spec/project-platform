@@ -94,21 +94,16 @@ async function onRequestPost(context) {
   try {
     const { email, password } = await context.request.json();
     const user = await context.env.DB.prepare(`
-
                 SELECT
                     id,
                     fullname,
                     email,
-                    password_hash,
+                    password,
                     role,
                     active
-
                 FROM users
-
                 WHERE email = ?
-
                 LIMIT 1
-
             `).bind(email.trim().toLowerCase()).first();
     if (!user) {
       return new Response(
@@ -138,7 +133,7 @@ async function onRequestPost(context) {
         }
       );
     }
-    if (user.password_hash !== password) {
+    if (user.password !== password) {
       return new Response(
         JSON.stringify({
           success: false,
@@ -157,21 +152,12 @@ async function onRequestPost(context) {
       Date.now() + 7 * 24 * 60 * 60 * 1e3
     ).toISOString();
     await context.env.DB.prepare(`
-
             INSERT INTO sessions (
-
                 id,
                 user_id,
                 expires_at
-
             )
-
-            VALUES (
-
-                ?, ?, ?
-
-            )
-
+            VALUES (?, ?, ?)
         `).bind(
       sessionId,
       user.id,
