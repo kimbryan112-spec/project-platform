@@ -10,14 +10,14 @@ export async function onRequestPost(context) {
             password
         } = await context.request.json();
 
-        // INCONSISTENCY FIXED: Changed 'password' to 'password_hash' and 'fullname' to 'full_name' based on schema.sql
+        // INCONSISTENCY FIXED: Changed 'password' to 'password_hash' and 'fullname' to 'fullname' based on schema.sql
         const user = await context.env.DB.prepare(`
             SELECT
                 id,
                 email,
                 password_hash,
                 role,
-                full_name,
+                fullname,
                 active
             FROM users
             WHERE email = ?
@@ -100,7 +100,7 @@ export async function onRequestPost(context) {
                 id: user.id,
                 email: user.email,
                 role: user.role,
-                name: user.full_name // Itinugma sa full_name galing sa database
+                name: user.fullname // Itinugma sa fullname galing sa database
             }
         };
 

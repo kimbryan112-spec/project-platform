@@ -3,7 +3,7 @@
 -- =========================
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    full_name TEXT NOT NULL,
+    fullname TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'dashboard',
@@ -18,14 +18,17 @@ CREATE TABLE IF NOT EXISTS projects (
     project_year INTEGER NOT NULL,
     project_month INTEGER NOT NULL,
     row_index INTEGER NOT NULL,
+
     couple_name TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'PLANNED',
     progress INTEGER NOT NULL DEFAULT 0,
     type TEXT NOT NULL DEFAULT 'NOT SET',
+
     raw_files TEXT NOT NULL DEFAULT '',
     drone TEXT NOT NULL DEFAULT '',
     instruction TEXT NOT NULL DEFAULT '',
     concerns TEXT NOT NULL DEFAULT '',
+
     watch_link TEXT NOT NULL DEFAULT '',
     files_link TEXT NOT NULL DEFAULT '',
 
