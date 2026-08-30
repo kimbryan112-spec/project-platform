@@ -6,13 +6,13 @@ const playlistFile = path.join(musicFolder, "playlist.json");
 
 const files = fs.readdirSync(musicFolder);
 
-console.log(files);
+console.log("All files:", files);
 
 const playlist = files
     .filter(file => {
-    const ext = path.extname(file).toLowerCase();
-    return [".mp3", ".wav"].includes(ext);
-})
+        const ext = path.extname(file).toLowerCase();
+        return [".mp3", ".wav"].includes(ext);
+    })
     .sort((a, b) =>
         a.localeCompare(
             b,
@@ -21,7 +21,7 @@ const playlist = files
         )
     );
 
-console.log(playlist);
+console.log("Filtered playlist:", playlist);
 
 fs.writeFileSync(
     playlistFile,

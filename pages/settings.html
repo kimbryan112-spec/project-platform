@@ -2,15 +2,10 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Project Platform - Settings</title>
-
     <link rel="stylesheet" href="../css/style.css">
-
 </head>
 
 <body>
@@ -20,434 +15,238 @@
     <!-- =========================
     SIDEBAR
     ========================= -->
-
     <aside class="sidebar">
-
         <div class="logo">
-
             <h2>PROJECT PLATFORM</h2>
-
             <p>KBHFILMS</p>
-
         </div>
 
         <nav>
-
             <a href="admin.html" class="btn-3d">
                 📊 Admin Dashboard
             </a>
-
             <a href="dashboard.html" class="btn-3d">
                 📋 Dashboard
             </a>
-
             <a href="settings.html" class="btn-3d active">
                 ⚙ Settings
             </a>
-
         </nav>
 
         <!-- Sidebar Footer -->
-
         <div class="sidebar-footer">
-
             <div class="user-info">
-
                 <div class="user-name">
                     Kim Bryan Hernandez
                 </div>
-
                 <div class="user-role">
                     Administrator
                 </div>
-
             </div>
 
             <div class="logout-wrapper">
-
-                <button
-                    id="logoutBtn"
-                    class="logout-btn btn-3d">
-
+                <button id="logoutBtn" class="logout-btn btn-3d">
                     🚪 Logout
-
                 </button>
-
-                <div
-                    id="logoutConfirm"
-                    class="logout-confirm">
-
-                    <p>
-
-                        Do you want to logout?
-
-                    </p>
-
+                <div id="logoutConfirm" class="logout-confirm">
+                    <p>Do you want to logout?</p>
                     <div class="logout-actions">
-
-                        <button
-                            id="confirmLogout"
-                            class="yes-btn">
-
-                            Yes
-
-                        </button>
-
-                        <button
-                            id="cancelLogout"
-                            class="no-btn">
-
-                            No
-
-                        </button>
-
+                        <button id="confirmLogout" class="yes-btn">Yes</button>
+                        <button id="cancelLogout" class="no-btn">No</button>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </aside>
 
     <!-- =========================
-MAIN
-========================= -->
+    MAIN
+    ========================= -->
+    <main class="main">
 
-<main class="main">
-
-    <!-- =========================
-TOPBAR
-========================= -->
-
-<header class="topbar">
-
-    <div class="topbar-left">
-
-        <div class="page-title">
-
-            <h1>
-                Administrator
-            </h1>
-
-            <p>
-                Wedding Project Platform
-            </p>
-
-        </div>
-
-        <div class="year-header">
-
-            <div class="live-calendar">
-
-                <div
-                    id="calendarMonth"
-                    class="calendar-month">
-
-                    AUG
-
+        <!-- =========================
+        TOPBAR
+        ========================= -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="page-title">
+                    <h1>Administrator</h1>
+                    <p>Wedding Project Platform</p>
                 </div>
 
-                <div
-                    id="calendarDay"
-                    class="calendar-day">
+                <div class="year-header">
+                    <div class="live-calendar">
+                        <div id="calendarMonth" class="calendar-month">AUG</div>
+                        <div id="calendarDay" class="calendar-day">21</div>
+                    </div>
+                    <h2>
+                        ⚙ Settings
+                        <br>
+                        <span style="font-size:15px; color:#777; font-weight:500;">
+                            Database Management & Maintenance
+                        </span>
+                    </h2>
+                </div>
+            </div>
 
-                    21
+            <div class="topbar-right">
+                <select id="yearSelect"></select>
+                <button class="next-year-btn btn-3d">
+                    + Next Year
+                </button>
+                <div class="profile">
+                    <img src="../assets/images/kbhfilms-logo.png" alt="KBHFILMS Logo">
+                </div>
+            </div>
+        </header>
 
+        <!-- =========================
+        SETTINGS CONTENT START
+        ========================= -->
+        <div class="settings-dashboard">
+            <div class="settings-wrapper">
+
+                <!-- DATABASE STATUS -->
+                <div class="settings-card">
+                    <div class="settings-title">
+                        <h2>🗄 Database Status</h2>
+                        <p>Cloudflare D1 Information</p>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="info-box">
+                            <span>Connection</span>
+                            <strong id="dbStatus">🟢 Connected</strong>
+                        </div>
+
+                        <div class="info-box">
+                            <span>Total Records</span>
+                            <strong id="dbTotalRecords">0</strong>
+                        </div>
+
+                        <div class="info-box">
+                            <span>Current Year</span>
+                            <strong id="dbCurrentYear">--</strong>
+                        </div>
+
+                        <div class="info-box">
+                            <span>Current Month</span>
+                            <strong id="dbCurrentMonth">--</strong>
+                        </div>
+
+                        <div class="info-box">
+                            <span>Last Backup</span>
+                            <strong id="dbLastBackup">--</strong>
+                        </div>
+
+                        <div class="info-box">
+                            <span>Database Size</span>
+                            <strong id="dbSize">--</strong>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
-
-            <h2>
-
-                ⚙ Settings
-
-                <br>
-
-                <span
-                    style="
-                    font-size:15px;
-                    color:#777;
-                    font-weight:500;">
-
-                    Database Management & Maintenance
-
-                </span>
-
-            </h2>
-
-        </div>
-
-    </div>
-
-    <div class="topbar-right">
-
-        <select id="yearSelect"></select>
-
-        <button
-            class="next-year-btn btn-3d">
-
-            + Next Year
-
-        </button>
-
-        <div class="profile">
-
-            <img
-                src="../assets/images/kbhfilms-logo.png"
-                alt="KBHFILMS Logo">
-
-        </div>
-
-    </div>
-
-</header>
-
-<!-- =========================
-SETTINGS CONTENT START
-========================= -->
-
-<div class="settings-dashboard">
-
-    <div class="settings-wrapper">
-
-    <!-- DATABASE STATUS -->
-
-    <div class="settings-card">
-
-        <div class="settings-title">
-
-            <h2>🗄 Database Status</h2>
-
-            <p>Cloudflare D1 Information</p>
-
-        </div>
-
-        <div class="settings-grid">
-
-            <div class="info-box">
-                <span>Connection</span>
-                <strong id="dbStatus">
-                    🟢 Connected
-                </strong>
-            </div>
-
-            <div class="info-box">
-                <span>Total Records</span>
-                <strong id="dbTotalRecords">
-                    0
-                </strong>
-            </div>
-
-            <div class="info-box">
-                <span>Current Year</span>
-                <strong id="dbCurrentYear">
-                    --
-                </strong>
-            </div>
-
-            <div class="info-box">
-                <span>Current Month</span>
-                <strong id="dbCurrentMonth">
-    --
-</strong>
-            </div>
-
-            <div class="info-box">
-                <span>Last Backup</span>
-                <strong id="dbLastBackup">
-                    --
-                </strong>
-            </div>
-
-            <div class="info-box">
-                <span>Database Size</span>
-                <strong id="dbSize">
-                    --
-                </strong>
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- RESET MONTH -->
-
-    <div class="settings-card">
-
-        <div class="settings-title">
-
-            <h2>🗓 Reset Month</h2>
-
-            <p>Delete every project inside one month only.</p>
-
-        </div>
-
-        <div class="settings-form">
-
-            <select id="resetMonth">
-
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-
-            </select>
-
-            <select id="resetMonthYear">
-
-                <option>2025</option>
-                <option selected>2026</option>
-                <option>2027</option>
-
-            </select>
-
-            <button
-                id="resetMonthBtn"
-                class="btn-3d danger-btn">
-
-                Reset Month
-
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- RESET YEAR -->
-
-    <div class="settings-card">
-
-        <div class="settings-title">
-
-            <h2>📅 Reset Year</h2>
-
-            <p>Delete all records from selected year.</p>
-
-        </div>
-
-        <div class="settings-form">
-
-            <select id="resetYear">
-
-                <option>2025</option>
-                <option selected>2026</option>
-                <option>2027</option>
-
-            </select>
-
-            <button
-                id="resetYearBtn"
-                class="btn-3d warning-btn">
-
-                Reset Year
-
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- BACKUP -->
-
-    <div class="settings-card">
-
-        <div class="settings-title">
-
-            <h2>💾 Backup Database</h2>
-
-            <p>Create JSON backup.</p>
-
-        </div>
-
-        <button
-            id="backupBtn"
-            class="btn-3d">
-
-            Download Backup
-
-        </button>
-
-    </div>
-
-
-
-       <!-- RESTORE -->
-
-    <div class="settings-card">
-
-        <div class="settings-title">
-
-            <h2>📂 Restore Backup</h2>
-
-            <p>Restore Cloudflare D1 from JSON file.</p>
-
-        </div>
-
-        <input
-            id="restoreFile"
-            type="file"
-            accept=".json">
-
-        <br><br>
-
-        <button
-            id="restoreBtn"
-            class="btn-3d">
-
-            Restore Database
-
-        </button>
-
-    </div>
-
-    <!-- DANGER -->
-
-    <div class="settings-card danger-zone">
-
-        <div class="settings-title">
-
-            <h2>☠ Danger Zone</h2>
-
-            <p>Permanently delete EVERYTHING.</p>
-
-        </div>
-
-        <input
-            id="confirmDelete"
-            type="text"
-            placeholder="Type RESET">
-
-        <br><br>
-
-        <button
-            id="deleteAllBtn"
-            class="btn-3d delete-btn">
-
-            DELETE EVERYTHING
-
-        </button>
-
-    </div>
-
-</div> <!-- settings-wrapper -->
-
-</div> <!-- settings-dashboard -->
-
-</main>
+                <!-- RESET MONTH -->
+                <div class="settings-card">
+                    <div class="settings-title">
+                        <h2>🗓 Reset Month</h2>
+                        <p>Delete every project inside one month only.</p>
+                    </div>
+
+                    <div class="settings-form">
+                        <select id="resetMonth">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+
+                        <select id="resetMonthYear">
+                            <option>2025</option>
+                            <option selected>2026</option>
+                            <option>2027</option>
+                        </select>
+
+                        <button id="resetMonthBtn" class="btn-3d danger-btn">
+                            Reset Month
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RESET YEAR -->
+                <div class="settings-card">
+                    <div class="settings-title">
+                        <h2>📅 Reset Year</h2>
+                        <p>Delete all records from selected year.</p>
+                    </div>
+
+                    <div class="settings-form">
+                        <select id="resetYear">
+                            <option>2025</option>
+                            <option selected>2026</option>
+                            <option>2027</option>
+                        </select>
+
+                        <button id="resetYearBtn" class="btn-3d warning-btn">
+                            Reset Year
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BACKUP -->
+                <div class="settings-card">
+                    <div class="settings-title">
+                        <h2>💾 Backup Database</h2>
+                        <p>Create JSON backup.</p>
+                    </div>
+
+                    <button id="backupBtn" class="btn-3d">
+                        Download Backup
+                    </button>
+                </div>
+
+                <!-- RESTORE -->
+                <div class="settings-card">
+                    <div class="settings-title">
+                        <h2>📂 Restore Backup</h2>
+                        <p>Restore Cloudflare D1 from JSON file.</p>
+                    </div>
+
+                    <input id="restoreFile" type="file" accept=".json">
+                    <br><br>
+
+                    <button id="restoreBtn" class="btn-3d">
+                        Restore Database
+                    </button>
+                </div>
+
+                <!-- DANGER -->
+                <div class="settings-card danger-zone">
+                    <div class="settings-title">
+                        <h2>☠ Danger Zone</h2>
+                        <p>Permanently delete EVERYTHING.</p>
+                    </div>
+
+                    <input id="confirmDelete" type="text" placeholder="Type RESET">
+                    <br><br>
+
+                    <button id="deleteAllBtn" class="btn-3d delete-btn">
+                        DELETE EVERYTHING
+                    </button>
+                </div>
+
+            </div> <!-- settings-wrapper -->
+        </div> <!-- settings-dashboard -->
+
+    </main>
 
 </div> <!-- #app -->
 

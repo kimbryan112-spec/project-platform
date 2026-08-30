@@ -1,39 +1,12 @@
 // ===============================
 // PROJECT PLATFORM
-// LOCAL LOGIN
-// ===============================
-
-// Default Users (Local Mode)
-
-const users = [
-
-    {
-        email: "adminyang@kbhfilms.com",
-        password: "Yangyang#12",
-        role: "admin",
-        displayRole: "Admin",
-        name: "Kim Bryan Hernandez"
-    },
-
-    {
-        email: "yongzhi@kbhfilms.com",
-        password: "yong2023",
-        role: "dashboard",
-        displayRole: "Manager",
-        name: "Yong Zhi Ng"
-    },
-
-];
-
-// ===============================
-// LOGIN
+// SERVER LOGIN (Connected to D1 via API)
 // ===============================
 
 const loginForm = document.getElementById("loginForm");
 const errorText = document.getElementById("loginError");
 
-loginForm.addEventListener("submit", function (e) {
-
+loginForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const email = document
@@ -46,53 +19,59 @@ loginForm.addEventListener("submit", function (e) {
         .getElementById("password")
         .value;
 
-    const user = users.find(u =>
-        u.email === email &&
-        u.password === password
-    );
-
-    if (!user) {
-
-        errorText.textContent =
-            "Invalid email or password.";
-
-        return;
-
+    // Linisin muna ang lumang error message kung meron man
+    if (errorText) {
+        errorText.textContent = "";
     }
 
-    // Save Current User
+    try {
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
 
-    localStorage.setItem(
-        "currentUser",
-        JSON.stringify(user)
-    );
+        const data = await response.json();
 
-    // Redirect
+        if (!response.ok || !data.success) {
+            if (errorText) {
+                errorText.textContent = data.message || "Invalid email or password.";
+            }
+            return;
+        }
 
-    if (user.role === "admin") {
+        // Save Current User to localStorage (Tugma sa dashboard.html at script.js checks mo)
+        localStorage.setItem(
+            "currentUser",
+            JSON.stringify(data.user)
+        );
 
-        window.location.href =
-            "pages/admin.html";
+        // Redirect base sa role ng user galing sa Database
+        if (data.user.role === "admin") {
+            window.location.href = "pages/admin.html";
+        } else {
+            window.location.href = "pages/dashboard.html";
+        }
 
-    } else {
-
-        window.location.href =
-            "pages/dashboard.html";
-
+    } catch (err) {
+        console.error("Login error:", err);
+        if (errorText) {
+            errorText.textContent = "A connection error occurred. Please try again.";
+        }
     }
-
 });
 
 // ===============================
 // CREATE ACCOUNT
 // ===============================
 
-document
-    .getElementById("createAccountLink")
-    .addEventListener("click", function () {
-
+const createAccountLink = document.getElementById("createAccountLink");
+if (createAccountLink) {
+    createAccountLink.addEventListener("click", function () {
         alert(
             "Account creation is available for KBHFILMS team members only."
         );
-
     });
+}

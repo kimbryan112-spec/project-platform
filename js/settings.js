@@ -27,18 +27,9 @@ console.log("================================");
 let currentYear = new Date().getFullYear().toString();
 
 const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
+    "January", "February", "March", "April",
+    "May", "June", "July", "August",
+    "September", "October", "November", "December"
 ];
 
 // ==================================
@@ -46,13 +37,8 @@ const monthNames = [
 // ==================================
 
 function updateLiveCalendar() {
-
     const now = new Date();
-
-    const month = now.toLocaleString("en-US", {
-        month: "short"
-    }).toUpperCase();
-
+    const month = now.toLocaleString("en-US", { month: "short" }).toUpperCase();
     const day = now.getDate();
 
     const monthEl = document.getElementById("calendarMonth");
@@ -60,7 +46,6 @@ function updateLiveCalendar() {
 
     if (monthEl) monthEl.textContent = month;
     if (dayEl) dayEl.textContent = day;
-
 }
 
 // ==================================
@@ -68,19 +53,14 @@ function updateLiveCalendar() {
 // ==================================
 
 function initializeYearDropdown() {
-
     const yearSelect = document.getElementById("yearSelect");
-
     if (!yearSelect) return;
 
     yearSelect.innerHTML = "";
-
     const current = new Date().getFullYear();
 
     for (let year = 2023; year <= current + 5; year++) {
-
         const option = document.createElement("option");
-
         option.value = year;
         option.textContent = year;
 
@@ -89,26 +69,20 @@ function initializeYearDropdown() {
         }
 
         yearSelect.appendChild(option);
-
     }
 
     currentYear = String(current);
 
     yearSelect.addEventListener("change", () => {
-
         currentYear = yearSelect.value;
-
-        const yearDisplay =
-            document.getElementById("dbCurrentYear");
+        const yearDisplay = document.getElementById("dbCurrentYear");
 
         if (yearDisplay) {
             yearDisplay.textContent = currentYear;
         }
 
         loadDatabaseStatus();
-
     });
-
 }
 
 // ==================================
@@ -116,50 +90,32 @@ function initializeYearDropdown() {
 // ==================================
 
 function initializeNextYearButton() {
-
-    const nextYearBtn =
-        document.querySelector(".next-year-btn");
-
-    const yearSelect =
-        document.getElementById("yearSelect");
+    const nextYearBtn = document.querySelector(".next-year-btn");
+    const yearSelect = document.getElementById("yearSelect");
 
     if (!nextYearBtn || !yearSelect) return;
 
     nextYearBtn.addEventListener("click", () => {
-
-        const nextYear =
-            String(Number(currentYear) + 1);
-
-        const exists = [...yearSelect.options]
-            .some(option => option.value === nextYear);
+        const nextYear = String(Number(currentYear) + 1);
+        const exists = [...yearSelect.options].some(option => option.value === nextYear);
 
         if (!exists) {
-
-            const option =
-                document.createElement("option");
-
+            const option = document.createElement("option");
             option.value = nextYear;
             option.textContent = nextYear;
-
             yearSelect.appendChild(option);
-
         }
 
         currentYear = nextYear;
-
         yearSelect.value = currentYear;
 
-        const yearDisplay =
-            document.getElementById("dbCurrentYear");
-
+        const yearDisplay = document.getElementById("dbCurrentYear");
         if (yearDisplay) {
             yearDisplay.textContent = currentYear;
         }
 
         loadDatabaseStatus();
-
     });
-
 }
 
 // ==================================
@@ -167,15 +123,10 @@ function initializeNextYearButton() {
 // ==================================
 
 function updateCurrentMonthLabel() {
-
-    const label =
-        document.getElementById("dbCurrentMonth");
-
+    const label = document.getElementById("dbCurrentMonth");
     if (!label) return;
 
-    label.textContent =
-        monthNames[new Date().getMonth()];
-
+    label.textContent = monthNames[new Date().getMonth()];
 }
 
 // ==================================
@@ -183,69 +134,41 @@ function updateCurrentMonthLabel() {
 // ==================================
 
 function initializeLogout() {
-
-    const logoutBtn =
-        document.getElementById("logoutBtn");
-
-    const logoutConfirm =
-        document.getElementById("logoutConfirm");
-
-    const confirmLogout =
-        document.getElementById("confirmLogout");
-
-    const cancelLogout =
-        document.getElementById("cancelLogout");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const logoutConfirm = document.getElementById("logoutConfirm");
+    const confirmLogout = document.getElementById("confirmLogout");
+    const cancelLogout = document.getElementById("cancelLogout");
 
     if (logoutBtn) {
-
         logoutBtn.addEventListener("click", (e) => {
-
             e.stopPropagation();
-
             logoutConfirm.classList.toggle("show");
-
         });
-
     }
 
     if (cancelLogout) {
-
         cancelLogout.addEventListener("click", (e) => {
-
             e.stopPropagation();
-
             logoutConfirm.classList.remove("show");
-
         });
-
     }
 
     if (confirmLogout) {
-
         confirmLogout.addEventListener("click", () => {
-
             localStorage.removeItem("currentUser");
-
             window.location.href = "../login.html";
-
         });
-
     }
 
     document.addEventListener("click", (e) => {
-
         if (
             logoutConfirm &&
             !logoutConfirm.contains(e.target) &&
             !logoutBtn.contains(e.target)
         ) {
-
             logoutConfirm.classList.remove("show");
-
         }
-
     });
-
 }
 
 // ==================================
@@ -253,23 +176,14 @@ function initializeLogout() {
 // ==================================
 
 document.addEventListener("DOMContentLoaded", () => {
-
     console.log("[INIT] Settings page loaded.");
-
     updateLiveCalendar();
-
     setInterval(updateLiveCalendar, 60000);
-
     initializeYearDropdown();
-
     initializeNextYearButton();
-
     updateCurrentMonthLabel();
-
     initializeLogout();
-
     loadDatabaseStatus();
-
 });
 
 /* ==================================
@@ -278,65 +192,33 @@ document.addEventListener("DOMContentLoaded", () => {
    DATABASE STATUS
 ================================== */
 
-// ==================================
-// ELEMENTS
-// ==================================
-
-const dbStatus =
-    document.getElementById("dbStatus");
-
-const dbTotalRecords =
-    document.getElementById("dbTotalRecords");
-
-const dbCurrentYear =
-    document.getElementById("dbCurrentYear");
-
-const dbCurrentMonth =
-    document.getElementById("dbCurrentMonth");
-
-const dbSize =
-    document.getElementById("dbSize");
-
-const dbLastBackup =
-    document.getElementById("dbLastBackup");
+const dbStatus = document.getElementById("dbStatus");
+const dbTotalRecords = document.getElementById("dbTotalRecords");
+const dbCurrentYear = document.getElementById("dbCurrentYear");
+const dbCurrentMonth = document.getElementById("dbCurrentMonth");
+const dbSize = document.getElementById("dbSize");
+const dbLastBackup = document.getElementById("dbLastBackup");
 
 // ==================================
 // LOCAL STORAGE RECORD COUNT
 // ==================================
 
 function countLocalRecords() {
-
     let total = 0;
-
     for (let i = 0; i < localStorage.length; i++) {
-
         const key = localStorage.key(i);
-
         if (!key.startsWith("projects_")) continue;
 
         try {
-
-            const data = JSON.parse(
-                localStorage.getItem(key)
-            );
-
+            const data = JSON.parse(localStorage.getItem(key));
             if (Array.isArray(data)) {
                 total += data.length;
             }
-
         } catch {
-
-            console.warn(
-                "[STATUS] Invalid localStorage:",
-                key
-            );
-
+            console.warn("[STATUS] Invalid localStorage:", key);
         }
-
     }
-
     return total;
-
 }
 
 // ==================================
@@ -344,22 +226,13 @@ function countLocalRecords() {
 // ==================================
 
 function getLocalStorageSize() {
-
     let total = 0;
-
     for (let i = 0; i < localStorage.length; i++) {
-
         const key = localStorage.key(i);
-
-        const value =
-            localStorage.getItem(key) || "";
-
+        const value = localStorage.getItem(key) || "";
         total += key.length + value.length;
-
     }
-
     return (total / 1024).toFixed(2) + " KB";
-
 }
 
 // ==================================
@@ -367,104 +240,70 @@ function getLocalStorageSize() {
 // ==================================
 
 async function loadDatabaseStatus() {
-
     console.log("[STATUS] Loading...");
 
-    dbCurrentYear.textContent = currentYear;
-
-    dbCurrentMonth.textContent =
-        monthNames[new Date().getMonth()];
+    if (dbCurrentYear) dbCurrentYear.textContent = currentYear;
+    if (dbCurrentMonth) dbCurrentMonth.textContent = monthNames[new Date().getMonth()];
 
     // ==================================
     // LOCAL MODE
     // ==================================
-
     if (LOCAL_MODE) {
+        if (dbStatus) {
+            dbStatus.textContent = "🟡 Local Storage";
+            dbStatus.className = "";
+        }
+        if (dbTotalRecords) dbTotalRecords.textContent = countLocalRecords();
+        if (dbSize) dbSize.textContent = getLocalStorageSize();
+        if (dbLastBackup) dbLastBackup.textContent = localStorage.getItem("lastBackup") || "Never";
 
-        dbStatus.textContent =
-            "🟡 Local Storage";
-
-        dbStatus.className = "";
-
-        dbTotalRecords.textContent =
-            countLocalRecords();
-
-        dbSize.textContent =
-            getLocalStorageSize();
-
-        dbLastBackup.textContent =
-            localStorage.getItem(
-                "lastBackup"
-            ) || "Never";
-
-        console.log(
-            "[STATUS] Loaded from Local Storage."
-        );
-
+        console.log("[STATUS] Loaded from Local Storage.");
         return;
-
     }
 
     // ==================================
     // CLOUD MODE
     // ==================================
-
     try {
-
-        dbStatus.textContent =
-            "🟢 Connected";
-
-        dbStatus.className =
-            "status-online";
+        if (dbStatus) {
+            dbStatus.textContent = "🟢 Connected";
+            dbStatus.className = "status-online";
+        }
 
         const response = await fetch(
-            "/api/projects?t=" + Date.now(),
-            {
-                cache: "no-store"
-            }
+            `/api/projects?year=${currentYear}&t=` + Date.now(),
+            { cache: "no-store" }
         );
 
-        if (!response.ok)
-            throw new Error(response.status);
+        if (!response.ok) throw new Error(response.status);
 
-        const projects =
-            await response.json();
+        const data = await response.json();
 
-        dbTotalRecords.textContent =
-            Array.isArray(projects)
-                ? projects.length
-                : 0;
+        // ITINAMA: Binasa ang data.projects dahil object ang ibinabalik ng /api/projects
+        const projectsArray = data.projects || (Array.isArray(data) ? data : []);
 
-        dbSize.textContent =
-            "--";
+        if (dbTotalRecords) {
+            dbTotalRecords.textContent = projectsArray.length;
+        }
 
-        dbLastBackup.textContent =
-            localStorage.getItem(
-                "lastBackup"
-            ) || "Never";
+        if (dbSize) dbSize.textContent = "--";
+        if (dbLastBackup) {
+            dbLastBackup.textContent = localStorage.getItem("lastBackup") || "Never";
+        }
 
-        console.log(
-            "[STATUS] Cloudflare Connected."
-        );
+        console.log("[STATUS] Cloudflare Connected.");
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error(error);
 
-        dbStatus.textContent =
-            "🔴 Offline";
+        if (dbStatus) {
+            dbStatus.textContent = "🔴 Offline";
+            dbStatus.className = "status-offline";
+        }
 
-        dbStatus.className =
-            "status-offline";
-
-        dbTotalRecords.textContent = "--";
-
-        dbSize.textContent = "--";
-
+        if (dbTotalRecords) dbTotalRecords.textContent = "--";
+        if (dbSize) dbSize.textContent = "--";
     }
-
 }
 
 // ==================================
@@ -472,9 +311,7 @@ async function loadDatabaseStatus() {
 // ==================================
 
 setInterval(() => {
-
     loadDatabaseStatus();
-
 }, 30000);
 
 /* ==========================================
@@ -483,110 +320,59 @@ setInterval(() => {
 ========================================== */
 
 async function resetMonth() {
-
     const month = Number(document.getElementById("resetMonth").value);
     const year = Number(document.getElementById("resetMonthYear").value);
 
     if (!month || !year) {
-
         alert("Please select both month and year.");
-
         return;
-
     }
 
-    const confirmReset = confirm(
-        `Delete ALL projects for ${month}/${year}?`
-    );
-
+    const confirmReset = confirm(`Delete ALL projects for ${month}/${year}?`);
     if (!confirmReset) return;
 
     try {
-
-        // ==================================
-        // LOCAL STORAGE
-        // ==================================
-
         if (LOCAL_MODE) {
+            const monthNamesShort = [
+                "jan", "feb", "mar", "apr", "may", "jun",
+                "jul", "aug", "sep", "oct", "nov", "dec"
+            ];
+            const monthKey = monthNamesShort[month - 1];
+            const key = `projects_${year}_${monthKey}`;
+            localStorage.removeItem(key);
 
-    const monthNamesShort = [
-        "jan", "feb", "mar", "apr", "may", "jun",
-        "jul", "aug", "sep", "oct", "nov", "dec"
-    ];
+            if (year === 2026 && monthKey === "sep") {
+                localStorage.removeItem("projects_sep");
+                localStorage.removeItem("projects");
+            }
 
-    const monthKey =
-        monthNamesShort[month - 1];
-
-    const key =
-        `projects_${year}_${monthKey}`;
-
-    localStorage.removeItem(key);
-
-    // Remove old legacy key kung meron
-    if (year === 2026 && monthKey === "sep") {
-
-        localStorage.removeItem("projects_sep");
-        localStorage.removeItem("projects");
-
-    }
-
-    alert("Month reset completed.");
-
-    loadDatabaseStatus();
-
-    return;
-
-}
-
-        // ==================================
-        // CLOUDFLARE API
-        // ==================================
+            alert("Month reset completed.");
+            loadDatabaseStatus();
+            return;
+        }
 
         const response = await fetch("/api/reset-month", {
-
             method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                month,
-                year
-
-            })
-
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ month, year })
         });
 
         const result = await response.json();
 
         if (!response.ok) {
-
-            throw new Error(
-                result.message || "Unable to reset selected month."
-            );
-
+            throw new Error(result.message || "Unable to reset selected month.");
         }
 
         alert(result.message || "Month reset completed successfully.");
-
         loadDatabaseStatus();
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error("Reset Month Error:", error);
-
         alert(error.message || "Unable to reset month.");
-
     }
-
 }
 
-document.getElementById("resetMonthBtn")
-    ?.addEventListener("click", resetMonth);
+document.getElementById("resetMonthBtn")?.addEventListener("click", resetMonth);
 
 /* ==========================================
    PART 4
@@ -594,114 +380,60 @@ document.getElementById("resetMonthBtn")
 ========================================== */
 
 async function resetYear() {
-
-    const year = Number(
-        document.getElementById("resetYear").value
-    );
+    const year = Number(document.getElementById("resetYear").value);
 
     if (!year) {
-
         alert("Please select a year.");
-
         return;
-
     }
 
-    const confirmReset = confirm(
-        `Delete ALL projects for year ${year}?`
-    );
-
+    const confirmReset = confirm(`Delete ALL projects for year ${year}?`);
     if (!confirmReset) return;
 
     try {
+        if (LOCAL_MODE) {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith(`projects_${year}_`)) {
+                    localStorage.removeItem(key);
+                }
+            }
 
-        // ==================================
-// LOCAL STORAGE
-// ==================================
+            const locks = JSON.parse(localStorage.getItem("monthLocks") || "{}");
+            Object.keys(locks).forEach(key => {
+                if (key.startsWith(`${year}_`)) {
+                    delete locks[key];
+                }
+            });
 
-if (LOCAL_MODE) {
-
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-
-        const key = localStorage.key(i);
-
-        if (
-            key &&
-            key.startsWith(`projects_${year}_`)
-        ) {
-            localStorage.removeItem(key);
+            localStorage.setItem("monthLocks", JSON.stringify(locks));
+            alert("Year reset completed successfully.");
+            loadDatabaseStatus();
+            return;
         }
-
-    }
-
-    // Remove month locks for this year
-    const locks = JSON.parse(localStorage.getItem("monthLocks") || "{}");
-
-    Object.keys(locks).forEach(key => {
-        if (key.startsWith(`${year}_`)) {
-            delete locks[key];
-        }
-    });
-
-    localStorage.setItem("monthLocks", JSON.stringify(locks));
-
-    alert("Year reset completed successfully.");
-
-    loadDatabaseStatus();
-
-    return;
-
-}   
-
-        // ==================================
-        // CLOUDFLARE API
-        // ==================================
 
         const response = await fetch("/api/reset-year", {
-
             method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                year
-
-            })
-
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ year })
         });
 
         const result = await response.json();
 
         if (!response.ok) {
-
-            throw new Error(
-                result.message ||
-                "Unable to reset selected year."
-            );
-
+            throw new Error(result.message || "Unable to reset selected year.");
         }
 
         alert(result.message || "Year reset completed successfully.");
-
         loadDatabaseStatus();
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error("Reset Year Error:", error);
-
         alert(error.message || "Unable to reset year.");
-
     }
-
 }
 
-document.getElementById("resetYearBtn")
-    ?.addEventListener("click", resetYear);
+document.getElementById("resetYearBtn")?.addEventListener("click", resetYear);
 
 /* ==========================================
    PART 5
@@ -709,104 +441,53 @@ document.getElementById("resetYearBtn")
 ========================================== */
 
 async function backupDatabase() {
-
     try {
-
         let blob;
 
-        // ==================================
-        // LOCAL STORAGE
-        // ==================================
-
         if (LOCAL_MODE) {
-
             const backupData = {};
-
             for (let i = 0; i < localStorage.length; i++) {
-
                 const key = localStorage.key(i);
-
-                backupData[key] =
-                    localStorage.getItem(key);
-
+                backupData[key] = localStorage.getItem(key);
             }
-
             blob = new Blob(
                 [JSON.stringify(backupData, null, 2)],
-                {
-                    type: "application/json"
-                }
+                { type: "application/json" }
             );
-
-        }
-
-        // ==================================
-        // CLOUDFLARE API
-        // ==================================
-
-        else {
-
+        } else {
             const response = await fetch("/api/backup");
-
-            if (!response.ok) {
-
-                throw new Error("Backup failed.");
-
-            }
-
+            if (!response.ok) throw new Error("Backup failed.");
             blob = await response.blob();
-
         }
 
         const url = URL.createObjectURL(blob);
-
         const link = document.createElement("a");
-
         const today = new Date();
 
         link.href = url;
-
-        link.download =
-            `backup-${today.getFullYear()}-${
-                String(today.getMonth() + 1).padStart(2, "0")
-            }-${
-                String(today.getDate()).padStart(2, "0")
-            }.json`;
+        link.download = `backup-${today.getFullYear()}-${
+            String(today.getMonth() + 1).padStart(2, "0")
+        }-${String(today.getDate()).padStart(2, "0")}.json`;
 
         document.body.appendChild(link);
-
         link.click();
-
         document.body.removeChild(link);
-
         URL.revokeObjectURL(url);
 
-        localStorage.setItem(
-            "lastBackup",
-            today.toLocaleString()
-        );
-
-        document.getElementById("dbLastBackup").textContent =
-            today.toLocaleString();
+        localStorage.setItem("lastBackup", today.toLocaleString());
+        const dbLastBackupEl = document.getElementById("dbLastBackup");
+        if (dbLastBackupEl) dbLastBackupEl.textContent = today.toLocaleString();
 
         alert("Backup downloaded successfully.");
-
         loadDatabaseStatus();
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error("Backup Error:", error);
-
         alert(error.message || "Unable to create backup.");
-
     }
-
 }
 
-document.getElementById("backupBtn")
-    ?.addEventListener("click", backupDatabase);
+document.getElementById("backupBtn")?.addEventListener("click", backupDatabase);
 
 /* ==========================================
    PART 6
@@ -814,16 +495,11 @@ document.getElementById("backupBtn")
 ========================================== */
 
 async function restoreDatabase() {
-
-    const fileInput =
-        document.getElementById("restoreFile");
+    const fileInput = document.getElementById("restoreFile");
 
     if (!fileInput.files.length) {
-
         alert("Please select a backup file.");
-
         return;
-
     }
 
     const confirmRestore = confirm(
@@ -833,136 +509,69 @@ async function restoreDatabase() {
     if (!confirmRestore) return;
 
     try {
-
         const file = fileInput.files[0];
-
         const text = await file.text();
-
         const backupData = JSON.parse(text);
 
-// Accept both Local backup and Cloud backup formats
-const isLocalBackup =
-    backupData &&
-    typeof backupData === "object" &&
-    !Array.isArray(backupData);
+        const isLocalBackup = backupData && typeof backupData === "object" && !Array.isArray(backupData);
+        const isCloudBackup = Array.isArray(backupData.projects);
 
-const isCloudBackup =
-    Array.isArray(backupData.projects);
+        if (!isLocalBackup && !isCloudBackup) {
+            throw new Error("Invalid backup file.");
+        }
 
-if (!isLocalBackup && !isCloudBackup) {
-    throw new Error("Invalid backup file.");
-}
+        if (LOCAL_MODE) {
+            if (isCloudBackup) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const monthNamesShort = [
+                    "jan", "feb", "mar", "apr", "may", "jun",
+                    "jul", "aug", "sep", "oct", "nov", "dec"
+                ];
+                const month = monthNamesShort[now.getMonth()];
+                const key = `projects_${year}_${month}`;
 
-if (LOCAL_MODE) {
+                localStorage.setItem(key, JSON.stringify(backupData.projects));
+            } else {
+                localStorage.clear();
+                Object.keys(backupData).forEach(key => {
+                    localStorage.setItem(key, backupData[key]);
+                });
+            }
 
-    // ==========================
-    // ONLINE BACKUP -> LOCAL
-    // ==========================
-    if (isCloudBackup) {
+            alert("Database restored successfully.");
+            fileInput.value = "";
+            loadDatabaseStatus();
+            return;
+        }
 
-        const now = new Date();
+        if (!isCloudBackup) {
+            throw new Error("This backup file is for Local Storage only.");
+        }
 
-        const year = now.getFullYear();
-
-        const monthNamesShort = [
-            "jan", "feb", "mar", "apr", "may", "jun",
-            "jul", "aug", "sep", "oct", "nov", "dec"
-        ];
-
-        const month =
-            monthNamesShort[now.getMonth()];
-
-        const key =
-            `projects_${year}_${month}`;
-
-        localStorage.setItem(
-            key,
-            JSON.stringify(backupData.projects)
-        );
-
-    }
-
-    // ==========================
-    // LOCAL BACKUP -> LOCAL
-    // ==========================
-    else {
-
-        localStorage.clear();
-
-        Object.keys(backupData).forEach(key => {
-            localStorage.setItem(
-                key,
-                backupData[key]
-            );
+        const response = await fetch("/api/restore", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(backupData)
         });
 
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Unable to restore database.");
+        }
+
+        alert(result.message || "Database restored successfully.");
+        fileInput.value = "";
+        loadDatabaseStatus();
+
+    } catch (error) {
+        console.error("Restore Error:", error);
+        alert(error.message || "Unable to restore database.");
     }
-
-    alert("Database restored successfully.");
-
-    fileInput.value = "";
-
-    loadDatabaseStatus();
-
-    return;
-
 }
 
-        // ==================================
-// CLOUDFLARE API
-// ==================================
-
-if (!isCloudBackup) {
-
-    throw new Error(
-        "This backup file is for Local Storage only."
-    );
-
-}
-
-const response = await fetch("/api/restore", {
-
-    method: "POST",
-
-    headers: {
-        "Content-Type": "application/json"
-    },
-
-    body: JSON.stringify(backupData)
-
-});
-
-const result = await response.json();
-
-if (!response.ok) {
-
-    throw new Error(
-        result.message ||
-        "Unable to restore database."
-    );
-
-}
-
-alert(result.message || "Database restored successfully.");
-
-fileInput.value = "";
-
-loadDatabaseStatus();
-
-}
-
-catch (error) {
-
-    console.error("Restore Error:", error);
-
-    alert(error.message || "Unable to restore database.");
-
-}
-
-}
-
-document.getElementById("restoreBtn")
-    ?.addEventListener("click", restoreDatabase);
+document.getElementById("restoreBtn")?.addEventListener("click", restoreDatabase);
 
 /* ==========================================
    PART 7
@@ -970,18 +579,12 @@ document.getElementById("restoreBtn")
 ========================================== */
 
 async function deleteEverything() {
-
-    const confirmation = document
-        .getElementById("confirmDelete")
-        .value
-        .trim();
+    const confirmInput = document.getElementById("confirmDelete");
+    const confirmation = confirmInput ? confirmInput.value.trim() : "";
 
     if (confirmation !== "RESET") {
-
         alert('Please type "RESET" to continue.');
-
         return;
-
     }
 
     const confirmDelete = confirm(
@@ -991,81 +594,46 @@ async function deleteEverything() {
     if (!confirmDelete) return;
 
     try {
+        if (LOCAL_MODE) {
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (
+                    key &&
+                    (
+                        key.startsWith("projects_") ||
+                        key === "projects" ||
+                        key === "kbhfilms_projects_data" ||
+                        key === "lastBackup"
+                    )
+                ) {
+                    localStorage.removeItem(key);
+                }
+            }
 
-        // ==================================
-// LOCAL STORAGE
-// ==================================
-
-if (LOCAL_MODE) {
-
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-
-        const key = localStorage.key(i);
-
-        if (
-            key &&
-            (
-                key.startsWith("projects_") ||
-                key === "projects" ||
-                key === "kbhfilms_projects_data" ||
-                key === "lastBackup"
-            )
-        ) {
-
-            localStorage.removeItem(key);
-
+            if (confirmInput) confirmInput.value = "";
+            alert("Database cleared successfully.");
+            loadDatabaseStatus();
+            return;
         }
 
-    }
-
-    document.getElementById("confirmDelete").value = "";
-
-    alert("Database cleared successfully.");
-
-    loadDatabaseStatus();
-
-    return;
-
-}
-
-        // ==================================
-        // CLOUDFLARE API
-        // ==================================
-
         const response = await fetch("/api/delete-all", {
-
             method: "DELETE"
-
         });
 
         const result = await response.json();
 
         if (!response.ok) {
-
-            throw new Error(
-                result.message || "Unable to delete database."
-            );
-
+            throw new Error(result.message || "Unable to delete database.");
         }
 
         alert(result.message || "Database cleared successfully.");
-
-        document.getElementById("confirmDelete").value = "";
-
+        if (confirmInput) confirmInput.value = "";
         loadDatabaseStatus();
 
-    }
-
-    catch (error) {
-
+    } catch (error) {
         console.error("Delete Database Error:", error);
-
         alert(error.message || "Unable to delete database.");
-
     }
-
 }
 
-document
-    .getElementById("deleteAllBtn")
-    ?.addEventListener("click", deleteEverything);
+document.getElementById("deleteAllBtn")?.addEventListener("click", deleteEverything);
