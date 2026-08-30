@@ -98,7 +98,7 @@ async function onRequestPost(context) {
                     id,
                     fullname,
                     email,
-                    password_hash,
+                    password,
                     role,
                     active
                 FROM users
@@ -133,7 +133,7 @@ async function onRequestPost(context) {
         }
       );
     }
-    if (user.password_hash !== password) {
+    if (user.password !== password) {
       return new Response(
         JSON.stringify({
           success: false,
