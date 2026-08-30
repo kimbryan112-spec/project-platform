@@ -2256,8 +2256,9 @@ border-bottom: 1px solid #e7d8b4;
             #d4a35b 100%
         );
 
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+    background-clip: text; /* <--- Idagdag mo itong line na ito */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 
     text-shadow:
         0 2px 12px rgba(255,185,90,.25);

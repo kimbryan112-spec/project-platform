@@ -4,29 +4,36 @@
 ================================== */
 
 export async function onRequestPost(context) {
-    try {
-        const {
-            email,
-            password
-        } = await context.request.json();
 
-        // Naitugma na ang full_name ayon sa schema.sql at D1 Studio
-        const user = await context.env.DB.prepare(`
-            SELECT
-                id,
-                email,
-                password_hash,
-                role,
-                full_name,
-                active
-            FROM users
-            WHERE email = ?
-            LIMIT 1
-        `)
-        .bind(email.toLowerCase())
-        .first();
+    try {
+
+        const { email, password } =
+            await context.request.json();
+
+        // Load user from D1
+        const user =
+            await context.env.DB.prepare(`
+
+                SELECT
+                    id,
+                    fullname,
+                    email,
+                    password_hash,
+                    role,
+                    active
+
+                FROM users
+
+                WHERE email = ?
+
+                LIMIT 1
+
+            `)
+            .bind(email.trim().toLowerCase())
+            .first();
 
         if (!user) {
+
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -34,12 +41,16 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 401,
-                    headers: { "Content-Type": "application/json" }
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 }
             );
+
         }
 
         if (!user.active) {
+
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -47,13 +58,18 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 403,
-                    headers: { "Content-Type": "application/json" }
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 }
             );
+
         }
 
-        // Plain text password comparison base sa database mo
+        // Plain-text password comparison
+        // (Palitan ng password hashing sa future)
         if (user.password_hash !== password) {
+
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -61,81 +77,125 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 401,
-                    headers: { "Content-Type": "application/json" }
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 }
             );
+
         }
 
         // ===============================
         // CREATE SESSION
         // ===============================
+
         const sessionId = crypto.randomUUID();
-        const expires = new Date(
-            Date.now() + (7 * 24 * 60 * 60 * 1000)
-        ).toISOString();
+
+        const expires =
+            new Date(
+                Date.now() + (7 * 24 * 60 * 60 * 1000)
+            ).toISOString();
 
         await context.env.DB.prepare(`
+
             INSERT INTO sessions (
+
                 id,
                 user_id,
                 expires_at
+
             )
+
             VALUES (
+
                 ?, ?, ?
+
             )
+
         `)
         .bind(
+
             sessionId,
             user.id,
             expires
+
         )
         .run();
 
         // ===============================
-        // RESPONSE
+        // SUCCESS RESPONSE
         // ===============================
-        const responseObject = {
-            success: true,
-            user: {
-                id: user.id,
-                email: user.email,
-                role: user.role,
-                name: user.full_name // Naka-ayos na sa full_name
-            }
-        };
 
         const response = new Response(
-            JSON.stringify(responseObject),
-            {
-                headers: {
-                    "Content-Type": "application/json"
+
+            JSON.stringify({
+
+                success: true,
+
+                user: {
+
+                    id: user.id,
+                    fullname: user.fullname,
+                    email: user.email,
+                    role: user.role
+
                 }
+
+            }),
+
+            {
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                }
+
             }
+
         );
 
         response.headers.append(
+
             "Set-Cookie",
+
             `session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=604800`
+
         );
 
         return response;
 
     }
+
     catch (err) {
+
         console.error("[LOGIN ERROR]", err);
+
         return new Response(
+
             JSON.stringify({
+
                 success: false,
                 message: err.message
+
             }),
+
             {
+
                 status: 500,
+
                 headers: {
+
                     "Content-Type": "application/json"
+
                 }
+
             }
+
         );
+
     }
+
 }
 
 export default {
