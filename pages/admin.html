@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Dashboard</title>
 
     <!-- Favicon -->
@@ -20,6 +20,41 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="../css/style.css">
+
+    <!-- Inline Mobile Layout Fix para hindi mag-zoom out -->
+    <style>
+        @media (max-width: 768px) {
+            body {
+                width: 100vw;
+                overflow-x: hidden;
+            }
+            #app {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+            }
+            .sidebar {
+                width: 100% !important;
+                height: auto !important;
+                position: relative !important;
+                box-shadow: none !important;
+            }
+            .main {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 10px !important;
+                box-sizing: border-box;
+            }
+            .table-wrapper {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .project-table {
+                min-width: 850px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -455,7 +490,6 @@ async function fetchActivityLogs() {
                 const os = log.os || "Windows";
                 const browser = log.browser || "Browser";
 
-                // Pagtukoy kung Mobile/Phone ba o Desktop para sa tamang Icon at kulay
                 const isPhone = /iphone|android|ipad|mobile/i.test(device);
                 const deviceIcon = isPhone ? "📱" : "💻";
                 const badgeColor = isPhone ? "background: #dcfce7; color: #15803d;" : "background: #e0f2fe; color: #0369a1;";

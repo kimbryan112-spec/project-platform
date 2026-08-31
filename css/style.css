@@ -521,7 +521,6 @@ select{
     background:#ffffff;
 }
 
-/* Kulay kapag NEW ang pinili sa song status */
 .dashboard-song-status option[value="NEW"],
 .dashboard-song-status:has(option[value="NEW"]:checked) {
     background-color: #e0f2fe !important;
@@ -2654,12 +2653,11 @@ input[type="url"]::placeholder{
 
     .main {
         padding: 16px 12px;
-        padding-bottom: 90px; /* space para sa mobile bottom nav */
+        padding-bottom: 90px;
         width: 100%;
         box-sizing: border-box;
     }
 
-    /* Modern Glassmorphism Topbar sa Mobile */
     .topbar {
         flex-direction: column;
         gap: 12px;
@@ -2683,7 +2681,6 @@ input[type="url"]::placeholder{
         justify-content: space-between;
     }
 
-    /* Floating App-Like Bottom Navigation sa Mobile */
     .sidebar {
         position: fixed;
         bottom: 0;
@@ -2704,7 +2701,7 @@ input[type="url"]::placeholder{
 
     .sidebar .logo, 
     .sidebar .sidebar-footer {
-        display: none; /* Itago ang desktop elements para lumitaw ang malinis na mobile app frame */
+        display: none;
     }
 
     .sidebar nav {
@@ -2724,7 +2721,6 @@ input[type="url"]::placeholder{
         border-radius: 10px;
     }
 
-    /* Modern Glass Look para sa Cards at Tables sa Mobile */
     .table-wrapper, 
     .settings-card, 
     .year-month-panel {
