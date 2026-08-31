@@ -37,7 +37,7 @@
         <nav>
             <a href="admin.html" class="btn-3d active">📊 Admin Dashboard</a>
             <a href="dashboard.html" class="btn-3d">📋 Dashboard</a>
-            <a href="settings.html" class="btn-3d" id="settingsMenu">⚙ Settings</a>
+            <a href="settings.html" class="btn-3d">⚙ Settings</a>
         </nav>
 
         <div class="sidebar-footer">
@@ -82,13 +82,13 @@
             <div class="topbar-right">
                 <!-- Notification Bell Icon -->
                 <div class="notification-wrapper" style="position: relative; display: inline-block; margin-right: 15px; cursor: pointer;">
-                    <div id="notificationBell" style="font-size: 20px; background: #f1f5f9; width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">
+                    <div id="notificationBell" style="font-size: 20px; background: #f1f5f9; padding: 8px 12px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
                         🔔
                     </div>
                     <span id="notificationBadge" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 50%; display: none;">0</span>
                     
                     <!-- Dropdown Panel para sa Logs -->
-                    <div id="notificationDropdown" style="display: none; position: absolute; right: 0; top: 48px; width: 340px; background: white; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden; border: 1px solid #e2e8f0;">
+                    <div id="notificationDropdown" style="display: none; position: absolute; right: 0; top: 45px; width: 340px; background: white; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden; border: 1px solid #e2e8f0;">
                         <div style="background: #2563eb; color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
                             <span>Activity Center</span>
                             <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
@@ -107,7 +107,7 @@
             </div>
         </header>
 
-        <!-- YEAR + MONTH NAVIGATION & MUSIC PLAYER -->
+        <!-- YEAR + MONTH NAVIGATION -->
         <div class="year-month-panel">
             <div class="month-buttons">
                 <button class="month-btn btn-3d" data-month="jan">Jan</button>
@@ -124,7 +124,7 @@
                 <button class="month-btn btn-3d" data-month="dec">Dec</button>
             </div>
 
-            <!-- MUSIC PLAYER (Nakaayos na pabalik sa tamang panel) -->
+            <!-- MUSIC PLAYER -->
             <div class="music-player">
                 <div class="music-controls">
                     <button id="musicPrev" class="music-btn">⏮</button>
@@ -161,6 +161,7 @@
                     </tr>
                 </thead>
                 <tbody id="projectTableBody">
+                    <!-- Template script para sa Rows 1 hanggang 6 -->
                     <script>
                         const droneOptionsHTML = `
                             <option value="NO DRONE">NO DRONE</option>
@@ -186,7 +187,7 @@
                         const songCellHTML = `
                             <td class="song-cell">
                                 <div class="song-card">
-                                    <input type="url" class="song-link" placeholder="Song title or link...">
+                                    <input type="url" class="song-link">
                                     <div class="song-actions">
                                         <select class="dashboard-song-status">
                                             <option selected></option>

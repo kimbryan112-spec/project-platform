@@ -6,155 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Platform - Settings</title>
     <link rel="stylesheet" href="../css/style.css">
-    
-    <!-- Fixed Sidebar, Scrollable Main, & 3D Buttons Fix para sa Desktop -->
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
-            background: #f5f7fb;
-        }
-        #app {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-        .sidebar {
-            width: 240px;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            background: #1f2937;
-            color: #fff;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .main {
-            flex: 1;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 24px 32px;
-            box-sizing: border-box;
-            background: #f5f7fb;
-        }
-        .settings-dashboard {
-            width: 100%;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding-bottom: 40px;
-        }
-        .settings-wrapper {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-top: 15px;
-        }
-        .settings-card {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        }
-        .settings-card.full-width {
-            grid-column: span 2;
-        }
-        .settings-card .settings-title {
-            margin-bottom: 12px;
-        }
-        .settings-card .settings-title h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1f2937;
-            margin: 0;
-        }
-        .settings-card .settings-title p {
-            margin: 2px 0 0 0;
-            color: #6b7280;
-            font-size: 12px;
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .info-box {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .info-box span {
-            display: block;
-            font-size: 11px;
-            color: #6b7280;
-            margin-bottom: 2px;
-        }
-        .info-box strong {
-            display: block;
-            font-size: 14px;
-            color: #111827;
-            font-weight: 700;
-        }
-        .settings-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .settings-form select, 
-        .settings-form input,
-        .settings-card input[type="file"],
-        .settings-card input[type="text"] {
-            height: 38px;
-            padding: 0 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: #fff;
-            font-size: 13px;
-            outline: none;
-        }
-        .settings-form select:focus,
-        .settings-card input:focus {
-            border-color: #2563eb;
-        }
-        .settings-form button,
-        .settings-card > button {
-            height: 38px;
-            padding: 0 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* Custom 3D Button Colors para sa Settings */
-        .btn-3d-danger {
-            border: 1px solid #991b1b !important;
-            background: linear-gradient(to bottom, #f87171 0%, #ef4444 55%, #dc2626 100%) !important;
-            color: #fff !important;
-        }
-        .btn-3d-warning {
-            border: 1px solid #b45309 !important;
-            background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 55%, #d97706 100%) !important;
-            color: #fff !important;
-        }
-        .btn-3d-primary {
-            border: 1px solid #1d4ed8 !important;
-            background: linear-gradient(to bottom, #60a5fa 0%, #3b82f6 55%, #2563eb 100%) !important;
-            color: #fff !important;
-        }
-        .btn-3d-success {
-            border: 1px solid #15803d !important;
-            background: linear-gradient(to bottom, #4ade80 0%, #22c55e 55%, #16a34a 100%) !important;
-            color: #fff !important;
-        }
-    </style>
 </head>
 
 <body>
@@ -168,7 +19,6 @@
         <div class="logo">
             <h2>PROJECT PLATFORM</h2>
             <p>KBHFILMS</p>
-            <span class="app-version">Version 1.2.8</span>
         </div>
 
         <nav>
@@ -178,7 +28,7 @@
             <a href="dashboard.html" class="btn-3d">
                 📋 Dashboard
             </a>
-            <a href="settings.html" class="btn-3d active" id="settingsMenu">
+            <a href="settings.html" class="btn-3d active">
                 ⚙ Settings
             </a>
         </nav>
@@ -218,37 +68,28 @@
         TOPBAR
         ========================= -->
         <header class="topbar">
-            <div class="topbar-left" style="align-items: center; gap: 20px;">
+            <div class="topbar-left">
                 <div class="page-title">
                     <h1>Administrator</h1>
-                    <p style="margin-top: 2px; font-size: 14px;">Wedding Project Platform</p>
+                    <p>Wedding Project Platform</p>
                 </div>
 
-                <div class="live-calendar" style="width: 50px;">
-                    <div id="calendarMonth" class="calendar-month" style="font-size: 10px; padding: 4px 0;">AUG</div>
-                    <div id="calendarDay" class="calendar-day" style="font-size: 22px; padding: 6px 0;">21</div>
+                <div class="year-header">
+                    <div class="live-calendar">
+                        <div id="calendarMonth" class="calendar-month">AUG</div>
+                        <div id="calendarDay" class="calendar-day">21</div>
+                    </div>
+                    <h2>
+                        ⚙ Settings
+                        <br>
+                        <span style="font-size:15px; color:#777; font-weight:500;">
+                            Database Management & Maintenance
+                        </span>
+                    </h2>
                 </div>
             </div>
 
             <div class="topbar-right">
-                <!-- Notification Bell / Activity Center -->
-                <div class="notification-wrapper" style="position: relative; display: inline-block; margin-right: 15px; cursor: pointer;">
-                    <div id="notificationBell" style="font-size: 18px; background: #f8fafc; width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">
-                        🔔
-                    </div>
-                    <span id="notificationBadge" style="position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none;">0</span>
-                    
-                    <div id="notificationDropdown" style="display: none; position: absolute; right: 0; top: 48px; width: 340px; background: #ffffff; border-radius: 12px; box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15); z-index: 1000; overflow: hidden;">
-                        <div style="background: #2563eb; color: white; padding: 12px 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
-                            <span>Activity Center</span>
-                            <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
-                        </div>
-                        <div id="notificationList" style="max-height: 380px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
-                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>
-                        </div>
-                    </div>
-                </div>
-
                 <select id="yearSelect"></select>
                 <button class="next-year-btn btn-3d">
                     + Next Year
@@ -263,17 +104,10 @@
         SETTINGS CONTENT START
         ========================= -->
         <div class="settings-dashboard">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
-                <div>
-                    <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 0;">⚙ Settings & Maintenance</h2>
-                    <p style="margin: 2px 0 0 0; font-size: 13px; color: #64748b;">Database Management & Cloudflare D1 Information</p>
-                </div>
-            </div>
-
             <div class="settings-wrapper">
 
-                <!-- DATABASE STATUS (Full Width) -->
-                <div class="settings-card full-width">
+                <!-- DATABASE STATUS -->
+                <div class="settings-card">
                     <div class="settings-title">
                         <h2>🗄 Database Status</h2>
                         <p>Cloudflare D1 Information</p>
@@ -320,7 +154,7 @@
                     </div>
 
                     <div class="settings-form">
-                        <select id="resetMonth" style="flex: 1;">
+                        <select id="resetMonth">
                             <option value="1">January</option>
                             <option value="2">February</option>
                             <option value="3">March</option>
@@ -335,9 +169,9 @@
                             <option value="12">December</option>
                         </select>
 
-                        <select id="resetMonthYear" style="width: 100px;"></select>
+                        <select id="resetMonthYear"></select>
 
-                        <button id="resetMonthBtn" class="btn-3d btn-3d-danger">
+                        <button id="resetMonthBtn" class="btn-3d danger-btn">
                             Reset Month
                         </button>
                     </div>
@@ -351,9 +185,9 @@
                     </div>
 
                     <div class="settings-form">
-                        <select id="resetYear" style="flex: 1;"></select>
+                        <select id="resetYear"></select>
 
-                        <button id="resetYearBtn" class="btn-3d btn-3d-warning">
+                        <button id="resetYearBtn" class="btn-3d warning-btn">
                             Reset Year
                         </button>
                     </div>
@@ -363,10 +197,10 @@
                 <div class="settings-card">
                     <div class="settings-title">
                         <h2>💾 Backup Database</h2>
-                        <p>Create JSON backup file.</p>
+                        <p>Create JSON backup.</p>
                     </div>
 
-                    <button id="backupBtn" class="btn-3d btn-3d-primary" style="width: 100%;">
+                    <button id="backupBtn" class="btn-3d">
                         Download Backup
                     </button>
                 </div>
@@ -375,30 +209,30 @@
                 <div class="settings-card">
                     <div class="settings-title">
                         <h2>📂 Restore Backup</h2>
-                        <p>Restore Cloudflare D1 from JSON.</p>
+                        <p>Restore Cloudflare D1 from JSON file.</p>
                     </div>
 
-                    <div class="settings-form">
-                        <input id="restoreFile" type="file" accept=".json" style="flex: 1; padding: 6px;">
-                        <button id="restoreBtn" class="btn-3d btn-3d-success">
-                            Restore
-                        </button>
-                    </div>
+                    <input id="restoreFile" type="file" accept=".json">
+                    <br><br>
+
+                    <button id="restoreBtn" class="btn-3d">
+                        Restore Database
+                    </button>
                 </div>
 
-                <!-- DANGER ZONE (Full Width) -->
-                <div class="settings-card full-width danger-zone" style="background: #fff5f5; border-color: #fca5a5;">
+                <!-- DANGER -->
+                <div class="settings-card danger-zone">
                     <div class="settings-title">
-                        <h2 style="color: #b91c1c;">☠ Danger Zone</h2>
-                        <p>Permanently delete EVERYTHING from the system.</p>
+                        <h2>☠ Danger Zone</h2>
+                        <p>Permanently delete EVERYTHING.</p>
                     </div>
 
-                    <div class="settings-form">
-                        <input id="confirmDelete" type="text" placeholder="Type RESET to confirm" style="width: 220px;">
-                        <button id="deleteAllBtn" class="btn-3d btn-3d-danger">
-                            DELETE EVERYTHING
-                        </button>
-                    </div>
+                    <input id="confirmDelete" type="text" placeholder="Type RESET">
+                    <br><br>
+
+                    <button id="deleteAllBtn" class="btn-3d delete-btn">
+                        DELETE EVERYTHING
+                    </button>
                 </div>
 
             </div> <!-- settings-wrapper -->
@@ -407,18 +241,6 @@
     </main>
 
 </div> <!-- #app -->
-
-<script>
-const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-if (!currentUser) {
-    window.location.href = "../login.html";
-}
-if (currentUser.role !== "admin") {
-    alert("Access Denied.");
-    window.location.href = "dashboard.html";
-}
-const IS_ADMIN = true;
-</script>
 
 <script>
 // Script para mag-populate ng Years mula 2023 hanggang 2031 para sa lahat ng dropdowns sa settings
@@ -443,6 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
             option.value = y;
             option.textContent = y;
             
+            // Default na piliin ang kasalukuyang taon (2026) o kung anong nakaset
             if (y === currentYear) {
                 option.selected = true;
             }
@@ -450,142 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
             selectElement.appendChild(option);
         }
     });
-
-    // Notification dropdown handlers for Settings page
-    const bell = document.getElementById("notificationBell");
-    const dropdown = document.getElementById("notificationDropdown");
-
-    if (bell && dropdown) {
-        bell.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const isOpen = dropdown.style.display === "block";
-            
-            if (!isOpen) {
-                fetchActivityLogs();
-                dropdown.style.display = "block";
-                const badgeEl = document.getElementById("notificationBadge");
-                if (badgeEl) badgeEl.style.display = "none";
-            } else {
-                localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
-                dropdown.style.display = "none";
-                checkNewLogsCount();
-            }
-        });
-
-        document.addEventListener("click", (e) => {
-            if (dropdown.style.display === "block" && !dropdown.contains(e.target) && !bell.contains(e.target)) {
-                localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
-                dropdown.style.display = "none";
-                checkNewLogsCount();
-            }
-        });
-    }
-
-    setInterval(checkNewLogsCount, 3000);
-    checkNewLogsCount();
 });
-
-async function fetchActivityLogs() {
-    const listEl = document.getElementById("notificationList");
-    const badgeEl = document.getElementById("notificationBadge");
-    
-    try {
-        const res = await fetch("/api/logs");
-        if (!res.ok) return;
-        const data = await res.json();
-        const logs = data.logs || [];
-
-        const lastSeen = localStorage.getItem("kbh_last_seen_log");
-        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
-
-        const filteredLogs = logs.filter(log => {
-            const name = (log.user_name || "").toLowerCase();
-            return !name.includes("admin") && !name.includes("kim bryan hernandez");
-        });
-
-        if (filteredLogs.length > 0) {
-            badgeEl.style.display = "none";
-
-            listEl.innerHTML = filteredLogs.slice(0, 15).map(log => {
-                let logDate;
-                if (log.created_at) {
-                    let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
-                    logDate = new Date(dStr);
-                } else {
-                    logDate = new Date();
-                }
-
-                const logTime = logDate.getTime();
-                const isNew = logTime > lastSeenTime;
-                
-                const cardBackground = isNew ? "background: #f0f7ff; border-left: 4px solid #2563eb;" : "background: #ffffff; border-left: 4px solid transparent;";
-
-                const timeString = logDate.toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-                const dateString = logDate.toLocaleDateString('en-PH', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' });
-
-                const device = log.device || "Desktop";
-                const os = log.os || "Windows";
-                const browser = log.browser || "Browser";
-
-                const isPhone = /iphone|android|ipad|mobile/i.test(device);
-                const deviceIcon = isPhone ? "📱" : "💻";
-                const badgeColor = isPhone ? "background: #dcfce7; color: #15803d;" : "background: #e0f2fe; color: #0369a1;";
-
-                return `
-                    <div style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; ${cardBackground} display: flex; flex-direction: column; gap: 4px; transition: background 0.3s;">
-                        <div style="font-weight: 600; color: #1e293b; display: flex; justify-content: space-between; align-items: center;">
-                            <span>👤 ${log.user_name}</span>
-                            <span style="font-size: 10px; ${badgeColor} padding: 2px 6px; border-radius: 4px; font-weight: 500;">${deviceIcon} ${device}</span>
-                        </div>
-                        <div style="color: #2563eb; font-weight: 500; font-size: 12px;">⚡ ${log.action}</div>
-                        <div style="color: #64748b; font-size: 11px; background: rgba(0,0,0,0.02); padding: 4px 6px; border-radius: 4px;">📝 ${log.details || 'No additional details'}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 10px; color: #94a3b8;">
-                            <span>🌐 ${browser} • ${os}</span>
-                            <span>📅 ${dateString} • ${timeString}</span>
-                        </div>
-                    </div>
-                `;
-            }).join("");
-        } else {
-            badgeEl.style.display = "none";
-            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
-        }
-    } catch (err) {
-        console.error("Error fetching logs:", err);
-    }
-}
-
-async function checkNewLogsCount() {
-    try {
-        const res = await fetch("/api/logs");
-        if (!res.ok) return;
-        const data = await res.json();
-        const logs = data.logs || [];
-        const badgeEl = document.getElementById("notificationBadge");
-        const dropdown = document.getElementById("notificationDropdown");
-
-        const lastSeen = localStorage.getItem("kbh_last_seen_log");
-        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
-
-        const newLogs = logs.filter(log => {
-            const name = (log.user_name || "").toLowerCase();
-            if (name.includes("admin") || name.includes("kim bryan hernandez")) return false;
-
-            if (log.created_at) {
-                let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
-                return new Date(dStr).getTime() > lastSeenTime;
-            }
-            return false;
-        });
-
-        if (newLogs.length > 0 && dropdown.style.display !== "block") {
-            badgeEl.textContent = newLogs.length;
-            badgeEl.style.display = "inline-block";
-        } else {
-            badgeEl.style.display = "none";
-        }
-    } catch (e) {}
-}
 </script>
 
 <script src="../js/settings.js"></script>
