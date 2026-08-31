@@ -2637,12 +2637,17 @@ input[type="url"]::placeholder{
 }
 
 /* ==================================
-   MODERN MOBILE APP & ROTATE VIEW STYLES
+   MODERN MOBILE APP & ROTATE VIEW STYLES (ZOOM & COMPACT)
 ================================== */
 @media screen and (max-width: 900px) {
+    html {
+        touch-action: manipulation;
+    }
+
     body {
         background-color: #0c0a09;
-        overflow-x: hidden;
+        overflow-x: auto;
+        -webkit-text-size-adjust: 100%;
     }
 
     #app {
@@ -2665,8 +2670,8 @@ input[type="url"]::placeholder{
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
-        z-index: 1000;
-        padding: 0 10px;
+        z-index: 999;
+        padding: 0 6px;
         box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
     }
 
@@ -2680,46 +2685,84 @@ input[type="url"]::placeholder{
         width: 100%;
         justify-content: space-around;
         margin-top: 0;
-        gap: 4px;
+        gap: 2px;
     }
 
     .sidebar nav a {
-        font-size: 10px;
-        padding: 6px 10px;
+        font-size: 9px;
+        padding: 4px 6px;
         flex-direction: column;
         gap: 2px;
         text-align: center;
-        border-radius: 8px;
+        border-radius: 6px;
     }
 
-    /* Main Area: Diretto sa Table ang Unang Salubong */
+    /* Main Area: Siksik na Salubong */
     .main {
-        padding: 8px 8px 75px 8px !important;
+        padding: 6px 6px 70px 6px !important;
         width: 100% !important;
         box-sizing: border-box;
     }
 
-    /* Compact Top Header & Music Player */
+    /* Compact Top Header, Music Player & Notification Bell sa Upper Right */
     .topbar {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        background: rgba(24, 24, 27, 0.85);
+        background: rgba(24, 24, 27, 0.9);
         backdrop-filter: blur(12px);
-        padding: 6px 10px;
-        border-radius: 10px;
-        margin-bottom: 8px;
+        padding: 4px 8px;
+        border-radius: 8px;
+        margin-bottom: 6px;
         border: 1px solid rgba(255, 255, 255, 0.08);
+        position: relative;
+        z-index: 1001;
     }
 
     .topbar-left {
-        flex-direction: column;
-        gap: 0;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        position: relative;
+        z-index: 1002;
+    }
+
+    /* Pag-ayos sa Notification Bell para laging nasa Unahan (Front) at Functional */
+    .notification-wrapper {
+        position: relative !important;
+        display: inline-block !important;
+        margin-right: 0 !important;
+        z-index: 1005 !important;
+    }
+
+    #notificationBell {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
+        background: #1e293b !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    #notificationDropdown {
+        position: fixed !important;
+        right: 10px !important;
+        left: 10px !important;
+        top: 60px !important;
+        width: auto !important;
+        max-width: 100% !important;
+        z-index: 99999 !important;
     }
 
     .page-title h1 {
-        font-size: 14px !important;
+        font-size: 12px !important;
         font-weight: 800;
         color: #ffffff;
     }
@@ -2738,7 +2781,7 @@ input[type="url"]::placeholder{
         right: auto !important;
         width: auto !important;
         background: rgba(0, 0, 0, 0.3);
-        padding: 2px 6px;
+        padding: 2px 4px;
         border-radius: 6px;
         border: 1px solid rgba(255, 255, 255, 0.06);
         display: flex;
@@ -2752,28 +2795,28 @@ input[type="url"]::placeholder{
     }
 
     .music-btn {
-        width: 20px !important;
-        height: 20px !important;
-        font-size: 8px !important;
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 7px !important;
     }
 
     .music-btn.play {
-        width: 24px !important;
-        height: 24px !important;
-        font-size: 10px !important;
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 9px !important;
     }
 
     .volume-row, .volume-icon {
         display: none !important;
     }
 
-    /* Months Panel (Lilitaw sa ibaba ng topbar kapag nag-scroll ka ng konti pababa) */
+    /* Months Panel (Siksik sa ibaba ng topbar) */
     .year-month-panel {
-        background: rgba(24, 24, 27, 0.8);
+        background: rgba(24, 24, 27, 0.85);
         backdrop-filter: blur(14px);
-        padding: 6px 8px;
-        border-radius: 10px;
-        margin-bottom: 8px;
+        padding: 4px 6px;
+        border-radius: 8px;
+        margin-bottom: 6px;
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
@@ -2781,7 +2824,7 @@ input[type="url"]::placeholder{
         display: flex;
         flex-wrap: nowrap !important;
         overflow-x: auto;
-        gap: 6px;
+        gap: 4px;
         padding-bottom: 2px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
@@ -2792,56 +2835,81 @@ input[type="url"]::placeholder{
     }
 
     .month-btn {
-        padding: 4px 10px !important;
-        min-width: 50px !important;
-        min-height: 28px !important;
-        font-size: 11px !important;
+        padding: 3px 8px !important;
+        min-width: 44px !important;
+        min-height: 24px !important;
+        font-size: 10px !important;
         flex-shrink: 0;
-        border-radius: 6px !important;
+        border-radius: 4px !important;
     }
 
     .month-legend {
-        font-size: 10px;
-        gap: 10px;
-        margin-bottom: 2px;
+        font-size: 9px;
+        gap: 8px;
+        margin-bottom: 1px;
         color: #a1a1aa;
         justify-content: center;
     }
 
-    /* Table Wrapper: Smooth Horizontal Swipe View (Portrait & Landscape Rotate) */
+    /* Table Wrapper & 4-Layer / 4-Column Layout Optimization + Zoom capability */
     .table-wrapper {
-        background: rgba(24, 24, 27, 0.75);
+        background: rgba(24, 24, 27, 0.8);
         backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        /* Pinapayagan ang pinch-to-zoom at scroll para sa madaling tingin */
+        transform-origin: top left;
     }
 
     .project-table {
-        min-width: 1100px;
+        min-width: 950px;
+    }
+
+    .project-table th,
+    .project-table td {
+        padding: 5px !important;
+        font-size: 11px !important;
+    }
+
+    .couple-cell {
+        width: 200px !important;
+    }
+
+    .song-cell {
+        width: 180px !important;
     }
 }
 
-/* Karagdagang Optimization para sa Landscape / Rotate View (Phone Naka-Higa) */
+/* Optimization para sa Landscape / Rotate View (Phone Naka-Higa) - Mas Siksik */
 @media screen and (max-width: 900px) and (orientation: landscape) {
     .main {
-        padding: 6px 6px 65px 6px !important;
+        padding: 4px 4px 60px 4px !important;
     }
 
     .topbar {
-        padding: 4px 8px;
-        margin-bottom: 6px;
+        padding: 3px 6px;
+        margin-bottom: 4px;
     }
 
     .year-month-panel {
-        padding: 4px 6px;
-        margin-bottom: 6px;
+        padding: 3px 4px;
+        margin-bottom: 4px;
     }
 
     .sidebar {
-        height: 50px;
+        height: 48px;
+    }
+
+    .sidebar nav a {
+        padding: 2px 4px;
+        font-size: 8px;
+    }
+
+    .project-table {
+        min-width: 900px;
     }
 }
