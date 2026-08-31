@@ -75,6 +75,31 @@ function updateLiveCalendar() {
     }
 }
 
+// ==================================
+// ACTIVITY CENTER & AUDIT LOG HELPER
+// ==================================
+async function recordActivity(action, details = "") {
+    try {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
+        const userName = currentUser.name || currentUser.username || "Kim Bryan Hernandez";
+
+        await fetch("/api/logs", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_name: userName,
+                action: action,
+                details: details,
+                browser: navigator.userAgent.includes("Chrome") ? "Chrome" : "Browser",
+                os: navigator.platform,
+                device: window.innerWidth < 768 ? "Mobile" : "Desktop"
+            })
+        });
+    } catch (err) {
+        console.error("Error recording activity:", err);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     updateLiveCalendar();
@@ -146,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             clearProjectTable();
             await loadProjects();
+            recordActivity("Changed Year", `Selected Year: ${currentYear}`);
         });
     }
 
@@ -174,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("currentYearTitle").textContent = currentYear;
 
             loadProjects();
+            recordActivity("Added/Selected Next Year", `Year: ${currentYear}`);
         });
     }
 
@@ -190,14 +217,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.classList.contains('status-select')) {
                 updateStatusColor(e.target);
                 updateTimelineProgress();
+                recordActivity("Changed Status", `Status -> ${e.target.value}`);
             }
 
             if (e.target.classList.contains('type-select')) {
                 updateTypeColor(e.target);
+                recordActivity("Changed Type", `Type -> ${e.target.value}`);
             }
 
             if (e.target.classList.contains('dashboard-song-status')) {
                 updateSongStatusColor(e.target);
+                recordActivity("Changed Song Status", `Song Status -> ${e.target.value}`);
             }
 
             if (e.target.classList.contains('drone-select')) {
@@ -205,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     "selected",
                     e.target.value !== "NO DRONE"
                 );
+                recordActivity("Changed Drone", `Drone -> ${e.target.value}`);
             }
 
             document.querySelectorAll('.dashboard-song-status')
@@ -647,6 +678,7 @@ function saveProjects() {
                     `projects_${saveYear}_${saveMonth}`,
                     JSON.stringify(projectsData)
                 );
+                recordActivity("Saved Projects", `Year: ${saveYear}, Month: ${saveMonth.toUpperCase()}`);
             } else {
                 console.error("[SAVE] API error:", response.status);
             }
@@ -963,6 +995,7 @@ document.querySelectorAll(".month-btn").forEach(button => {
         currentMonth = button.dataset.month;
 
         await loadProjects();
+        recordActivity("Switched Month", `Month: ${currentMonth.toUpperCase()}`);
     });
 
     button.addEventListener("contextmenu", (e) => {
@@ -1008,6 +1041,7 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", async () => {
     button.classList.add("locked");
     updateMonthLockUI();
     monthContextMenu.style.display = "none";
+    recordActivity("Locked Month", `Month: ${month.toUpperCase()} (${currentYear})`);
 });
 
 document.getElementById("unlockMonthBtn")?.addEventListener("click", async () => {
@@ -1023,6 +1057,7 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", async () =>
     button.classList.remove("locked");
     updateMonthLockUI();
     monthContextMenu.style.display = "none";
+    recordActivity("Unlocked Month", `Month: ${month.toUpperCase()} (${currentYear})`);
 });
 
 /* ==================================
@@ -1103,6 +1138,7 @@ document.querySelectorAll(".watch-btn").forEach(button => {
             minimized: false,
             link: link
         }));
+        recordActivity("Watched Project", "Opened preview window");
     });
 
     button.addEventListener("contextmenu", (e) => {
@@ -1125,6 +1161,7 @@ document.querySelectorAll(".get-files-btn").forEach(button => {
             return;
         }
         window.open(link, "_blank");
+        recordActivity("Opened Raw Files", "Checked project files link");
     });
 
     button.addEventListener("contextmenu", (e) => {
@@ -1181,6 +1218,7 @@ watchLinkInput?.addEventListener("input", () => {
     activeWatchButton.dataset.watchLink = watchLinkInput.value.trim();
     activeWatchButton.querySelector(".play-icon")?.classList.toggle("has-link", watchLinkInput.value.trim() !== "");
     saveProjects();
+    recordActivity("Attached Watch Link", "Updated video link");
 });
 
 closeWatchLinkModal?.addEventListener("click", () => {
@@ -1202,6 +1240,7 @@ filesLinkInput?.addEventListener("input", () => {
     activeFilesButton.dataset.filesLink = filesLinkInput.value.trim();
     activeFilesButton.classList.toggle("has-link", filesLinkInput.value.trim() !== "");
     saveProjects();
+    recordActivity("Attached Files Link", "Updated raw files link");
 });
 
 closeFilesLinkModal?.addEventListener("click", () => {
@@ -1224,6 +1263,7 @@ songLinkInput?.addEventListener("input", () => {
     activeSongInput.dataset.songLink = songLinkInput.value.trim();
     updateSongLinkStyle(activeSongInput);
     saveProjects();
+    recordActivity("Attached Song Link", "Updated song link");
 });
 
 songTitleInput?.addEventListener("input", () => {
@@ -1231,6 +1271,7 @@ songTitleInput?.addEventListener("input", () => {
 
     activeSongInput.value = songTitleInput.value;
     saveProjects();
+    recordActivity("Updated Song Title", `Song: ${songTitleInput.value}`);
 });
 
 closeSongLinkModal?.addEventListener("click", () => {
@@ -1276,6 +1317,7 @@ document.addEventListener("DOMContentLoaded", () => {
         instructionBtn.dataset.notes = instructionTextarea.value;
         instructionBtn.style.background = instructionTextarea.value.trim() ? "#22c55e" : "#ff7a1a";
         saveProjects();
+        recordActivity("Updated Special Instructions", "Edited instruction notes");
     });
 });
 
@@ -1318,6 +1360,7 @@ commentsTextarea?.addEventListener("input", () => {
     activeNotesButton.dataset.notes = commentsTextarea.value;
     activeNotesButton.classList.toggle("has-comments", commentsTextarea.value.trim() !== "");
     saveProjects();
+    recordActivity("Updated Comments / Concerns", "Edited notes");
 });
 
 /* ==================================
@@ -1445,6 +1488,7 @@ if (cancelLogout) {
 
 if (confirmLogout) {
     confirmLogout.addEventListener("click", () => {
+        recordActivity("Logged Out", "User signed out");
         localStorage.removeItem("currentUser");
         window.location.href = "../login.html";
     });
@@ -1658,6 +1702,7 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
                 suggestions.innerHTML = "";
                 suggestions.classList.remove("show");
                 saveProjects();
+                recordActivity("Selected Drone via Search", `Drone -> ${option.value}`);
             });
 
             suggestions.appendChild(item);
@@ -1716,10 +1761,7 @@ function updateRowProgress(row) {
         getFilesBtn.style.display = delivered ? "block" : "none";
     }
 
-    // --- NAINTO ANG FIX PARA SA MANAGER / HINDI ADMIN VIEWING ---
     if (typeof IS_ADMIN !== "undefined" && !IS_ADMIN) {
-        // Sa halip na i-disable (na nagpapakulay grey/disabled sa browser), 
-        // pinipigilan lang natin ang pag-click at pagbabago gamit ang pointer-events
         slider.style.pointerEvents = "none"; 
     }
 
@@ -1729,7 +1771,6 @@ function updateRowProgress(row) {
     const hue = value * 1.2;
     const color = `hsl(${hue}, 90%, 50%)`;
 
-    // Sinisigurado nating laging nakalapat ang accent-color at gradient background kahit lumipat ng status
     slider.style.accentColor = color;
     slider.style.background = `linear-gradient(to right, ${color} ${value}%, #e2e8f0 ${value}%)`;
 }
@@ -1752,7 +1793,7 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
 
     const tbody = document.querySelector(".project-table tbody");
     if (tbody) {
-        tbody.style.opacity = "0"; // Pansamantalang itago para walang visual flash
+        tbody.style.opacity = "0"; 
     }
 
     if (!saved) {
