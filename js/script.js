@@ -78,26 +78,72 @@ function updateLiveCalendar() {
 // ==================================
 // ACTIVITY CENTER & AUDIT LOG HELPER
 // ==================================
-function getClientDeviceInfo() {
+async function getClientDeviceInfo() {
     const ua = navigator.userAgent;
     let device = "Desktop";
     let os = "Unknown OS";
     let browser = "Unknown Browser";
 
-    // Detect Device Type
-    if (/iphone/i.test(ua)) device = "iPhone";
-    else if (/ipad/i.test(ua)) device = "iPad";
-    else if (/android/i.test(ua)) device = "Android Phone";
-    else if (/macintosh|mac os x/i.test(ua)) device = "Mac";
-    else if (/windows/i.test(ua)) device = "Windows PC";
-    else if (/mobile/i.test(ua)) device = "Mobile Device";
+    // 1. Gamitin ang modernong navigator.userAgentData kung available (Mas accurate para sa Mobile/Desktop)
+    if (navigator.userAgentData) {
+        try {
+            const hints = await navigator.userAgentData.getHighEntropyValues([
+                "platform", 
+                "platformVersion", 
+                "model", 
+                "mobile"
+            ]);
+            
+            if (hints.mobile) {
+                device = "Mobile Device";
+                if (hints.model && hints.model !== "") {
+                    device = hints.model; // Halimbawa: "iPhone", "Samsung", etc.
+                }
+            } else {
+                device = "Desktop / PC";
+            }
 
-    // Detect OS
-    if (/windows/i.test(ua)) os = "Windows";
-    else if (/mac os x/i.test(ua)) os = "macOS";
-    else if (/android/i.test(ua)) os = "Android";
-    else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
-    else if (/linux/i.test(ua)) os = "Linux";
+            if (hints.platform) {
+                os = hints.platform;
+                if (os === "Android") device = "Android Phone";
+                if (os === "iOS") device = "iPhone";
+            }
+        } catch (e) {
+            // Fallback kapag hindi sinuportahan ng browser
+        }
+    }
+
+    // 2. Fallback / Detailed Regex detection kung sakaling walang userAgentData o generic pa rin
+    if (device === "Desktop" || device === "Desktop / PC" || device === "Mobile Device") {
+        if (/iphone/i.test(ua)) {
+            device = "iPhone";
+            os = "iOS";
+        } else if (/ipad/i.test(ua)) {
+            device = "iPad";
+            os = "iOS";
+        } else if (/android/i.test(ua)) {
+            device = "Android Phone";
+            os = "Android";
+        } else if (/macintosh|mac os x/i.test(ua)) {
+            device = "Mac";
+            os = "macOS";
+        } else if (/windows/i.test(ua)) {
+            device = "Windows PC";
+            os = "Windows";
+        } else if (/linux/i.test(ua)) {
+            device = "Linux";
+            os = "Linux";
+        }
+    }
+
+    // Detect OS kung hindi pa nakuha nang maayos
+    if (os === "Unknown OS" || !os) {
+        if (/windows/i.test(ua)) os = "Windows";
+        else if (/mac os x/i.test(ua)) os = "macOS";
+        else if (/android/i.test(ua)) os = "Android";
+        else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
+        else if (/linux/i.test(ua)) os = "Linux";
+    }
 
     // Detect Browser
     if (/chrome|crios/i.test(ua) && !/edge|opr/i.test(ua)) browser = "Chrome";
@@ -112,7 +158,9 @@ async function recordActivity(action, details = "") {
     try {
         const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
         const userName = currentUser.name || currentUser.username || currentUser.full_name || "Kim Bryan Hernandez";
-        const clientInfo = getClientDeviceInfo();
+        
+        // Tawagin ang async device detector para makuha ang tamang device/OS/browser info
+        const clientInfo = await getClientDeviceInfo();
 
         await fetch("/api/logs", {
             method: "POST",
