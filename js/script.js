@@ -676,7 +676,6 @@ function saveProjectsLocal() {
             JSON.stringify(projectsData)
         );
 
-        // Agad i-update ang UI habang nagti-type para hindi mawala ang kulay green
         updateCurrentMonthHasData();
 
     }, 300);
@@ -728,7 +727,6 @@ function updateCurrentMonthHasData() {
     const hasData = monthHasData();
     activeBtn.classList.toggle("has-data", hasData);
 
-    // I-sync din ang cache para hindi mawala kapag nagpalit ng buwan at bumalik
     if (!LOCAL_MODE) {
         cachedHasDataMonths[currentMonth] = hasData;
     }
@@ -929,8 +927,8 @@ function updateSongStatusColor(select) {
         select.style.backgroundColor = "#fdba74";
         select.style.color = "#7c2d12";
     } else if (value === "NEW") {
-        select.style.backgroundColor = "#e0f2fe"; // Light blue background
-        select.style.color = "#0369a1";         // Dark blue text
+        select.style.backgroundColor = "#e0f2fe"; 
+        select.style.color = "#0369a1"; 
     } else {
         select.style.backgroundColor = "#ffffff";
         select.style.color = "#374151";
@@ -1718,17 +1716,22 @@ function updateRowProgress(row) {
         getFilesBtn.style.display = delivered ? "block" : "none";
     }
 
-    // --- DITO NATIN NILAGYAN NG RESTRICTION PARA SA MANAGER / HINDI ADMIN ---
+    // --- NAINTO ANG FIX PARA SA MANAGER / HINDI ADMIN VIEWING ---
     if (typeof IS_ADMIN !== "undefined" && !IS_ADMIN) {
-        slider.disabled = true;
-        slider.style.pointerEvents = "none"; // Hndi ma-click o ma-drag ng Manager
+        // Sa halip na i-disable (na nagpapakulay grey/disabled sa browser), 
+        // pinipigilan lang natin ang pag-click at pagbabago gamit ang pointer-events
+        slider.style.pointerEvents = "none"; 
     }
 
     label.textContent = slider.value + "%";
 
     const value = Number(slider.value);
     const hue = value * 1.2;
-    slider.style.accentColor = `hsl(${hue}, 90%, 50%)`;
+    const color = `hsl(${hue}, 90%, 50%)`;
+
+    // Sinisigurado nating laging nakalapat ang accent-color at gradient background kahit lumipat ng status
+    slider.style.accentColor = color;
+    slider.style.background = `linear-gradient(to right, ${color} ${value}%, #e2e8f0 ${value}%)`;
 }
 
 document.querySelectorAll(".progress-slider").forEach(slider => {
@@ -1754,10 +1757,9 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
 
     if (!saved) {
         console.log(`[LOCAL RESTORE] No cache found for ${key}`);
-        // Linisin ang mga rows kung walang cache para hindi mag-iwan ng lumang data
         const rows = document.querySelectorAll(".project-table tbody tr");
         rows.forEach(row => {
-            const emptyData = {}; // Clear fields logic mo dito kung meron
+            const emptyData = {}; 
             populateRow(row, emptyData);
         });
         if (tbody) {
@@ -1781,7 +1783,6 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
 
         console.log(`[LOCAL RESTORE] Restored ${projects.length} project(s) from ${key}`);
         
-        // Ibalik agad nang smooth ang opacity
         if (tbody) {
             requestAnimationFrame(() => {
                 tbody.style.transition = "opacity 0.15s ease-in-out";
