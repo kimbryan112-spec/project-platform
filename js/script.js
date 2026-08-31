@@ -793,8 +793,7 @@ function setMonthEditable(editable) {
     });
 
     document.querySelectorAll(".progress-slider").forEach(slider => {
-        slider.disabled = false;
-        slider.style.pointerEvents = "none";
+        slider.disabled = !editable;
         slider.style.opacity = "1";
     });
 
@@ -880,15 +879,8 @@ function updateStatusColor(select) {
     }
 
     const row = select.closest("tr");
-    const timeline = row?.querySelector(".timeline");
-    const percent = row?.querySelector(".timeline-percent");
-
-    if (timeline) {
-        timeline.style.display = select.value === "IN PROGRESS" ? "block" : "none";
-    }
-
-    if (percent) {
-        percent.style.display = select.value === "IN PROGRESS" ? "block" : "none";
+    if (row) {
+        updateRowProgress(row);
     }
 
     const concernsBtn = row?.querySelector(".concerns-btn");
@@ -1716,6 +1708,7 @@ function updateRowProgress(row) {
     const inProgress = status.value === "IN PROGRESS";
     const delivered = status.value === "DELIVERED";
 
+    // Dito natin sapilitang pinapalabas gamit ang inline style kapag IN PROGRESS
     slider.style.display = inProgress ? "block" : "none";
     label.style.display = inProgress ? "block" : "none";
 
