@@ -387,18 +387,26 @@ document.addEventListener("DOMContentLoaded", () => {
         bell.addEventListener("click", (e) => {
             e.stopPropagation();
             const isOpen = dropdown.style.display === "block";
-            dropdown.style.display = isOpen ? "none" : "block";
             
             if (!isOpen) {
                 fetchActivityLogs();
+                dropdown.style.display = "block";
                 const badgeEl = document.getElementById("notificationBadge");
                 if (badgeEl) badgeEl.style.display = "none";
+            } else {
+                // Kapag isinara ang bell, i-save ang timestamp para mawala na ang highlight sa susunod
+                localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
+                dropdown.style.display = "none";
+                checkNewLogsCount();
             }
         });
 
         document.addEventListener("click", (e) => {
-            if (!dropdown.contains(e.target) && !bell.contains(e.target)) {
+            if (dropdown.style.display === "block" && !dropdown.contains(e.target) && !bell.contains(e.target)) {
+                // Kapag nag-click sa labas para isirhan, i-save din ang oras bilang nabasa na
+                localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
                 dropdown.style.display = "none";
+                checkNewLogsCount();
             }
         });
     }
@@ -417,6 +425,9 @@ async function fetchActivityLogs() {
         const data = await res.json();
         const logs = data.logs || [];
 
+        const lastSeen = localStorage.getItem("kbh_last_seen_log");
+        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
+
         const filteredLogs = logs.filter(log => {
             const name = (log.user_name || "").toLowerCase();
             return !name.includes("admin") && !name.includes("kim bryan hernandez");
@@ -434,6 +445,12 @@ async function fetchActivityLogs() {
                     logDate = new Date();
                 }
 
+                const logTime = logDate.getTime();
+                const isNew = logTime > lastSeenTime;
+                
+                // Kapag bago pa, lagyan ng asul na highlight background at accent border
+                const cardBackground = isNew ? "background: #f0f7ff; border-left: 4px solid #2563eb;" : "background: #ffffff; border-left: 4px solid transparent;";
+
                 const timeString = logDate.toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
                 const dateString = logDate.toLocaleDateString('en-PH', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -441,18 +458,17 @@ async function fetchActivityLogs() {
                 const os = log.os || "Windows";
                 const browser = log.browser || "Browser";
 
-                // Kulayan ng green kapag iPhone o Android/Mobile, blue kapag desktop
                 const isPhone = device.includes("iPhone") || device.includes("Android") || device.includes("Mobile");
                 const badgeColor = isPhone ? "background: #dcfce7; color: #15803d;" : "background: #e0f2fe; color: #0369a1;";
 
                 return `
-                    <div style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; ${cardBackground} display: flex; flex-direction: column; gap: 4px; transition: background 0.3s;">
                         <div style="font-weight: 600; color: #1e293b; display: flex; justify-content: space-between; align-items: center;">
                             <span>${log.user_name}</span>
                             <span style="font-size: 10px; ${badgeColor} padding: 2px 6px; border-radius: 4px; font-weight: 500;">📱 ${device}</span>
                         </div>
                         <div style="color: #2563eb; font-weight: 500; font-size: 12px;">${log.action}</div>
-                        <div style="color: #64748b; font-size: 11px; background: #f8fafc; padding: 4px 6px; border-radius: 4px;">${log.details || ''}</div>
+                        <div style="color: #64748b; font-size: 11px; background: rgba(0,0,0,0.02); padding: 4px 6px; border-radius: 4px;">${log.details || ''}</div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 10px; color: #94a3b8;">
                             <span>🌐 ${browser} • ${os}</span>
                             <span>📅 ${dateString} • ${timeString}</span>
