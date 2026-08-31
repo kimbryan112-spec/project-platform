@@ -291,8 +291,9 @@ if (!currentUser) {
     window.location.href = "../login.html";
 }
 
-// Dashboard user, Manager, at Admin ang pwede
-if (currentUser.role !== "admin" && currentUser.role !== "dashboard" && currentUser.role !== "manager") {
+// Dashboard user, Manager, at Admin ang pwede (Case-insensitive check)
+const userRoleLower = (currentUser.role || "").toLowerCase();
+if (userRoleLower !== "admin" && userRoleLower !== "dashboard" && userRoleLower !== "manager") {
     alert("Access Denied.");
     window.location.href = "../login.html";
 }

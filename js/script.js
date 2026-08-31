@@ -1711,12 +1711,17 @@ function updateRowProgress(row) {
     const inProgress = status.value === "IN PROGRESS";
     const delivered = status.value === "DELIVERED";
 
-    // Dito natin sapilitang pinapalabas gamit ang inline style kapag IN PROGRESS
     slider.style.display = inProgress ? "block" : "none";
     label.style.display = inProgress ? "block" : "none";
 
     if (getFilesBtn) {
         getFilesBtn.style.display = delivered ? "block" : "none";
+    }
+
+    // --- DITO NATIN NILAGYAN NG RESTRICTION PARA SA MANAGER / HINDI ADMIN ---
+    if (typeof IS_ADMIN !== "undefined" && !IS_ADMIN) {
+        slider.disabled = true;
+        slider.style.pointerEvents = "none"; // Hndi ma-click o ma-drag ng Manager
     }
 
     label.textContent = slider.value + "%";

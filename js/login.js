@@ -28,6 +28,7 @@ loginForm.addEventListener("submit", async function (e) {
         if (email === "adminyang@kbhfilms.com" && password === "Yangyang#12") {
             const offlineUser = {
                 id: 1,
+                name: "Kim Bryan Hernandez",
                 fullname: "Kim Bryan Hernandez",
                 email: email,
                 role: "admin"
@@ -38,12 +39,13 @@ loginForm.addEventListener("submit", async function (e) {
         } else if (email === "yongzhi@kbhfilms.com" && password === "yong2023") {
             const offlineUser = {
                 id: 2,
+                name: "Yong Zhi Ng",
                 fullname: "Yong Zhi Ng",
                 email: email,
-                role: "manager"
+                role: "Manager" // <--- Ginawa nang kapital ang M
             };
             localStorage.setItem("currentUser", JSON.stringify(offlineUser));
-            window.location.href = "pages/dashboard.html"; // Itinuro sa dashboard.html para sa manager
+            window.location.href = "pages/dashboard.html"; 
             return;
         } else {
             if (errorText) {
@@ -72,12 +74,24 @@ loginForm.addEventListener("submit", async function (e) {
             return;
         }
 
+        const loggedInUser = data.user;
+        if (!loggedInUser.name && loggedInUser.fullname) {
+            loggedInUser.name = loggedInUser.fullname;
+        } else if (!loggedInUser.name && loggedInUser.email === "yongzhi@kbhfilms.com") {
+            loggedInUser.name = "Yong Zhi Ng";
+        }
+
+        // Kung sakaling lowercase ang galing sa server, ginagawa nating Capitalized
+        if (loggedInUser.role === "manager") {
+            loggedInUser.role = "Manager";
+        }
+
         localStorage.setItem(
             "currentUser",
-            JSON.stringify(data.user)
+            JSON.stringify(loggedInUser)
         );
 
-        if (data.user.role === "admin") {
+        if (loggedInUser.role === "admin" || loggedInUser.role === "Admin") {
             window.location.href = "pages/admin.html";
         } else {
             window.location.href = "pages/dashboard.html";
