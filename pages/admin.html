@@ -379,7 +379,7 @@ const IS_ADMIN = true;
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>
-// Script para paganahin ang pag-toggle ng Notification Dropdown
+// Script para paganahin ang pag-toggle ng Notification Dropdown at pag-fetch ng logs
 document.addEventListener("DOMContentLoaded", () => {
     const bell = document.getElementById("notificationBell");
     const dropdown = document.getElementById("notificationDropdown");
@@ -389,8 +389,11 @@ document.addEventListener("DOMContentLoaded", () => {
             e.stopPropagation();
             dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
             
-            // Dito natin ilalagay ang pag-fetch ng logs sa susunod na step
-            fetchActivityLogs();
+            if (dropdown.style.display === "block") {
+                fetchActivityLogs();
+                const badgeEl = document.getElementById("notificationBadge");
+                if (badgeEl) badgeEl.style.display = "none";
+            }
         });
 
         document.addEventListener("click", (e) => {
@@ -399,6 +402,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // Auto-check para sa bagong logs bawat 15 segundo para sa badge
+    setInterval(checkNewLogsCount, 15000);
 });
 
 async function fetchActivityLogs() {
@@ -412,12 +418,11 @@ async function fetchActivityLogs() {
         const logs = data.logs || [];
 
         if (logs.length > 0) {
-            badgeEl.textContent = logs.length;
-            badgeEl.style.display = "inline-block";
+            badgeEl.style.display = "none";
 
             listEl.innerHTML = logs.map(log => `
                 <div style="padding: 8px 10px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 2px;">
-                    <div style="font-weight: 600; color: #1e293b;">${log.user_name} - ${log.action}</div>
+                    <div style="font-weight: 600; color: #1e293b;">${log.user_name} - <span style="color: #2563eb;">${log.action}</span></div>
                     <div style="color: #64748b; font-size: 11px;">${log.details || ''}</div>
                     <div style="color: #94a3b8; font-size: 10px; align-self: flex-end;">${new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                 </div>
@@ -429,6 +434,22 @@ async function fetchActivityLogs() {
     } catch (err) {
         console.error("Error fetching logs:", err);
     }
+}
+
+async function checkNewLogsCount() {
+    try {
+        const res = await fetch("/api/logs");
+        if (!res.ok) return;
+        const data = await res.json();
+        const logs = data.logs || [];
+        const badgeEl = document.getElementById("notificationBadge");
+        const dropdown = document.getElementById("notificationDropdown");
+
+        if (logs.length > 0 && dropdown.style.display !== "block") {
+            badgeEl.textContent = logs.length;
+            badgeEl.style.display = "inline-block";
+        }
+    } catch (e) {}
 }
 
 if ("serviceWorker" in navigator) {

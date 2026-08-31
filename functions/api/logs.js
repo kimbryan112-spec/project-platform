@@ -1,0 +1,64 @@
+export async function onRequestPost(context) {
+    try {
+        const { request, env } = context;
+        const body = await request.json();
+        
+        const { user_name, action, details, browser, os, device } = body;
+
+        if (!env.DB) {
+            return new Response(JSON.stringify({ error: "Database not connected" }), {
+                status: 500,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        await env.DB.prepare(`
+            INSERT INTO activity_logs (user_name, action, details, browser, os, device)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `).bind(
+            user_name || "Admin/User",
+            action || "Unknown Action",
+            details || "",
+            browser || "Browser",
+            os || "OS",
+            device || "Desktop"
+        ).run();
+
+        return new Response(JSON.stringify({ success: true }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+        });
+    } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" }
+        });
+    }
+}
+
+export async function onRequestGet(context) {
+    try {
+        const { env } = context;
+
+        if (!env.DB) {
+            return new Response(JSON.stringify({ error: "Database not connected" }), {
+                status: 500,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
+
+        const { results } = await env.DB.prepare(`
+            SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 50
+        `).all();
+
+        return new Response(JSON.stringify({ logs: results || [] }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+        });
+    } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" }
+        });
+    }
+}
