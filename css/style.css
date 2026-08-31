@@ -2637,9 +2637,9 @@ input[type="url"]::placeholder{
 }
 
 /* ==================================
-   MODERN MOBILE APP VIEW STYLES
+   MODERN MOBILE APP & ROTATE VIEW STYLES
 ================================== */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 900px) {
     body {
         background-color: #0c0a09;
         overflow-x: hidden;
@@ -2651,42 +2651,13 @@ input[type="url"]::placeholder{
         width: 100%;
     }
 
-    .main {
-        padding: 16px 12px;
-        padding-bottom: 90px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .topbar {
-        flex-direction: column;
-        gap: 12px;
-        background: rgba(18, 18, 18, 0.9);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        padding: 12px;
-        border-radius: 12px;
-        margin-bottom: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .topbar-left {
-        flex-direction: column;
-        gap: 10px;
-        width: 100%;
-    }
-
-    .topbar-right {
-        width: 100%;
-        justify-content: space-between;
-    }
-
+    /* Fixed Bottom Navigation (App style para sa Portrait & Landscape) */
     .sidebar {
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 70px;
+        height: 60px;
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
@@ -2701,7 +2672,7 @@ input[type="url"]::placeholder{
 
     .sidebar .logo, 
     .sidebar .sidebar-footer {
-        display: none;
+        display: none !important;
     }
 
     .sidebar nav {
@@ -2713,22 +2684,164 @@ input[type="url"]::placeholder{
     }
 
     .sidebar nav a {
-        font-size: 11px;
-        padding: 8px 12px;
+        font-size: 10px;
+        padding: 6px 10px;
         flex-direction: column;
         gap: 2px;
         text-align: center;
-        border-radius: 10px;
+        border-radius: 8px;
     }
 
-    .table-wrapper, 
-    .settings-card, 
+    /* Main Area: Diretto sa Table ang Unang Salubong */
+    .main {
+        padding: 8px 8px 75px 8px !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Compact Top Header & Music Player */
+    .topbar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(24, 24, 27, 0.85);
+        backdrop-filter: blur(12px);
+        padding: 6px 10px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .topbar-left {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .page-title h1 {
+        font-size: 14px !important;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    .page-title p {
+        display: none !important;
+    }
+
+    .year-header {
+        display: none !important;
+    }
+
+    .music-player {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        width: auto !important;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .music-controls {
+        margin-bottom: 0 !important;
+        gap: 2px !important;
+    }
+
+    .music-btn {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 8px !important;
+    }
+
+    .music-btn.play {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 10px !important;
+    }
+
+    .volume-row, .volume-icon {
+        display: none !important;
+    }
+
+    /* Months Panel (Lilitaw sa ibaba ng topbar kapag nag-scroll ka ng konti pababa) */
     .year-month-panel {
+        background: rgba(24, 24, 27, 0.8);
+        backdrop-filter: blur(14px);
+        padding: 6px 8px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .month-buttons {
+        display: flex;
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        gap: 6px;
+        padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .month-buttons::-webkit-scrollbar {
+        display: none;
+    }
+
+    .month-btn {
+        padding: 4px 10px !important;
+        min-width: 50px !important;
+        min-height: 28px !important;
+        font-size: 11px !important;
+        flex-shrink: 0;
+        border-radius: 6px !important;
+    }
+
+    .month-legend {
+        font-size: 10px;
+        gap: 10px;
+        margin-bottom: 2px;
+        color: #a1a1aa;
+        justify-content: center;
+    }
+
+    /* Table Wrapper: Smooth Horizontal Swipe View (Portrait & Landscape Rotate) */
+    .table-wrapper {
         background: rgba(24, 24, 27, 0.75);
         backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .project-table {
+        min-width: 1100px;
+    }
+}
+
+/* Karagdagang Optimization para sa Landscape / Rotate View (Phone Naka-Higa) */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    .main {
+        padding: 6px 6px 65px 6px !important;
+    }
+
+    .topbar {
+        padding: 4px 8px;
+        margin-bottom: 6px;
+    }
+
+    .year-month-panel {
+        padding: 4px 6px;
+        margin-bottom: 6px;
+    }
+
+    .sidebar {
+        height: 50px;
     }
 }
