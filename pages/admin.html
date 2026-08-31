@@ -94,7 +94,7 @@
                             <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
                         </div>
                         <div id="notificationList" style="max-height: 350px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
-                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>
+                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs mula sa mga members.</p>
                         </div>
                     </div>
                 </div>
@@ -379,7 +379,7 @@ const IS_ADMIN = true;
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>
-// Script para paganahin ang pag-toggle ng Notification Dropdown at pag-fetch ng logs
+// Script para paganahin ang pag-toggle ng Notification Dropdown at pag-fetch ng logs (Admin excluded, Live Accurate Time)
 document.addEventListener("DOMContentLoaded", () => {
     const bell = document.getElementById("notificationBell");
     const dropdown = document.getElementById("notificationDropdown");
@@ -417,19 +417,32 @@ async function fetchActivityLogs() {
         const data = await res.json();
         const logs = data.logs || [];
 
-        if (logs.length > 0) {
+        // Salain ang logs: I-filter out kapag ang user ay Admin / Kim Bryan Hernandez
+        const filteredLogs = logs.filter(log => {
+            const name = (log.user_name || "").toLowerCase();
+            return !name.includes("admin") && !name.includes("kim bryan hernandez");
+        });
+
+        if (filteredLogs.length > 0) {
             badgeEl.style.display = "none";
 
-            listEl.innerHTML = logs.map(log => `
-                <div style="padding: 8px 10px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 2px;">
-                    <div style="font-weight: 600; color: #1e293b;">${log.user_name} - <span style="color: #2563eb;">${log.action}</span></div>
-                    <div style="color: #64748b; font-size: 11px;">${log.details || ''}</div>
-                    <div style="color: #94a3b8; font-size: 10px; align-self: flex-end;">${new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                </div>
-            `).join("");
+            listEl.innerHTML = filteredLogs.map(log => {
+                // Live & Accurate Time/Date formatting
+                const logDate = new Date(log.created_at);
+                const timeString = logDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const dateString = logDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+
+                return `
+                    <div style="padding: 8px 10px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 2px;">
+                        <div style="font-weight: 600; color: #1e293b;">${log.user_name} - <span style="color: #2563eb;">${log.action}</span></div>
+                        <div style="color: #64748b; font-size: 11px;">${log.details || ''}</div>
+                        <div style="color: #94a3b8; font-size: 10px; align-self: flex-end;">${dateString} • ${timeString}</div>
+                    </div>
+                `;
+            }).join("");
         } else {
             badgeEl.style.display = "none";
-            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
+            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs mula sa mga members.</p>';
         }
     } catch (err) {
         console.error("Error fetching logs:", err);
@@ -445,8 +458,13 @@ async function checkNewLogsCount() {
         const badgeEl = document.getElementById("notificationBadge");
         const dropdown = document.getElementById("notificationDropdown");
 
-        if (logs.length > 0 && dropdown.style.display !== "block") {
-            badgeEl.textContent = logs.length;
+        const filteredLogs = logs.filter(log => {
+            const name = (log.user_name || "").toLowerCase();
+            return !name.includes("admin") && !name.includes("kim bryan hernandez");
+        });
+
+        if (filteredLogs.length > 0 && dropdown.style.display !== "block") {
+            badgeEl.textContent = filteredLogs.length;
             badgeEl.style.display = "inline-block";
         }
     } catch (e) {}
