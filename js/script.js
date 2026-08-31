@@ -928,6 +928,9 @@ function updateSongStatusColor(select) {
     } else if (value === "REQUESTED") {
         select.style.backgroundColor = "#fdba74";
         select.style.color = "#7c2d12";
+    } else if (value === "NEW") {
+        select.style.backgroundColor = "#e0f2fe"; // Light blue background
+        select.style.color = "#0369a1";         // Dark blue text
     } else {
         select.style.backgroundColor = "#ffffff";
         select.style.color = "#374151";

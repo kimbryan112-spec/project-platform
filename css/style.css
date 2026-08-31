@@ -521,6 +521,14 @@ select{
     background:#ffffff;
 }
 
+/* Kulay kapag NEW ang pinili sa song status */
+.dashboard-song-status option[value="NEW"],
+.dashboard-song-status:has(option[value="NEW"]:checked) {
+    background-color: #e0f2fe !important;
+    color: #0369a1 !important;
+    font-weight: 700;
+}
+
 .comments-btn{
     width:50%;
     height:34px;
