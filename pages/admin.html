@@ -94,7 +94,7 @@
                             <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
                         </div>
                         <div id="notificationList" style="max-height: 380px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
-                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs mula sa mga members.</p>
+                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang bagong activity mula sa mga members.</p>
                         </div>
                     </div>
                 </div>
@@ -379,7 +379,7 @@ const IS_ADMIN = true;
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>
-// Script para sa Activity Center (Live PH Time, Device, OS, Browser Info)
+// Script para sa Activity Center (New/Unread Notifications Only)
 document.addEventListener("DOMContentLoaded", () => {
     const bell = document.getElementById("notificationBell");
     const dropdown = document.getElementById("notificationDropdown");
@@ -387,10 +387,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (bell && dropdown) {
         bell.addEventListener("click", (e) => {
             e.stopPropagation();
-            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+            const isOpen = dropdown.style.display === "block";
+            dropdown.style.display = isOpen ? "none" : "block";
             
-            if (dropdown.style.display === "block") {
+            if (!isOpen) {
+                // Kapag binuksan ang bell, i-save ang kasalukuyang oras para maging "read" na ang lahat ng lumang logs
+                localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
                 fetchActivityLogs();
+                
                 const badgeEl = document.getElementById("notificationBadge");
                 if (badgeEl) badgeEl.style.display = "none";
             }
@@ -405,6 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Auto-check para sa bagong logs bawat 15 segundo para sa badge
     setInterval(checkNewLogsCount, 15000);
+    checkNewLogsCount();
 });
 
 async function fetchActivityLogs() {
@@ -417,17 +422,28 @@ async function fetchActivityLogs() {
         const data = await res.json();
         const logs = data.logs || [];
 
-        // Salain ang logs: I-filter out kapag ang user ay Admin / Kim Bryan Hernandez
+        // Kunin ang timestamp ng huling pagbukas ng notifications
+        const lastSeen = localStorage.getItem("kbh_last_seen_log");
+        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
+
+        // Salain ang logs: 
+        // 1. I-filter out kapag ang user ay Admin / Kim Bryan Hernandez
+        // 2. Kunin lang ang mga bago pa kaysa sa huling pagbukas (Unread / New lang)
         const filteredLogs = logs.filter(log => {
             const name = (log.user_name || "").toLowerCase();
-            return !name.includes("admin") && !name.includes("kim bryan hernandez");
+            if (name.includes("admin") || name.includes("kim bryan hernandez")) return false;
+
+            if (log.created_at) {
+                let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
+                return new Date(dStr).getTime() > lastSeenTime;
+            }
+            return false;
         });
 
         if (filteredLogs.length > 0) {
             badgeEl.style.display = "none";
 
             listEl.innerHTML = filteredLogs.map(log => {
-                // Tiyaking tama ang oras sa Philippine Time (Asia/Manila)
                 let logDate;
                 if (log.created_at) {
                     let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
@@ -439,7 +455,6 @@ async function fetchActivityLogs() {
                 const timeString = logDate.toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
                 const dateString = logDate.toLocaleDateString('en-PH', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' });
 
-                // Device, OS, Browser Info Extraction
                 const device = log.device || "Desktop";
                 const os = log.os || "Windows";
                 const browser = log.browser || "Browser";
@@ -461,7 +476,7 @@ async function fetchActivityLogs() {
             }).join("");
         } else {
             badgeEl.style.display = "none";
-            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs mula sa mga members.</p>';
+            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang bagong activity mula sa mga members.</p>';
         }
     } catch (err) {
         console.error("Error fetching logs:", err);
@@ -477,14 +492,25 @@ async function checkNewLogsCount() {
         const badgeEl = document.getElementById("notificationBadge");
         const dropdown = document.getElementById("notificationDropdown");
 
-        const filteredLogs = logs.filter(log => {
+        const lastSeen = localStorage.getItem("kbh_last_seen_log");
+        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
+
+        const newLogs = logs.filter(log => {
             const name = (log.user_name || "").toLowerCase();
-            return !name.includes("admin") && !name.includes("kim bryan hernandez");
+            if (name.includes("admin") || name.includes("kim bryan hernandez")) return false;
+
+            if (log.created_at) {
+                let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
+                return new Date(dStr).getTime() > lastSeenTime;
+            }
+            return false;
         });
 
-        if (filteredLogs.length > 0 && dropdown.style.display !== "block") {
-            badgeEl.textContent = filteredLogs.length;
+        if (newLogs.length > 0 && dropdown.style.display !== "block") {
+            badgeEl.textContent = newLogs.length;
             badgeEl.style.display = "inline-block";
+        } else {
+            badgeEl.style.display = "none";
         }
     } catch (e) {}
 }
