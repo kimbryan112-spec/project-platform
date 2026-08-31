@@ -84,65 +84,36 @@ async function getClientDeviceInfo() {
     let os = "Unknown OS";
     let browser = "Unknown Browser";
 
-    // 1. Gamitin ang modernong navigator.userAgentData kung available (Mas accurate para sa Mobile/Desktop)
-    if (navigator.userAgentData) {
-        try {
-            const hints = await navigator.userAgentData.getHighEntropyValues([
-                "platform", 
-                "platformVersion", 
-                "model", 
-                "mobile"
-            ]);
-            
-            if (hints.mobile) {
-                device = "Mobile Device";
-                if (hints.model && hints.model !== "") {
-                    device = hints.model; // Halimbawa: "iPhone", "Samsung", etc.
-                }
-            } else {
-                device = "Desktop / PC";
-            }
+    // Pilitin munang hanapin kung may 'Android' o 'iPhone' sa buong User-Agent string
+    const isAndroidPhone = /android/i.test(ua);
+    const isIPhone = /iphone|ipod/i.test(ua);
+    const isIPad = /ipad/i.test(ua);
+    const isMobileUA = /mobile/i.test(ua);
 
-            if (hints.platform) {
-                os = hints.platform;
-                if (os === "Android") device = "Android Phone";
-                if (os === "iOS") device = "iPhone";
-            }
-        } catch (e) {
-            // Fallback kapag hindi sinuportahan ng browser
-        }
-    }
-
-    // 2. Fallback / Detailed Regex detection kung sakaling walang userAgentData o generic pa rin
-    if (device === "Desktop" || device === "Desktop / PC" || device === "Mobile Device") {
-        if (/iphone/i.test(ua)) {
-            device = "iPhone";
-            os = "iOS";
-        } else if (/ipad/i.test(ua)) {
-            device = "iPad";
-            os = "iOS";
-        } else if (/android/i.test(ua)) {
-            device = "Android Phone";
-            os = "Android";
-        } else if (/macintosh|mac os x/i.test(ua)) {
+    if (isAndroidPhone) {
+        device = "Android Phone";
+        os = "Android";
+    } else if (isIPhone) {
+        device = "iPhone";
+        os = "iOS";
+    } else if (isIPad) {
+        device = "iPad";
+        os = "iOS";
+    } else if (isMobileUA) {
+        device = "Mobile Device";
+        os = "Mobile OS";
+    } else {
+        // Desktop / PC detections
+        if (/macintosh|mac os x/i.test(ua)) {
             device = "Mac";
             os = "macOS";
         } else if (/windows/i.test(ua)) {
             device = "Windows PC";
             os = "Windows";
         } else if (/linux/i.test(ua)) {
-            device = "Linux";
+            device = "Linux PC";
             os = "Linux";
         }
-    }
-
-    // Detect OS kung hindi pa nakuha nang maayos
-    if (os === "Unknown OS" || !os) {
-        if (/windows/i.test(ua)) os = "Windows";
-        else if (/mac os x/i.test(ua)) os = "macOS";
-        else if (/android/i.test(ua)) os = "Android";
-        else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
-        else if (/linux/i.test(ua)) os = "Linux";
     }
 
     // Detect Browser
