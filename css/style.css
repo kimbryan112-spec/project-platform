@@ -8,10 +8,14 @@
     box-sizing:border-box;
 }
 
-body{
-    font-family:Arial, Helvetica, sans-serif;
-    background:#f5f5f5;
-    color:#222;
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    background: #f5f7fb;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #222;
 }
 
 a{
@@ -26,18 +30,23 @@ select{
 }
 
 /* ==================================
-    LAYOUT
+    LAYOUT (Desktop Fixed Sidebar & Scrollable Main)
 ================================== */
 
 #app{
     display:flex;
-    min-height:100vh;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
 .main{
     flex:1;
-    padding:28px 36px;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 24px 32px;
     background:#f5f7fb;
+    box-sizing: border-box;
 }
 
 /* ==================================
@@ -46,11 +55,16 @@ select{
 
 .sidebar{
     width:240px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
     background:#1f2937;
     color:#fff;
     padding:20px;
     display:flex;
     flex-direction:column;
+    box-sizing: border-box;
 }
 
 /* ==================================
@@ -2637,15 +2651,10 @@ input[type="url"]::placeholder{
 }
 
 /* =====================================================
-    OPTION 1: NATIVE MOBILE APP & EXCEL SPREADSHEET LAYOUT
-    (Fixed Header, Fixed Bottom Nav, Scrollable & Sticky Table)
+    MOBILE RESPONSIVE (Option 1 - Compact Spreadsheet Style)
 ===================================================== */
 @media screen and (max-width: 900px) {
-    /* 1. App-level lock: Bawal mag-scroll ang buong page, para laging sakto sa screen */
     html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
         height: 100vh;
         height: 100dvh;
         overflow: hidden;
@@ -2663,23 +2672,23 @@ input[type="url"]::placeholder{
         position: relative;
     }
 
-    /* 2. Fixed Bottom Navigation (Bottom App Bar ~60px) */
+    /* Fixed Bottom Navigation (Compact 50px) */
     .sidebar {
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 60px;
+        height: 50px;
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
-        background: rgba(15, 15, 15, 0.96);
+        background: rgba(15, 15, 15, 0.98);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         z-index: 1000;
         padding: 0 4px;
-        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
     }
 
     .sidebar .logo, 
@@ -2696,14 +2705,14 @@ input[type="url"]::placeholder{
     }
 
     .sidebar nav a {
-        font-size: 10px;
-        padding: 6px 10px;
+        font-size: 9px;
+        padding: 4px 6px;
         flex-direction: column;
-        gap: 2px;
+        gap: 1px;
         text-align: center;
-        border-radius: 8px;
+        border-radius: 6px;
         color: #94a3b8;
-        min-height: 44px; /* Touch target compliance */
+        min-height: 40px;
         justify-content: center;
     }
 
@@ -2713,81 +2722,118 @@ input[type="url"]::placeholder{
         border: 1px solid rgba(59, 130, 246, 0.4);
     }
 
-    /* 3. Main Workspace Container */
+    /* Main Workspace Container */
     .main {
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 6px 6px 66px 6px !important; /* Nilalagyan ng allowance sa baba para sa bottom nav */
+        padding: 4px 4px 54px 4px !important;
         width: 100% !important;
         height: 100%;
         overflow: hidden;
         box-sizing: border-box;
     }
 
-    /* 4. Compact Fixed Top Header (~60-70px) */
+    /* Top Header: Compact 50-60px, Single Row */
     .topbar {
         flex-shrink: 0;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        background: rgba(24, 24, 27, 0.9);
+        background: rgba(24, 24, 27, 0.95);
         backdrop-filter: blur(12px);
-        padding: 6px 10px;
-        border-radius: 8px;
-        margin-bottom: 4px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        margin-bottom: 3px;
         border: 1px solid rgba(255, 255, 255, 0.08);
+        height: 52px;
     }
 
     .topbar-left {
-        flex-direction: column;
-        gap: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-direction: row;
     }
 
-    .page-title h1 {
-        font-size: 14px !important;
-        font-weight: 800;
-        color: #ffffff;
-        margin: 0;
-        line-height: 1.2;
+    .page-title {
+        display: none !important;
     }
 
-    .page-title p,
+    /* Compact Media Player in Upper Left */
+    .music-player {
+        position: static !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 2px 6px;
+        border-radius: 6px;
+        gap: 4px;
+        width: auto !important;
+        box-shadow: none !important;
+    }
+
+    .music-controls {
+        margin-bottom: 0 !important;
+        gap: 3px !important;
+    }
+
+    .music-btn {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 10px !important;
+    }
+
+    .music-btn.play {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 11px !important;
+    }
+
+    .volume-row {
+        display: none !important;
+    }
+
     .year-header {
-        display: none !important; /* Itago ang napakalaking desktop title para hindi kumain ng space */
+        display: none !important;
     }
 
     .topbar-right {
+        display: flex;
+        align-items: center;
         gap: 6px;
     }
 
-    .topbar-right select {
-        height: 32px;
-        font-size: 12px;
-        padding: 0 4px;
-        border-radius: 6px;
+    .topbar-right select#yearSelect {
+        height: 28px !important;
+        font-size: 11px !important;
+        padding: 0 4px !important;
+        border-radius: 4px !important;
+        width: 70px !important;
     }
 
     .next-year-btn {
-        height: 32px;
-        font-size: 11px;
-        padding: 0 8px;
+        height: 28px !important;
+        font-size: 10px !important;
+        padding: 0 6px !important;
+        border-radius: 4px !important;
     }
 
     .profile {
-        width: 32px;
-        height: 32px;
+        width: 28px !important;
+        height: 28px !important;
     }
 
-    /* 5. Compact Fixed Month & Controls Panel */
+    /* Month Buttons Panel */
     .year-month-panel {
         flex-shrink: 0;
-        background: rgba(24, 24, 27, 0.85);
+        background: rgba(24, 24, 27, 0.9);
         backdrop-filter: blur(14px);
-        padding: 6px 8px;
-        border-radius: 8px;
-        margin-bottom: 4px;
+        padding: 4px 6px;
+        border-radius: 6px;
+        margin-bottom: 3px;
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
@@ -2795,8 +2841,8 @@ input[type="url"]::placeholder{
         display: flex;
         flex-wrap: nowrap !important;
         overflow-x: auto;
-        gap: 6px;
-        padding-bottom: 2px;
+        gap: 4px;
+        padding-bottom: 1px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
@@ -2806,115 +2852,141 @@ input[type="url"]::placeholder{
     }
 
     .month-btn {
-        padding: 4px 10px !important;
-        min-width: 50px !important;
-        min-height: 30px !important;
-        font-size: 11px !important;
+        padding: 2px 8px !important;
+        min-width: 40px !important;
+        min-height: 24px !important;
+        font-size: 10px !important;
         flex-shrink: 0;
-        border-radius: 6px !important;
+        border-radius: 4px !important;
     }
 
     .month-legend {
-        flex-shrink: 0;
-        font-size: 10px;
-        gap: 10px;
-        margin-bottom: 2px;
-        color: #a1a1aa;
-        justify-content: center;
+        display: none !important;
     }
 
-    .music-player {
-        display: none; /* Itago muna ang malaking music player sa mobile para malinis at compact ang header */
-    }
-
-    /* 6. Middle Scrollable Table Area (Google Sheets Workspace Experience) */
+    /* Spreadsheet Table & Horizontal Scroll Workspace */
     .table-wrapper {
         flex: 1;
-        background: rgba(24, 24, 27, 0.85);
+        background: rgba(24, 24, 27, 0.9);
         backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border-radius: 6px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
         width: 100%;
-        overflow: auto; /* Sabay na gumagana ang patayo (vertical) at pahalang (horizontal) na swipe */
+        overflow: auto;
         -webkit-overflow-scrolling: touch;
         position: relative;
     }
 
     .project-table {
-        min-width: 1700px; /* Sapat ang lawak para sa lahat ng columns kagaya sa desktop */
+        min-width: 1300px;
         border-collapse: separate;
         border-spacing: 0;
+        table-layout: fixed;
     }
 
-    /* Sticky Table Headers (Hihiga sa itaas habang nagpapatayo ng scroll) */
     .project-table thead th {
         position: sticky;
         top: 0;
         z-index: 30;
         background: linear-gradient(to bottom, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
         color: #fff;
+        font-size: 11px !important;
+        padding: 4px !important;
+        height: 28px;
     }
 
-    /* Sticky Left Column / Couple's Column (Mananatili sa kaliwa habang nagpapaswipe ng horizontal columns) */
+    /* FROZEN / STICKY FIRST COLUMN (Couple Column) */
     .project-table th:nth-child(1),
     .project-table td:nth-child(1) {
         position: sticky;
         left: 0;
-        z-index: 20;
+        z-index: 25;
         background-color: #ffffff !important;
-        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.15);
+        width: 150px !important;
+        max-width: 150px !important;
+        min-width: 150px !important;
     }
 
-    /* Pinakataas-kaliwang intersection cell (Couple's Header) para laging nasa ibabaw */
     .project-table thead th:nth-child(1) {
         z-index: 40 !important;
+        background: #1e3a8a !important;
     }
 
-    /* Mobile Touch Targets Compliance (Minimum 44px o sapat na laki para sa daliri) */
+    /* Compact Column Widths */
+    .project-table th:nth-child(2), .project-table td:nth-child(2) { width: 85px !important; min-width: 85px !important; }
+    .project-table th:nth-child(3), .project-table td:nth-child(3) { width: 85px !important; min-width: 85px !important; }
+    .project-table th:nth-child(4), .project-table td:nth-child(4) { width: 90px !important; min-width: 90px !important; }
+    .project-table th:nth-child(5), .project-table td:nth-child(5) { width: 90px !important; min-width: 90px !important; }
+    .project-table th:nth-child(6), .project-table td:nth-child(6),
+    .project-table th:nth-child(7), .project-table td:nth-child(7),
+    .project-table th:nth-child(8), .project-table td:nth-child(8),
+    .project-table th:nth-child(9), .project-table td:nth-child(9) { width: 180px !important; min-width: 180px !important; }
+
+    /* Couple Cell Styling */
+    .couple-cell {
+        width: 150px !important;
+        padding: 4px !important;
+    }
+
     .couple-name {
-        min-height: 38px;
-        font-size: 13px;
+        min-height: 24px !important;
+        max-height: 26px !important;
+        margin-bottom: 3px !important;
+        padding: 2px 6px !important;
+        font-size: 12px !important;
+        font-weight: 700;
+        border-width: 1px !important;
+        border-radius: 4px !important;
     }
 
+    .couple-actions {
+        display: flex;
+        gap: 3px;
+    }
+
+    /* Compact Buttons */
     .instruction-btn, 
-    .watch-btn {
-        min-height: 36px;
-        font-size: 11px;
+    .watch-btn,
+    .generate-btn, 
+    .raw-check-btn {
+        min-height: 28px !important;
+        height: 28px !important;
+        font-size: 10px !important;
+        padding: 2px 4px !important;
+        border-radius: 4px !important;
     }
 
+    /* Dropdowns & Inputs */
     .status-select, 
     .type-select, 
     .drone-select, 
-    .drone-search {
-        height: 36px;
-        font-size: 12px;
+    .drone-search,
+    .dashboard-raw-input,
+    .song-link,
+    .dashboard-song-status {
+        height: 28px !important;
+        font-size: 11px !important;
+        padding: 2px 4px !important;
+        border-radius: 4px !important;
     }
 
-    .generate-btn, 
-    .raw-check-btn {
-        height: 36px;
-        font-size: 12px;
+    .project-table td {
+        padding: 4px !important;
+    }
+
+    .timeline-percent {
+        font-size: 11px !important;
     }
 }
 
-/* Landscape Mode Optimization (Phone Naka-Higa): Mas maluwag na espasyo at mas maraming columns ang makikita */
 @media screen and (max-width: 900px) and (orientation: landscape) {
     .main {
-        padding: 4px 4px 55px 4px !important;
+        padding: 2px 2px 48px 2px !important;
     }
-
     .topbar {
-        padding: 4px 8px;
-        margin-bottom: 3px;
-    }
-
-    .year-month-panel {
-        padding: 4px 6px;
-        margin-bottom: 3px;
-    }
-
-    .sidebar {
-        height: 52px;
+        height: 44px;
+        padding: 2px 6px;
     }
 }

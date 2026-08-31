@@ -17,6 +17,7 @@ let currentYear = new Date().getFullYear().toString();
 let currentMonth =
     document.querySelector(".month-btn.active")?.dataset.month || "sep";
 let currentMonthLocked = false;
+let cachedHasDataMonths = {};
 
 // =========================
 // MONTH MAP
@@ -85,7 +86,6 @@ async function getClientDeviceInfo() {
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
 
-    // Modern User-Agent Data check (para sa mga bagong Android/iOS browsers)
     if (navigator.userAgentData) {
         try {
             const hints = await navigator.userAgentData.getHighEntropyValues([
@@ -97,7 +97,7 @@ async function getClientDeviceInfo() {
             
             if (hints.mobile || hints.platform === "Android" || hints.platform === "iOS") {
                 if (hints.model && hints.model !== "") {
-                    device = hints.model; // Halimbawa: "iPhone", "Samsung Galaxy", etc.
+                    device = hints.model;
                 } else {
                     device = hints.platform === "iOS" ? "iPhone" : "Android Phone";
                 }
@@ -106,7 +106,6 @@ async function getClientDeviceInfo() {
         } catch (e) {}
     }
 
-    // Fallback/Deep Regex kung sakaling hindi pumasok sa userAgentData (Gaya ng Linux armv81 sa phone)
     if (device === "Desktop" || device === "Unknown OS") {
         if (/iphone|ipod/i.test(ua)) {
             device = "iPhone";
@@ -121,7 +120,6 @@ async function getClientDeviceInfo() {
             device = "Mobile Phone";
             os = "Mobile OS";
         } else {
-            // Pure Desktop
             if (/macintosh|mac os x/i.test(ua)) {
                 device = "Mac";
                 os = "macOS";
@@ -135,7 +133,6 @@ async function getClientDeviceInfo() {
         }
     }
 
-    // Browser Detection
     if (/chrome|crios/i.test(ua) && !/edge|opr/i.test(ua)) browser = "Chrome";
     else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) browser = "Safari";
     else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
@@ -148,9 +145,8 @@ async function getClientDeviceInfo() {
 async function recordActivity(action, details = "") {
     try {
         const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
-        const userName = currentUser.name || currentUser.username || currentUser.full_name || "Kim Bryan Hernandez";
+        const userName = currentUser.name || currentUser.username || currentUser.full_name || "YANG";
         
-        // Tawagin ang async device detector para makuha ang tamang device/OS/browser info
         const clientInfo = await getClientDeviceInfo();
 
         await fetch("/api/logs", {
@@ -172,24 +168,20 @@ async function recordActivity(action, details = "") {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- REAL-TIME LOGIN / PAGE OPEN LOG ---
     const currentUserForLog = JSON.parse(localStorage.getItem("currentUser")) || {};
     const roleText = currentUserForLog.role ? ` (${currentUserForLog.role.toUpperCase()})` : "";
     recordActivity("Opened Dashboard", `User active on page${roleText}`);
-    // ----------------------------------------
 
     updateLiveCalendar();
     setInterval(updateLiveCalendar, 60000);
 
     const settingsBtn = document.getElementById("settingsMenu");
-
-    if (settingsBtn) {
+    if (settingsBtn && typeof IS_ADMIN !== "undefined") {
         settingsBtn.style.display = IS_ADMIN ? "" : "none";
     }
 
     const dashboardMenu = document.getElementById("dashboardMenu");
-
-    if (dashboardMenu && !IS_ADMIN) {
+    if (dashboardMenu && typeof IS_ADMIN !== "undefined" && !IS_ADMIN) {
         dashboardMenu.removeAttribute("href");
         dashboardMenu.style.pointerEvents = "none";
         dashboardMenu.style.cursor = "default";
@@ -230,11 +222,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentYear = String(current);
-        document.getElementById("currentYearTitle").textContent = currentYear;
+        const yearTitleEl = document.getElementById("currentYearTitle");
+        if (yearTitleEl) yearTitleEl.textContent = currentYear;
 
         yearSelect.addEventListener("change", async () => {
             currentYear = yearSelect.value;
-            document.getElementById("currentYearTitle").textContent = currentYear;
+            if (yearTitleEl) yearTitleEl.textContent = currentYear;
 
             currentMonth = "jan"; 
             
@@ -256,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nextYearBtn = document.querySelector(".next-year-btn");
 
-    if (nextYearBtn) {
+    if (nextYearBtn && yearSelect) {
         nextYearBtn.addEventListener("click", () => {
             const nextYear = String(Number(currentYear) + 1);
 
@@ -273,7 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentYear = nextYear;
             yearSelect.value = currentYear;
-            document.getElementById("currentYearTitle").textContent = currentYear;
+            const yearTitleEl = document.getElementById("currentYearTitle");
+            if (yearTitleEl) yearTitleEl.textContent = currentYear;
 
             loadProjects();
             recordActivity("Added/Selected Next Year", `Year: ${currentYear}`);
@@ -319,11 +313,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const watchModal = document.getElementById("watchModal");
+    const watchFrame = document.getElementById("watchFrame");
+    const watchPlayer = document.getElementById("watchBox");
+    const minimizeWatch = document.getElementById("minimizeWatchBtn");
+    const maximizeWatch = document.getElementById("maximizeWatchBtn");
+
     const savedPlayer = JSON.parse(
         localStorage.getItem("watchPlayerState")
     );
 
-    if (savedPlayer?.open) {
+    if (savedPlayer?.open && watchModal && watchFrame && watchPlayer) {
         watchFrame.src = savedPlayer.link;
         watchModal.classList.add("show");
 
@@ -339,8 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
             watchModal.style.pointerEvents = "none";
             watchPlayer.style.pointerEvents = "auto";
 
-            minimizeWatch.style.display = "none";
-            maximizeWatch.style.display = "inline-flex";
+            if (minimizeWatch) minimizeWatch.style.display = "none";
+            if (maximizeWatch) maximizeWatch.style.display = "inline-flex";
         }
     }
 });
@@ -690,7 +690,8 @@ async function loadProjects() {
         document.querySelectorAll(".month-btn").forEach(btn => {
             const key = getMonthKey(currentYear, btn.dataset.month);
             const locked = !!monthLocks[key];
-            if (IS_ADMIN) {
+            const isAdminCheck = typeof IS_ADMIN !== "undefined" ? IS_ADMIN : true;
+            if (isAdminCheck) {
                 btn.classList.toggle("locked", locked);
             } else {
                 btn.classList.remove("locked");
@@ -938,8 +939,9 @@ function updateMonthLockUI() {
     document.querySelectorAll(".month-btn").forEach(btn => {
         const key = getMonthKey(currentYear, btn.dataset.month);
         const locked = !!monthLocks[key];
+        const isAdminCheck = typeof IS_ADMIN !== "undefined" ? IS_ADMIN : true;
 
-        if (IS_ADMIN) {
+        if (isAdminCheck) {
             btn.classList.toggle("locked", locked);
         } else {
             btn.classList.remove("locked");
@@ -1075,6 +1077,9 @@ document.querySelectorAll(".month-btn").forEach(button => {
     });
 
     button.addEventListener("contextmenu", (e) => {
+        const isAdminCheck = typeof IS_ADMIN !== "undefined" ? IS_ADMIN : true;
+        if (!isAdminCheck) return;
+
         e.preventDefault();
         const selectedMonth = button.dataset.month;
 
@@ -1083,18 +1088,20 @@ document.querySelectorAll(".month-btn").forEach(button => {
         const key = getMonthKey(currentYear, selectedMonth);
         const locked = !!getMonthLocks()[key];
 
-        if (locked) {
-            lockBtn.style.display = "none";
-            unlockBtn.style.display = "flex";
-        } else {
-            lockBtn.style.display = "flex";
-            unlockBtn.style.display = "none";
-        }
+        if (lockBtn && unlockBtn && monthContextMenu) {
+            if (locked) {
+                lockBtn.style.display = "none";
+                unlockBtn.style.display = "flex";
+            } else {
+                lockBtn.style.display = "flex";
+                unlockBtn.style.display = "none";
+            }
 
-        monthContextMenu.dataset.month = selectedMonth;
-        monthContextMenu.style.display = "block";
-        monthContextMenu.style.left = `${e.pageX}px`;
-        monthContextMenu.style.top = `${e.pageY}px`;
+            monthContextMenu.dataset.month = selectedMonth;
+            monthContextMenu.style.display = "block";
+            monthContextMenu.style.left = `${e.pageX}px`;
+            monthContextMenu.style.top = `${e.pageY}px`;
+        }
     });
 });
 
@@ -1155,9 +1162,11 @@ document.addEventListener("contextmenu", (e) => {
     activeSongInput = input;
     const rect = input.getBoundingClientRect();
 
-    songContextMenu.style.display = "block";
-    songContextMenu.style.left = `${window.scrollX + rect.left}px`;
-    songContextMenu.style.top = `${window.scrollY + rect.top - songContextMenu.offsetHeight - 8}px`;
+    if (songContextMenu) {
+        songContextMenu.style.display = "block";
+        songContextMenu.style.left = `${window.scrollX + rect.left}px`;
+        songContextMenu.style.top = `${window.scrollY + rect.top - songContextMenu.offsetHeight - 8}px`;
+    }
 });
 
 const songLinkModal = document.getElementById("songLinkModal");
@@ -1205,9 +1214,11 @@ document.querySelectorAll(".watch-btn").forEach(button => {
             return;
         }
 
-        watchFrame.src = "";
-        watchFrame.src = link;
-        watchModal.classList.add("show");
+        if (watchFrame && watchModal) {
+            watchFrame.src = "";
+            watchFrame.src = link;
+            watchModal.classList.add("show");
+        }
 
         localStorage.setItem("watchPlayerState", JSON.stringify({
             open: true,
@@ -1222,10 +1233,12 @@ document.querySelectorAll(".watch-btn").forEach(button => {
         e.stopPropagation();
 
         activeWatchButton = button;
-        watchContextMenu.style.display = "block";
-        watchContextMenu.style.position = "fixed";
-        watchContextMenu.style.left = `${e.clientX}px`;
-        watchContextMenu.style.top = `${e.clientY}px`;
+        if (watchContextMenu) {
+            watchContextMenu.style.display = "block";
+            watchContextMenu.style.position = "fixed";
+            watchContextMenu.style.left = `${e.clientX}px`;
+            watchContextMenu.style.top = `${e.clientY}px`;
+        }
     });
 });
 
@@ -1245,10 +1258,12 @@ document.querySelectorAll(".get-files-btn").forEach(button => {
         e.stopPropagation();
 
         activeFilesButton = button;
-        filesContextMenu.style.display = "block";
-        filesContextMenu.style.position = "fixed";
-        filesContextMenu.style.left = `${e.clientX}px`;
-        filesContextMenu.style.top = `${e.clientY}px`;
+        if (filesContextMenu) {
+            filesContextMenu.style.display = "block";
+            filesContextMenu.style.position = "fixed";
+            filesContextMenu.style.left = `${e.clientX}px`;
+            filesContextMenu.style.top = `${e.clientY}px`;
+        }
     });
 });
 
@@ -1264,28 +1279,34 @@ document.addEventListener("click", (e) => {
     }
 });
 
-document.getElementById("closeWatchModal")?.addEventListener("click", () => {
-    watchModal.classList.remove("show");
-    watchPlayer.classList.remove("mini-player");
-    watchPlayer.style.left = "50%";
-    watchPlayer.style.top = "50%";
-    watchPlayer.style.right = "auto";
-    watchPlayer.style.bottom = "auto";
-    watchPlayer.style.transform = "translate(-50%, -50%)";
+const watchPlayerBox = document.getElementById("watchBox");
+const minimizeWatchBtn = document.getElementById("minimizeWatchBtn");
+const maximizeWatchBtn = document.getElementById("maximizeWatchBtn");
 
-    minimizeWatch.style.display = "inline-flex";
-    maximizeWatch.style.display = "none";
-    watchFrame.src = "";
+document.getElementById("closeWatchModal")?.addEventListener("click", () => {
+    if (watchModal) watchModal.classList.remove("show");
+    if (watchPlayerBox) {
+        watchPlayerBox.classList.remove("mini-player");
+        watchPlayerBox.style.left = "50%";
+        watchPlayerBox.style.top = "50%";
+        watchPlayerBox.style.right = "auto";
+        watchPlayerBox.style.bottom = "auto";
+        watchPlayerBox.style.transform = "translate(-50%, -50%)";
+    }
+
+    if (minimizeWatchBtn) minimizeWatchBtn.style.display = "inline-flex";
+    if (maximizeWatchBtn) maximizeWatchBtn.style.display = "none";
+    if (watchFrame) watchFrame.src = "";
     localStorage.removeItem("watchPlayerState");
 });
 
 document.getElementById("attachWatchLinkBtn")?.addEventListener("click", () => {
     if (!activeWatchButton) return;
 
-    watchContextMenu.style.display = "none";
-    watchLinkInput.value = activeWatchButton.dataset.watchLink || "";
-    watchLinkModal.classList.add("show");
-    watchLinkInput.focus();
+    if (watchContextMenu) watchContextMenu.style.display = "none";
+    if (watchLinkInput) watchLinkInput.value = activeWatchButton.dataset.watchLink || "";
+    if (watchLinkModal) watchLinkModal.classList.add("show");
+    if (watchLinkInput) watchLinkInput.focus();
 });
 
 watchLinkInput?.addEventListener("input", () => {
@@ -1298,16 +1319,16 @@ watchLinkInput?.addEventListener("input", () => {
 });
 
 closeWatchLinkModal?.addEventListener("click", () => {
-    watchLinkModal.classList.remove("show");
+    if (watchLinkModal) watchLinkModal.classList.remove("show");
 });
 
 document.getElementById("attachFilesLinkBtn")?.addEventListener("click", () => {
     if (!activeFilesButton) return;
 
-    filesContextMenu.style.display = "none";
-    filesLinkInput.value = activeFilesButton.dataset.filesLink || "";
-    filesLinkModal.classList.add("show");
-    filesLinkInput.focus();
+    if (filesContextMenu) filesContextMenu.style.display = "none";
+    if (filesLinkInput) filesLinkInput.value = activeFilesButton.dataset.filesLink || "";
+    if (filesLinkModal) filesLinkModal.classList.add("show");
+    if (filesLinkInput) filesLinkInput.focus();
 });
 
 filesLinkInput?.addEventListener("input", () => {
@@ -1320,17 +1341,17 @@ filesLinkInput?.addEventListener("input", () => {
 });
 
 closeFilesLinkModal?.addEventListener("click", () => {
-    filesLinkModal.classList.remove("show");
+    if (filesLinkModal) filesLinkModal.classList.remove("show");
 });
 
 document.getElementById("attachSongLinkBtn")?.addEventListener("click", () => {
     if (!activeSongInput) return;
 
-    songContextMenu.style.display = "none";
-    songTitleInput.value = activeSongInput.value || "";
-    songLinkInput.value = activeSongInput.dataset.songLink || "";
-    songLinkModal.classList.add("show");
-    songTitleInput.focus();
+    if (songContextMenu) songContextMenu.style.display = "none";
+    if (songTitleInput) songTitleInput.value = activeSongInput.value || "";
+    if (songLinkInput) songLinkInput.value = activeSongInput.dataset.songLink || "";
+    if (songLinkModal) songLinkModal.classList.add("show");
+    if (songTitleInput) songTitleInput.focus();
 });
 
 songLinkInput?.addEventListener("input", () => {
@@ -1351,7 +1372,7 @@ songTitleInput?.addEventListener("input", () => {
 });
 
 closeSongLinkModal?.addEventListener("click", () => {
-    songLinkModal.classList.remove("show");
+    if (songLinkModal) songLinkModal.classList.remove("show");
 });
 
 // ===============================
@@ -1370,14 +1391,16 @@ document.addEventListener("DOMContentLoaded", () => {
             activeCoupleRow = button.closest("tr");
             const instructionBtn = activeCoupleRow.querySelector(".instruction-btn");
 
-            instructionTextarea.value = instructionBtn.dataset.notes || "";
-            instructionModal.classList.add("show");
-            instructionTextarea.focus();
+            if (instructionTextarea && instructionModal) {
+                instructionTextarea.value = instructionBtn.dataset.notes || "";
+                instructionModal.classList.add("show");
+                instructionTextarea.focus();
+            }
         });
     });
 
     closeInstructionModal?.addEventListener("click", () => {
-        instructionModal.classList.remove("show");
+        instructionModal?.classList.remove("show");
     });
 
     instructionModal?.addEventListener("click", (e) => {
@@ -1406,21 +1429,21 @@ document.addEventListener("click", (e) => {
     if (!button) return;
 
     activeNotesButton = button;
-    commentsTextarea.value = button.dataset.notes || "";
+    if (commentsTextarea) commentsTextarea.value = button.dataset.notes || "";
 
     if (button.classList.contains("concerns-btn")) {
-        commentsModal.classList.add("concerns-mode");
+        commentsModal?.classList.add("concerns-mode");
     } else {
-        commentsModal.classList.remove("concerns-mode");
+        commentsModal?.classList.remove("concerns-mode");
     }
 
-    commentsModal.classList.add("show");
-    commentsTextarea.focus();
+    commentsModal?.classList.add("show");
+    commentsTextarea?.focus();
 });
 
 closeCommentsModal?.addEventListener("click", () => {
-    commentsModal.classList.remove("show");
-    commentsModal.classList.remove("concerns-mode");
+    commentsModal?.classList.remove("show");
+    commentsModal?.classList.remove("concerns-mode");
 });
 
 commentsModal?.addEventListener("click", (e) => {
@@ -1439,107 +1462,6 @@ commentsTextarea?.addEventListener("input", () => {
     recordActivity("Updated Comments / Concerns", "Edited notes");
 });
 
-/* ==================================
-    WATCH PLAYER WINDOW DRAG & CONTROLS
-================================== */
-const watchPlayer = document.getElementById("watchBox");
-const watchHeader = document.getElementById("watchHeader");
-const minimizeWatch = document.getElementById("minimizeWatchBtn");
-const maximizeWatch = document.getElementById("maximizeWatchBtn");
-
-let watchDragging = false;
-let watchOffsetX = 0;
-let watchOffsetY = 0;
-
-if (watchPlayer && watchHeader && watchFrame && minimizeWatch && maximizeWatch) {
-    watchPlayer.style.position = "fixed";
-    watchPlayer.style.left = "50%";
-    watchPlayer.style.top = "50%";
-    watchPlayer.style.transform = "translate(-50%, -50%)";
-
-    let dragRAF = null;
-    let dragX = 0;
-    let dragY = 0;
-
-    watchHeader.addEventListener("mousedown", (e) => {
-        e.preventDefault();
-        watchDragging = true;
-        watchPlayer.classList.add("dragging");
-        document.body.style.userSelect = "none";
-
-        const rect = watchPlayer.getBoundingClientRect();
-        watchPlayer.style.left = rect.left + "px";
-        watchPlayer.style.top = rect.top + "px";
-        watchPlayer.style.right = "auto";
-        watchPlayer.style.bottom = "auto";
-        watchPlayer.style.transform = "none";
-
-        watchOffsetX = e.clientX - rect.left;
-        watchOffsetY = e.clientY - rect.top;
-    });
-
-    document.addEventListener("mousemove", (e) => {
-        if (!watchDragging) return;
-
-        dragX = e.clientX - watchOffsetX;
-        dragY = e.clientY - watchOffsetY;
-
-        if (dragRAF) return;
-
-        dragRAF = requestAnimationFrame(() => {
-            watchPlayer.style.left = dragX + "px";
-            watchPlayer.style.top = dragY + "px";
-            dragRAF = null;
-        });
-    });
-
-    document.addEventListener("mouseup", () => {
-        watchDragging = false;
-        watchPlayer.classList.remove("dragging");
-        document.body.style.userSelect = "";
-    });
-
-    minimizeWatch.addEventListener("click", () => {
-        if (watchPlayer.classList.contains("mini-player")) return;
-
-        watchPlayer.classList.add("mini-player");
-        watchPlayer.style.left = "auto";
-        watchPlayer.style.top = "auto";
-        watchPlayer.style.right = "30px";
-        watchPlayer.style.bottom = "30px";
-        watchPlayer.style.transform = "none";
-
-        watchModal.style.background = "transparent";
-        watchModal.style.pointerEvents = "none";
-        watchPlayer.style.pointerEvents = "auto";
-
-        minimizeWatch.style.display = "none";
-        maximizeWatch.style.display = "inline-flex";
-    });
-
-    maximizeWatch.addEventListener("click", () => {
-        watchPlayer.classList.remove("mini-player");
-        watchPlayer.style.width = "";
-        watchPlayer.style.height = "";
-        watchPlayer.style.left = "50%";
-        watchPlayer.style.top = "50%";
-        watchPlayer.style.right = "auto";
-        watchPlayer.style.bottom = "auto";
-        watchPlayer.style.transform = "translate(-50%, -50%)";
-
-        maximizeWatch.style.display = "none";
-        minimizeWatch.style.display = "inline-flex";
-
-        const playerState = JSON.parse(localStorage.getItem("watchPlayerState"));
-        if (playerState) {
-            playerState.minimized = false;
-            localStorage.setItem("watchPlayerState", JSON.stringify(playerState));
-        }
-    });
-
-    maximizeWatch.style.display = "none";
-}
-
 // ===============================
 // LOGOUT
 // ===============================
@@ -1551,14 +1473,14 @@ const cancelLogout = document.getElementById("cancelLogout");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        logoutConfirm.classList.toggle("show");
+        logoutConfirm?.classList.toggle("show");
     });
 }
 
 if (cancelLogout) {
     cancelLogout.addEventListener("click", (e) => {
         e.stopPropagation();
-        logoutConfirm.classList.remove("show");
+        logoutConfirm?.classList.remove("show");
     });
 }
 
@@ -1685,8 +1607,8 @@ prevBtn?.addEventListener("click", () => {
 
 volumeSlider?.addEventListener("input", () => {
     bgMusic.volume = volumeSlider.value / 100;
-    volumeValue.textContent = volumeSlider.value + "%";
-    volumeIcon.textContent = bgMusic.volume === 0 ? "🔇" : "🔊";
+    if (volumeValue) volumeValue.textContent = volumeSlider.value + "%";
+    if (volumeIcon) volumeIcon.textContent = bgMusic.volume === 0 ? "🔇" : "🔊";
 });
 
 const initialVolume = Math.round(bgMusic.volume * 100);
@@ -1706,14 +1628,14 @@ volumeIcon?.addEventListener("click", () => {
     if (bgMusic.volume > 0) {
         lastVolume = bgMusic.volume;
         bgMusic.volume = 0;
-        volumeSlider.value = 0;
-        volumeValue.textContent = "0%";
-        volumeIcon.textContent = "🔇";
+        if (volumeSlider) volumeSlider.value = 0;
+        if (volumeValue) volumeValue.textContent = "0%";
+        if (volumeIcon) volumeIcon.textContent = "🔇";
     } else {
         bgMusic.volume = lastVolume || 0.15;
-        volumeSlider.value = Math.round(bgMusic.volume * 100);
-        volumeValue.textContent = volumeSlider.value + "%";
-        volumeIcon.textContent = "🔊";
+        if (volumeSlider) volumeSlider.value = Math.round(bgMusic.volume * 100);
+        if (volumeValue) volumeValue.textContent = volumeSlider.value + "%";
+        if (volumeIcon) volumeIcon.textContent = "🔊";
     }
 });
 
