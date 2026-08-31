@@ -78,10 +78,41 @@ function updateLiveCalendar() {
 // ==================================
 // ACTIVITY CENTER & AUDIT LOG HELPER
 // ==================================
+function getClientDeviceInfo() {
+    const ua = navigator.userAgent;
+    let device = "Desktop";
+    let os = "Unknown OS";
+    let browser = "Unknown Browser";
+
+    // Detect Device Type
+    if (/iphone/i.test(ua)) device = "iPhone";
+    else if (/ipad/i.test(ua)) device = "iPad";
+    else if (/android/i.test(ua)) device = "Android Phone";
+    else if (/macintosh|mac os x/i.test(ua)) device = "Mac";
+    else if (/windows/i.test(ua)) device = "Windows PC";
+    else if (/mobile/i.test(ua)) device = "Mobile Device";
+
+    // Detect OS
+    if (/windows/i.test(ua)) os = "Windows";
+    else if (/mac os x/i.test(ua)) os = "macOS";
+    else if (/android/i.test(ua)) os = "Android";
+    else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
+    else if (/linux/i.test(ua)) os = "Linux";
+
+    // Detect Browser
+    if (/chrome|crios/i.test(ua) && !/edge|opr/i.test(ua)) browser = "Chrome";
+    else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) browser = "Safari";
+    else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
+    else if (/edge/i.test(ua)) browser = "Edge";
+
+    return { device, os, browser };
+}
+
 async function recordActivity(action, details = "") {
     try {
         const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
-        const userName = currentUser.name || currentUser.username || "Kim Bryan Hernandez";
+        const userName = currentUser.name || currentUser.username || currentUser.full_name || "Kim Bryan Hernandez";
+        const clientInfo = getClientDeviceInfo();
 
         await fetch("/api/logs", {
             method: "POST",
@@ -90,9 +121,9 @@ async function recordActivity(action, details = "") {
                 user_name: userName,
                 action: action,
                 details: details,
-                browser: navigator.userAgent.includes("Chrome") ? "Chrome" : "Browser",
-                os: navigator.platform,
-                device: window.innerWidth < 768 ? "Mobile" : "Desktop"
+                browser: clientInfo.browser,
+                os: clientInfo.os,
+                device: clientInfo.device
             })
         });
     } catch (err) {
@@ -270,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==================================
-   CORE LOGIC: SAVE & LOAD (REST API)
+    CORE LOGIC: SAVE & LOAD (REST API)
 ================================== */
 
 function collectRowData(row) {
@@ -433,7 +464,7 @@ function populateRow(row, data) {
 }
 
 /* ==================================
-   CLEAR TABLE (MONTH SWITCH)
+    CLEAR TABLE (MONTH SWITCH)
 ================================== */
 function clearProjectTable() {
     document.querySelectorAll(".project-table tbody tr").forEach(row => {
@@ -883,7 +914,7 @@ function updateMonthLockUI() {
 }
 
 /* ==================================
-   UI HELPERS
+    UI HELPERS
 ================================== */
 function updateStatusColor(select) {
     if (!select) return;
@@ -968,7 +999,7 @@ function updateSongStatusColor(select) {
 }
 
 /* ==================================
-   MONTH RIGHT-CLICK MENU (ADMIN)
+    MONTH RIGHT-CLICK MENU (ADMIN)
 ================================== */
 const monthContextMenu = document.getElementById("monthContextMenu");
 
@@ -1061,7 +1092,7 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", async () =>
 });
 
 /* ==================================
-   WATCH & MODALS EVENTS
+    WATCH & MODALS EVENTS
 ================================== */
 let activeWatchButton = null;
 let activeFilesButton = null;
@@ -1364,7 +1395,7 @@ commentsTextarea?.addEventListener("input", () => {
 });
 
 /* ==================================
-   WATCH PLAYER WINDOW DRAG & CONTROLS
+    WATCH PLAYER WINDOW DRAG & CONTROLS
 ================================== */
 const watchPlayer = document.getElementById("watchBox");
 const watchHeader = document.getElementById("watchHeader");
@@ -1501,7 +1532,7 @@ document.addEventListener("click", (e) => {
 });
 
 /* ==================================
-   SOUNDS & MUSIC
+    SOUNDS & MUSIC
 ================================== */
 const clickSound = new Audio("../assets/sounds/click.mp3");
 clickSound.volume = 0.2;
@@ -1642,7 +1673,7 @@ volumeIcon?.addEventListener("click", () => {
 });
 
 /* ==================================
-   SONG LINK STYLE & DRONE AUTOCOMPLETE
+    SONG LINK STYLE & DRONE AUTOCOMPLETE
 ================================== */
 function updateSongLinkStyle(input) {
     if (!input) return;
@@ -1733,7 +1764,7 @@ document.addEventListener("dblclick", (e) => {
 });
 
 /* ==================================
-   TIMELINE & PROGRESS SLIDER
+    TIMELINE & PROGRESS SLIDER
 ================================== */
 function updateTimelineProgress() {
     document.querySelectorAll(".project-table tbody tr").forEach(row => {

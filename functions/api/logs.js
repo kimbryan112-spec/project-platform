@@ -19,8 +19,8 @@ export async function onRequestPost(context) {
             user_name || "Admin/User",
             action || "Unknown Action",
             details || "",
-            browser || "Browser",
-            os || "OS",
+            browser || "Unknown Browser",
+            os || "Unknown OS",
             device || "Desktop"
         ).run();
 
