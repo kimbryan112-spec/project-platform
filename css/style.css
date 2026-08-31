@@ -1,5 +1,5 @@
 /* ==================================
-   RESET
+    RESET
 ================================== */
 
 *{
@@ -26,7 +26,7 @@ select{
 }
 
 /* ==================================
-   LAYOUT
+    LAYOUT
 ================================== */
 
 #app{
@@ -41,7 +41,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR
+    SIDEBAR
 ================================== */
 
 .sidebar{
@@ -54,7 +54,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR LOGO
+    SIDEBAR LOGO
 ================================== */
 
 .logo{
@@ -84,7 +84,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR NAVIGATION
+    SIDEBAR NAVIGATION
 ================================== */
 
 .sidebar nav{
@@ -108,7 +108,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR + BTN-3D OVERRIDE
+    SIDEBAR + BTN-3D OVERRIDE
 ================================== */
 
 .sidebar .btn-3d{
@@ -131,7 +131,7 @@ select{
 }
 
 /* ==================================
-   ACTIVE PAGE
+    ACTIVE PAGE
 ================================== */
 
 .sidebar nav a.active,
@@ -146,7 +146,7 @@ select{
 }
 
 /* ==================================
-   INACTIVE PAGE
+    INACTIVE PAGE
 ================================== */
 
 .sidebar nav a:not(.active),
@@ -161,7 +161,7 @@ select{
 }
 
 /* ==================================
-   TOPBAR
+    TOPBAR
 ================================== */
 
 .topbar{
@@ -196,7 +196,7 @@ select{
 }
 
 /* ==================================
-   TABLE
+    TABLE
 ================================== */
 
 .table-wrapper{
@@ -260,7 +260,7 @@ select{
 }
 
 /* ==================================
-   COLUMN WIDTHS
+    COLUMN WIDTHS
 ================================== */
 
 .project-table th:nth-child(1),
@@ -300,7 +300,7 @@ select{
 }
 
 /* ==================================
-   INPUTS
+    INPUTS
 ================================== */
 
 .text-input{
@@ -345,7 +345,7 @@ select{
 }
 
 /* ==================================
-   DRONE SELECT + SEARCH
+    DRONE SELECT + SEARCH
 ================================== */
 
 .drone-cell{
@@ -438,7 +438,7 @@ select{
 }
 
 /* ==================================
-   SONG CARD
+    SONG CARD
 ================================== */
 
 .song-cell{
@@ -502,7 +502,7 @@ select{
 }
 
 /* ==================================
-   DASHBOARD ONLY
+    DASHBOARD ONLY
 ================================== */
 
 .dashboard-song-actions{
@@ -570,7 +570,7 @@ select{
 }
 
 /* ==================================
-   LINKS
+    LINKS
 ================================== */
 
 .project-table a{
@@ -583,7 +583,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR FOOTER
+    SIDEBAR FOOTER
 ================================== */
 
 .sidebar-footer{
@@ -625,7 +625,7 @@ select{
 }
 
 /* ==================================
-   LOGOUT CONFIRM POPUP
+    LOGOUT CONFIRM POPUP
 ================================== */
 
 .logout-wrapper{
@@ -717,7 +717,7 @@ select{
 }
 
 /* ==========================
-   CHECK BUTTON (3D)
+    CHECK BUTTON (3D)
 ========================== */
 
 .raw-check-btn,
@@ -745,7 +745,7 @@ select{
 }
 
 /* ==================================
-   YEAR + MONTH NAVIGATION
+    YEAR + MONTH NAVIGATION
 ================================== */
 
 .year-month-panel{
@@ -794,7 +794,7 @@ select{
 }
 
 /* ==================================
-   LIVE CALENDAR
+    LIVE CALENDAR
 ================================== */
 
 .live-calendar{
@@ -861,7 +861,7 @@ select{
 }
 
 /* ==========================
-   MONTH BUTTON (DEFAULT)
+    MONTH BUTTON (DEFAULT)
 ========================== */
 
 .month-btn{
@@ -890,7 +890,7 @@ select{
 }
 
 /* ==========================
-   HAS DATA (GREEN)
+    HAS DATA (GREEN)
 ========================== */
 
 .month-btn.has-data{
@@ -904,7 +904,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE
+    ACTIVE
 ========================== */
 
 .month-btn.active{
@@ -913,7 +913,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE + HAS DATA
+    ACTIVE + HAS DATA
 ========================== */
 
 .month-btn.active.has-data{
@@ -929,7 +929,7 @@ select{
 }
 
 /* ==========================
-   LOCKED
+    LOCKED
 ========================== */
 
 .month-btn.locked{
@@ -938,7 +938,7 @@ select{
 }
 
 /* ==========================
-   LOCKED + HAS DATA
+    LOCKED + HAS DATA
 ========================== */
 
 .month-btn.locked.has-data{
@@ -947,7 +947,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE + LOCKED
+    ACTIVE + LOCKED
 ========================== */
 
 .month-btn.active.locked{
@@ -958,7 +958,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE + LOCKED + HAS DATA
+    ACTIVE + LOCKED + HAS DATA
 ========================== */
 
 .month-btn.active.locked.has-data{
@@ -988,7 +988,7 @@ select{
 }
 
 /* ==========================================
-   MONTH RIGHT-CLICK CONTEXT MENU
+    MONTH RIGHT-CLICK CONTEXT MENU
 ========================================== */
 
 .month-context-menu {
@@ -1042,7 +1042,7 @@ select{
 }
 
 /* ==================================
-   REUSABLE BUTTONS (3D)
+    REUSABLE BUTTONS (3D)
 ================================== */
 
 .btn-3d{
@@ -1084,7 +1084,7 @@ select{
 }
 
 /* ==========================
-   COUPLE CELL
+    COUPLE CELL
 ========================== */
 
 .couple-cell{
@@ -1123,7 +1123,7 @@ select{
 }
 
 /* ==================================
-   BUTTON BASE
+    BUTTON BASE
 ================================== */
 
 .watch-btn{
@@ -1147,7 +1147,7 @@ select{
 }
 
 /* ==================================
-   WATCH
+    WATCH
 ================================== */
 
 .watch-btn{
@@ -1256,7 +1256,7 @@ select{
 }
 
 /* ==================================
-   COMMENTS MODAL
+    COMMENTS MODAL
 ================================== */
 
 #commentsTextarea{
@@ -1280,7 +1280,7 @@ select{
 }
 
 /* ==================================
-   PROJECT CONCERNS MODE
+    PROJECT CONCERNS MODE
 ================================== */
 
 #commentsModal.concerns-mode .modal-content{
@@ -1434,7 +1434,7 @@ select{
 }
 
 /* ==================================
-   WATCH CONTEXT MENU
+    WATCH CONTEXT MENU
 ================================== */
 
 #watchContextMenu{
@@ -1466,7 +1466,7 @@ select{
 }
 
 /* ==================================
-   WATCH LINK MODAL
+    WATCH LINK MODAL
 ================================== */
 
 #watchLinkInput{
@@ -1506,7 +1506,7 @@ select{
 }
 
 /* ==================================
-   LOGIN PAGE
+    LOGIN PAGE
 ================================== */
 
 .login-container{
@@ -1813,7 +1813,7 @@ select{
 }
 
 /* ==================================
-   PROJECT STATUS COLORS
+    PROJECT STATUS COLORS
 ================================== */
 
 .status-planned{
@@ -1853,7 +1853,7 @@ select{
 }
 
 /* ==================================
-   PROJECT TYPE COLORS
+    PROJECT TYPE COLORS
 ================================== */
 
 .type-basic{
@@ -1899,7 +1899,7 @@ select{
 }
 
 /* ==================================
-   PROFILE LOGO (TOPBAR)
+    PROFILE LOGO (TOPBAR)
 ================================== */
 
 .profile{
@@ -1933,7 +1933,7 @@ select{
 }
 
 /* =====================================================
-   SETTINGS PAGE
+    SETTINGS PAGE
 ===================================================== */
 
 .settings-dashboard{
@@ -2545,8 +2545,8 @@ input[type="url"]::placeholder{
 }
 
 /* ==========================================
-   ACTIVITY CENTER & NOTIFICATION DROPDOWN STYLES
-   ========================================== */
+    ACTIVITY CENTER & NOTIFICATION DROPDOWN STYLES
+    ========================================== */
 .notification-wrapper {
     position: relative;
     display: inline-block;
@@ -2636,22 +2636,34 @@ input[type="url"]::placeholder{
     background: #f8fafc;
 }
 
-/* ==================================
-   MODERN MOBILE APP & ROTATE VIEW STYLES
-================================== */
+/* =====================================================
+    OPTION 1: NATIVE MOBILE APP & EXCEL SPREADSHEET LAYOUT
+    (Fixed Header, Fixed Bottom Nav, Scrollable & Sticky Table)
+===================================================== */
 @media screen and (max-width: 900px) {
-    body {
+    /* 1. App-level lock: Bawal mag-scroll ang buong page, para laging sakto sa screen */
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
         background-color: #0c0a09;
-        overflow-x: hidden;
+        -webkit-text-size-adjust: 100%;
     }
 
     #app {
+        display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        width: 100%;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        position: relative;
     }
 
-    /* Fixed Bottom Navigation (App style para sa Portrait & Landscape) */
+    /* 2. Fixed Bottom Navigation (Bottom App Bar ~60px) */
     .sidebar {
         position: fixed;
         bottom: 0;
@@ -2661,13 +2673,13 @@ input[type="url"]::placeholder{
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
-        background: rgba(15, 15, 15, 0.95);
+        background: rgba(15, 15, 15, 0.96);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         z-index: 1000;
-        padding: 0 10px;
-        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+        padding: 0 4px;
+        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.6);
     }
 
     .sidebar .logo, 
@@ -2680,7 +2692,7 @@ input[type="url"]::placeholder{
         width: 100%;
         justify-content: space-around;
         margin-top: 0;
-        gap: 4px;
+        gap: 0;
     }
 
     .sidebar nav a {
@@ -2690,26 +2702,41 @@ input[type="url"]::placeholder{
         gap: 2px;
         text-align: center;
         border-radius: 8px;
+        color: #94a3b8;
+        min-height: 44px; /* Touch target compliance */
+        justify-content: center;
     }
 
-    /* Main Area: Diretto sa Table ang Unang Salubong */
+    .sidebar nav a.active {
+        color: #ffffff;
+        background: rgba(37, 99, 235, 0.3);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    /* 3. Main Workspace Container */
     .main {
-        padding: 8px 8px 75px 8px !important;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 6px 6px 66px 6px !important; /* Nilalagyan ng allowance sa baba para sa bottom nav */
         width: 100% !important;
+        height: 100%;
+        overflow: hidden;
         box-sizing: border-box;
     }
 
-    /* Compact Top Header & Music Player */
+    /* 4. Compact Fixed Top Header (~60-70px) */
     .topbar {
+        flex-shrink: 0;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        background: rgba(24, 24, 27, 0.85);
+        background: rgba(24, 24, 27, 0.9);
         backdrop-filter: blur(12px);
         padding: 6px 10px;
-        border-radius: 10px;
-        margin-bottom: 8px;
+        border-radius: 8px;
+        margin-bottom: 4px;
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
@@ -2722,58 +2749,45 @@ input[type="url"]::placeholder{
         font-size: 14px !important;
         font-weight: 800;
         color: #ffffff;
+        margin: 0;
+        line-height: 1.2;
     }
 
-    .page-title p {
-        display: none !important;
-    }
-
+    .page-title p,
     .year-header {
-        display: none !important;
+        display: none !important; /* Itago ang napakalaking desktop title para hindi kumain ng space */
     }
 
-    .music-player {
-        position: relative !important;
-        top: auto !important;
-        right: auto !important;
-        width: auto !important;
-        background: rgba(0, 0, 0, 0.3);
-        padding: 2px 6px;
+    .topbar-right {
+        gap: 6px;
+    }
+
+    .topbar-right select {
+        height: 32px;
+        font-size: 12px;
+        padding: 0 4px;
         border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        display: flex;
-        align-items: center;
-        gap: 4px;
     }
 
-    .music-controls {
-        margin-bottom: 0 !important;
-        gap: 2px !important;
+    .next-year-btn {
+        height: 32px;
+        font-size: 11px;
+        padding: 0 8px;
     }
 
-    .music-btn {
-        width: 20px !important;
-        height: 20px !important;
-        font-size: 8px !important;
+    .profile {
+        width: 32px;
+        height: 32px;
     }
 
-    .music-btn.play {
-        width: 24px !important;
-        height: 24px !important;
-        font-size: 10px !important;
-    }
-
-    .volume-row, .volume-icon {
-        display: none !important;
-    }
-
-    /* Months Panel (Lilitaw sa ibaba ng topbar kapag nag-scroll ka ng konti pababa) */
+    /* 5. Compact Fixed Month & Controls Panel */
     .year-month-panel {
-        background: rgba(24, 24, 27, 0.8);
+        flex-shrink: 0;
+        background: rgba(24, 24, 27, 0.85);
         backdrop-filter: blur(14px);
         padding: 6px 8px;
-        border-radius: 10px;
-        margin-bottom: 8px;
+        border-radius: 8px;
+        margin-bottom: 4px;
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
@@ -2794,13 +2808,14 @@ input[type="url"]::placeholder{
     .month-btn {
         padding: 4px 10px !important;
         min-width: 50px !important;
-        min-height: 28px !important;
+        min-height: 30px !important;
         font-size: 11px !important;
         flex-shrink: 0;
         border-radius: 6px !important;
     }
 
     .month-legend {
+        flex-shrink: 0;
         font-size: 10px;
         gap: 10px;
         margin-bottom: 2px;
@@ -2808,40 +2823,98 @@ input[type="url"]::placeholder{
         justify-content: center;
     }
 
-    /* Table Wrapper: Smooth Horizontal Swipe View (Portrait & Landscape Rotate) */
+    .music-player {
+        display: none; /* Itago muna ang malaking music player sa mobile para malinis at compact ang header */
+    }
+
+    /* 6. Middle Scrollable Table Area (Google Sheets Workspace Experience) */
     .table-wrapper {
-        background: rgba(24, 24, 27, 0.75);
+        flex: 1;
+        background: rgba(24, 24, 27, 0.85);
         backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
+        border-radius: 8px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         width: 100%;
-        overflow-x: auto;
+        overflow: auto; /* Sabay na gumagana ang patayo (vertical) at pahalang (horizontal) na swipe */
         -webkit-overflow-scrolling: touch;
+        position: relative;
     }
 
     .project-table {
-        min-width: 1100px;
+        min-width: 1700px; /* Sapat ang lawak para sa lahat ng columns kagaya sa desktop */
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    /* Sticky Table Headers (Hihiga sa itaas habang nagpapatayo ng scroll) */
+    .project-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: linear-gradient(to bottom, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
+        color: #fff;
+    }
+
+    /* Sticky Left Column / Couple's Column (Mananatili sa kaliwa habang nagpapaswipe ng horizontal columns) */
+    .project-table th:nth-child(1),
+    .project-table td:nth-child(1) {
+        position: sticky;
+        left: 0;
+        z-index: 20;
+        background-color: #ffffff !important;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    }
+
+    /* Pinakataas-kaliwang intersection cell (Couple's Header) para laging nasa ibabaw */
+    .project-table thead th:nth-child(1) {
+        z-index: 40 !important;
+    }
+
+    /* Mobile Touch Targets Compliance (Minimum 44px o sapat na laki para sa daliri) */
+    .couple-name {
+        min-height: 38px;
+        font-size: 13px;
+    }
+
+    .instruction-btn, 
+    .watch-btn {
+        min-height: 36px;
+        font-size: 11px;
+    }
+
+    .status-select, 
+    .type-select, 
+    .drone-select, 
+    .drone-search {
+        height: 36px;
+        font-size: 12px;
+    }
+
+    .generate-btn, 
+    .raw-check-btn {
+        height: 36px;
+        font-size: 12px;
     }
 }
 
-/* Karagdagang Optimization para sa Landscape / Rotate View (Phone Naka-Higa) */
+/* Landscape Mode Optimization (Phone Naka-Higa): Mas maluwag na espasyo at mas maraming columns ang makikita */
 @media screen and (max-width: 900px) and (orientation: landscape) {
     .main {
-        padding: 6px 6px 65px 6px !important;
+        padding: 4px 4px 55px 4px !important;
     }
 
     .topbar {
         padding: 4px 8px;
-        margin-bottom: 6px;
+        margin-bottom: 3px;
     }
 
     .year-month-panel {
         padding: 4px 6px;
-        margin-bottom: 6px;
+        margin-bottom: 3px;
     }
 
     .sidebar {
-        height: 50px;
+        height: 52px;
     }
 }

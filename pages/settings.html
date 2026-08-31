@@ -3,9 +3,96 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2563eb">
     <title>Project Platform - Settings</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+
+    <!-- Apple -->
+    <link rel="apple-touch-icon" href="/assets/icons/Icon-1024.png">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+
     <link rel="stylesheet" href="../css/style.css">
+    
+    <!-- Inline Compact Overrides para sa Settings para saktong-sakto at walang scroll -->
+    <style>
+        @media screen and (max-width: 900px) {
+            html, body {
+                overflow: hidden !important;
+                height: 100vh;
+                height: 100dvh;
+            }
+            .main {
+                padding: 4px 6px 65px 6px !important;
+                overflow-y: auto !important;
+                height: 100%;
+            }
+            .settings-wrapper {
+                gap: 8px !important;
+                margin-top: 4px !important;
+            }
+            .settings-card {
+                padding: 10px 12px !important;
+                border-radius: 10px !important;
+            }
+            .settings-card .settings-title {
+                margin-bottom: 6px !important;
+            }
+            .settings-card .settings-title h2 {
+                font-size: 15px !important;
+            }
+            .settings-card .settings-title p {
+                font-size: 11px !important;
+                margin-top: 2px !important;
+            }
+            .settings-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 6px !important;
+            }
+            .info-box {
+                padding: 6px 8px !important;
+                border-radius: 6px !important;
+            }
+            .info-box span {
+                font-size: 10px !important;
+                margin-bottom: 2px !important;
+            }
+            .info-box strong {
+                font-size: 12px !important;
+            }
+            .settings-form {
+                gap: 6px !important;
+            }
+            .settings-form select, 
+            .settings-form input {
+                height: 32px !important;
+                font-size: 12px !important;
+                padding: 0 6px !important;
+            }
+            .settings-form button, 
+            .settings-card > button {
+                height: 32px !important;
+                min-width: 110px !important;
+                font-size: 12px !important;
+                padding: 0 12px !important;
+            }
+            .settings-card input[type="file"],
+            .settings-card input[type="text"] {
+                height: 32px !important;
+                font-size: 12px !important;
+                padding: 4px !important;
+            }
+            .settings-card br {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -18,7 +105,8 @@
     <aside class="sidebar">
         <div class="logo">
             <h2>PROJECT PLATFORM</h2>
-            <p>KBHFILMS</p>
+            <p><strong>KBHFILMS</strong></p>
+            <span class="app-version">Version 1.2.8</span>
         </div>
 
         <nav>
@@ -90,6 +178,24 @@
             </div>
 
             <div class="topbar-right">
+                <!-- Notification Bell / Activity Center -->
+                <div class="notification-wrapper" style="position: relative; display: inline-block; margin-right: 15px; cursor: pointer;">
+                    <div id="notificationBell" style="font-size: 18px; background: #f8fafc; width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">
+                        🔔
+                    </div>
+                    <span id="notificationBadge" style="position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none;">0</span>
+                    
+                    <div id="notificationDropdown" style="display: none; position: absolute; right: 0; top: 48px; width: 340px; background: #ffffff; border-radius: 12px; box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15); z-index: 1000; overflow: hidden;">
+                        <div style="background: #2563eb; color: white; padding: 12px 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+                            <span>Activity Center</span>
+                            <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
+                        </div>
+                        <div id="notificationList" style="max-height: 380px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
+                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <select id="yearSelect"></select>
                 <button class="next-year-btn btn-3d">
                     + Next Year
@@ -213,9 +319,7 @@
                     </div>
 
                     <input id="restoreFile" type="file" accept=".json">
-                    <br><br>
-
-                    <button id="restoreBtn" class="btn-3d">
+                    <button id="restoreBtn" class="btn-3d" style="margin-top: 4px;">
                         Restore Database
                     </button>
                 </div>
@@ -228,9 +332,7 @@
                     </div>
 
                     <input id="confirmDelete" type="text" placeholder="Type RESET">
-                    <br><br>
-
-                    <button id="deleteAllBtn" class="btn-3d delete-btn">
+                    <button id="deleteAllBtn" class="btn-3d delete-btn" style="margin-top: 4px;">
                         DELETE EVERYTHING
                     </button>
                 </div>
@@ -265,7 +367,6 @@ document.addEventListener("DOMContentLoaded", () => {
             option.value = y;
             option.textContent = y;
             
-            // Default na piliin ang kasalukuyang taon (2026) o kung anong nakaset
             if (y === currentYear) {
                 option.selected = true;
             }
