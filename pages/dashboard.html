@@ -18,41 +18,6 @@
     <link rel="manifest" href="/manifest.json">
 
     <link rel="stylesheet" href="../css/style.css">
-
-    <!-- Inline Mobile Layout Fix para maiwasan ang auto-zoom out sa mobile -->
-    <style>
-        @media (max-width: 768px) {
-            body {
-                width: 100vw;
-                overflow-x: hidden;
-            }
-            #app {
-                display: flex;
-                flex-direction: column;
-                width: 100%;
-            }
-            .sidebar {
-                width: 100% !important;
-                height: auto !important;
-                position: relative !important;
-                box-shadow: none !important;
-            }
-            .main {
-                margin-left: 0 !important;
-                width: 100% !important;
-                padding: 10px !important;
-                box-sizing: border-box;
-            }
-            .table-wrapper {
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            .project-table {
-                min-width: 850px;
-            }
-        }
-    </style>
 </head>
 
 <body>
