@@ -84,13 +84,13 @@ async function getClientDeviceInfo() {
     let os = "Unknown OS";
     let browser = "Unknown Browser";
 
-    // Pilitin munang hanapin kung may 'Android' o 'iPhone' sa buong User-Agent string
-    const isAndroidPhone = /android/i.test(ua);
+    // 1. Unahing salain ang Mobile/Phone kahit may kasama pang "Linux" o "arm" sa UA string
+    const isAndroid = /android/i.test(ua);
     const isIPhone = /iphone|ipod/i.test(ua);
     const isIPad = /ipad/i.test(ua);
-    const isMobileUA = /mobile/i.test(ua);
+    const isMobileDevice = /mobile|armv|android|iphone|ipad/i.test(ua);
 
-    if (isAndroidPhone) {
+    if (isAndroid) {
         device = "Android Phone";
         os = "Android";
     } else if (isIPhone) {
@@ -99,11 +99,11 @@ async function getClientDeviceInfo() {
     } else if (isIPad) {
         device = "iPad";
         os = "iOS";
-    } else if (isMobileUA) {
+    } else if (isMobileDevice) {
         device = "Mobile Device";
         os = "Mobile OS";
     } else {
-        // Desktop / PC detections
+        // 2. Pure Desktop / PC detections kung walang mobile keywords
         if (/macintosh|mac os x/i.test(ua)) {
             device = "Mac";
             os = "macOS";
