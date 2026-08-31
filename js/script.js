@@ -152,6 +152,12 @@ async function recordActivity(action, details = "") {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- REAL-TIME LOGIN / PAGE OPEN LOG ---
+    const currentUserForLog = JSON.parse(localStorage.getItem("currentUser")) || {};
+    const roleText = currentUserForLog.role ? ` (${currentUserForLog.role.toUpperCase()})` : "";
+    recordActivity("Opened Dashboard", `User active on page${roleText}`);
+    // ----------------------------------------
+
     updateLiveCalendar();
     setInterval(updateLiveCalendar, 60000);
 
