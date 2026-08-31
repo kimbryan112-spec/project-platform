@@ -79,48 +79,68 @@ function updateLiveCalendar() {
 // ACTIVITY CENTER & AUDIT LOG HELPER
 // ==================================
 async function getClientDeviceInfo() {
-    const ua = navigator.userAgent;
     let device = "Desktop";
     let os = "Unknown OS";
     let browser = "Unknown Browser";
 
-    // 1. Unahing salain ang Mobile/Phone kahit may kasama pang "Linux" o "arm" sa UA string
-    const isAndroid = /android/i.test(ua);
-    const isIPhone = /iphone|ipod/i.test(ua);
-    const isIPad = /ipad/i.test(ua);
-    const isMobileDevice = /mobile|armv|android|iphone|ipad/i.test(ua);
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
 
-    if (isAndroid) {
-        device = "Android Phone";
-        os = "Android";
-    } else if (isIPhone) {
-        device = "iPhone";
-        os = "iOS";
-    } else if (isIPad) {
-        device = "iPad";
-        os = "iOS";
-    } else if (isMobileDevice) {
-        device = "Mobile Device";
-        os = "Mobile OS";
-    } else {
-        // 2. Pure Desktop / PC detections kung walang mobile keywords
-        if (/macintosh|mac os x/i.test(ua)) {
-            device = "Mac";
-            os = "macOS";
-        } else if (/windows/i.test(ua)) {
-            device = "Windows PC";
-            os = "Windows";
-        } else if (/linux/i.test(ua)) {
-            device = "Linux PC";
-            os = "Linux";
+    // Modern User-Agent Data check (para sa mga bagong Android/iOS browsers)
+    if (navigator.userAgentData) {
+        try {
+            const hints = await navigator.userAgentData.getHighEntropyValues([
+                "platform", 
+                "platformVersion", 
+                "model", 
+                "mobile"
+            ]);
+            
+            if (hints.mobile || hints.platform === "Android" || hints.platform === "iOS") {
+                if (hints.model && hints.model !== "") {
+                    device = hints.model; // Halimbawa: "iPhone", "Samsung Galaxy", etc.
+                } else {
+                    device = hints.platform === "iOS" ? "iPhone" : "Android Phone";
+                }
+                os = hints.platform;
+            }
+        } catch (e) {}
+    }
+
+    // Fallback/Deep Regex kung sakaling hindi pumasok sa userAgentData (Gaya ng Linux armv81 sa phone)
+    if (device === "Desktop" || device === "Unknown OS") {
+        if (/iphone|ipod/i.test(ua)) {
+            device = "iPhone";
+            os = "iOS";
+        } else if (/ipad/i.test(ua)) {
+            device = "iPad";
+            os = "iOS";
+        } else if (/android/i.test(ua) || (/linux/i.test(ua) && /armv|mobile|mobi/i.test(ua))) {
+            device = "Android Phone";
+            os = "Android";
+        } else if (/mobile|mobi|blackberry|opera mini|iemobile/i.test(ua)) {
+            device = "Mobile Phone";
+            os = "Mobile OS";
+        } else {
+            // Pure Desktop
+            if (/macintosh|mac os x/i.test(ua)) {
+                device = "Mac";
+                os = "macOS";
+            } else if (/windows/i.test(ua)) {
+                device = "Windows PC";
+                os = "Windows";
+            } else if (/linux/i.test(ua)) {
+                device = "Linux PC";
+                os = "Linux";
+            }
         }
     }
 
-    // Detect Browser
+    // Browser Detection
     if (/chrome|crios/i.test(ua) && !/edge|opr/i.test(ua)) browser = "Chrome";
     else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) browser = "Safari";
     else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
     else if (/edge/i.test(ua)) browser = "Edge";
+    else if (/opr|opera/i.test(ua)) browser = "Opera";
 
     return { device, os, browser };
 }
