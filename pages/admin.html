@@ -94,7 +94,7 @@
                             <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
                         </div>
                         <div id="notificationList" style="max-height: 380px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
-                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang bagong activity mula sa mga members.</p>
+                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>
                         </div>
                     </div>
                 </div>
@@ -379,7 +379,6 @@ const IS_ADMIN = true;
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>
-// Script para sa Activity Center (New/Unread Notifications Only)
 document.addEventListener("DOMContentLoaded", () => {
     const bell = document.getElementById("notificationBell");
     const dropdown = document.getElementById("notificationDropdown");
@@ -391,10 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
             dropdown.style.display = isOpen ? "none" : "block";
             
             if (!isOpen) {
-                // Kapag binuksan ang bell, i-save ang kasalukuyang oras para maging "read" na ang lahat ng lumang logs
-                localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
                 fetchActivityLogs();
-                
                 const badgeEl = document.getElementById("notificationBadge");
                 if (badgeEl) badgeEl.style.display = "none";
             }
@@ -407,7 +403,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Auto-check para sa bagong logs bawat 15 segundo para sa badge
     setInterval(checkNewLogsCount, 15000);
     checkNewLogsCount();
 });
@@ -422,28 +417,15 @@ async function fetchActivityLogs() {
         const data = await res.json();
         const logs = data.logs || [];
 
-        // Kunin ang timestamp ng huling pagbukas ng notifications
-        const lastSeen = localStorage.getItem("kbh_last_seen_log");
-        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
-
-        // Salain ang logs: 
-        // 1. I-filter out kapag ang user ay Admin / Kim Bryan Hernandez
-        // 2. Kunin lang ang mga bago pa kaysa sa huling pagbukas (Unread / New lang)
         const filteredLogs = logs.filter(log => {
             const name = (log.user_name || "").toLowerCase();
-            if (name.includes("admin") || name.includes("kim bryan hernandez")) return false;
-
-            if (log.created_at) {
-                let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
-                return new Date(dStr).getTime() > lastSeenTime;
-            }
-            return false;
+            return !name.includes("admin") && !name.includes("kim bryan hernandez");
         });
 
         if (filteredLogs.length > 0) {
             badgeEl.style.display = "none";
 
-            listEl.innerHTML = filteredLogs.map(log => {
+            listEl.innerHTML = filteredLogs.slice(0, 15).map(log => {
                 let logDate;
                 if (log.created_at) {
                     let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
@@ -459,11 +441,15 @@ async function fetchActivityLogs() {
                 const os = log.os || "Windows";
                 const browser = log.browser || "Browser";
 
+                // Kulayan ng green kapag iPhone o Android/Mobile, blue kapag desktop
+                const isPhone = device.includes("iPhone") || device.includes("Android") || device.includes("Mobile");
+                const badgeColor = isPhone ? "background: #dcfce7; color: #15803d;" : "background: #e0f2fe; color: #0369a1;";
+
                 return `
                     <div style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 4px;">
                         <div style="font-weight: 600; color: #1e293b; display: flex; justify-content: space-between; align-items: center;">
                             <span>${log.user_name}</span>
-                            <span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 500;">💻 ${device}</span>
+                            <span style="font-size: 10px; ${badgeColor} padding: 2px 6px; border-radius: 4px; font-weight: 500;">📱 ${device}</span>
                         </div>
                         <div style="color: #2563eb; font-weight: 500; font-size: 12px;">${log.action}</div>
                         <div style="color: #64748b; font-size: 11px; background: #f8fafc; padding: 4px 6px; border-radius: 4px;">${log.details || ''}</div>
@@ -476,7 +462,7 @@ async function fetchActivityLogs() {
             }).join("");
         } else {
             badgeEl.style.display = "none";
-            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang bagong activity mula sa mga members.</p>';
+            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
         }
     } catch (err) {
         console.error("Error fetching logs:", err);
