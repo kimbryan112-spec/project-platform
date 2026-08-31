@@ -169,11 +169,7 @@
                             <option value="12">December</option>
                         </select>
 
-                        <select id="resetMonthYear">
-                            <option>2025</option>
-                            <option selected>2026</option>
-                            <option>2027</option>
-                        </select>
+                        <select id="resetMonthYear"></select>
 
                         <button id="resetMonthBtn" class="btn-3d danger-btn">
                             Reset Month
@@ -189,11 +185,7 @@
                     </div>
 
                     <div class="settings-form">
-                        <select id="resetYear">
-                            <option>2025</option>
-                            <option selected>2026</option>
-                            <option>2027</option>
-                        </select>
+                        <select id="resetYear"></select>
 
                         <button id="resetYearBtn" class="btn-3d warning-btn">
                             Reset Year
@@ -249,6 +241,40 @@
     </main>
 
 </div> <!-- #app -->
+
+<script>
+// Script para mag-populate ng Years mula 2023 hanggang 2031 para sa lahat ng dropdowns sa settings
+document.addEventListener("DOMContentLoaded", () => {
+    const yearSelects = [
+        document.getElementById("yearSelect"),
+        document.getElementById("resetMonthYear"),
+        document.getElementById("resetYear")
+    ];
+
+    const currentYear = new Date().getFullYear();
+    const startYear = 2023;
+    const endYear = 2031;
+
+    yearSelects.forEach(selectElement => {
+        if (!selectElement) return;
+        
+        selectElement.innerHTML = "";
+        
+        for (let y = startYear; y <= endYear; y++) {
+            const option = document.createElement("option");
+            option.value = y;
+            option.textContent = y;
+            
+            // Default na piliin ang kasalukuyang taon (2026) o kung anong nakaset
+            if (y === currentYear) {
+                option.selected = true;
+            }
+            
+            selectElement.appendChild(option);
+        }
+    });
+});
+</script>
 
 <script src="../js/settings.js"></script>
 
