@@ -2721,6 +2721,11 @@ input[type="url"]::placeholder{
         gap: 8px;
     }
 
+    /* Itago ang Next Year button sa mobile view */
+    .next-year-btn {
+        display: none !important;
+    }
+
     .notification-wrapper {
         position: relative !important;
         display: inline-flex !important;
@@ -2746,10 +2751,10 @@ input[type="url"]::placeholder{
         gap: 0;
     }
 
-    .page-title h1 {
-        font-size: 14px !important;
-        font-weight: 800;
-        color: #ffffff;
+    /* Itago ang salitang Dashboard sa top bar/page title kapag mobile */
+    .page-title h1,
+    .page-title {
+        display: none !important;
     }
 
     .page-title p {
