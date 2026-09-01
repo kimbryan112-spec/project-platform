@@ -344,6 +344,23 @@ select{
     border-radius:4px;
 }
 
+/* ==========================================================
+   KULAY PARA SA PROPOSAL AT MONTAGE SA TYPE DROPDOWN
+   ========================================================== */
+.type-select option[value="PROPOSAL"],
+.type-proposal {
+    background-color: #e0f2fe !important;
+    color: #0369a1 !important;
+    font-weight: 700;
+}
+
+.type-select option[value="MONTAGE"],
+.type-montage {
+    background-color: #fae8ff !important;
+    color: #a21caf !important;
+    font-weight: 700;
+}
+
 /* ==================================
    DRONE SELECT + SEARCH
 ================================== */

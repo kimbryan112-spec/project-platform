@@ -1002,7 +1002,8 @@ function updateTypeColor(select) {
 
     select.classList.remove(
         "type-basic", "type-romantic", "type-upbeat",
-        "type-slow", "type-normal", "type-fast", "type-not-set"
+        "type-slow", "type-normal", "type-fast", "type-not-set",
+        "type-proposal", "type-montage"
     );
 
     switch (select.value) {
@@ -1012,6 +1013,8 @@ function updateTypeColor(select) {
         case "SLOW CLASSICAL": select.classList.add("type-slow"); break;
         case "NORMAL CLASSICAL": select.classList.add("type-normal"); break;
         case "FAST CLASSICAL": select.classList.add("type-fast"); break;
+        case "PROPOSAL": select.classList.add("type-proposal"); break;
+        case "MONTAGE": select.classList.add("type-montage"); break;
         default: select.classList.add("type-not-set");
     }
 }
