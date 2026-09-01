@@ -17,6 +17,7 @@ let currentYear = new Date().getFullYear().toString();
 let currentMonth =
     document.querySelector(".month-btn.active")?.dataset.month || "sep";
 let currentMonthLocked = false;
+let cachedHasDataMonths = {};
 
 // =========================
 // MONTH MAP
@@ -85,6 +86,7 @@ async function getClientDeviceInfo() {
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
 
+    // Modern User-Agent Data check (para sa mga bagong Android/iOS browsers)
     if (navigator.userAgentData) {
         try {
             const hints = await navigator.userAgentData.getHighEntropyValues([
@@ -96,7 +98,7 @@ async function getClientDeviceInfo() {
             
             if (hints.mobile || hints.platform === "Android" || hints.platform === "iOS") {
                 if (hints.model && hints.model !== "") {
-                    device = hints.model;
+                    device = hints.model; // Halimbawa: "iPhone", "Samsung Galaxy", etc.
                 } else {
                     device = hints.platform === "iOS" ? "iPhone" : "Android Phone";
                 }
@@ -105,6 +107,7 @@ async function getClientDeviceInfo() {
         } catch (e) {}
     }
 
+    // Fallback/Deep Regex kung sakaling hindi pumasok sa userAgentData (Gaya ng Linux armv81 sa phone)
     if (device === "Desktop" || device === "Unknown OS") {
         if (/iphone|ipod/i.test(ua)) {
             device = "iPhone";
@@ -119,6 +122,7 @@ async function getClientDeviceInfo() {
             device = "Mobile Phone";
             os = "Mobile OS";
         } else {
+            // Pure Desktop
             if (/macintosh|mac os x/i.test(ua)) {
                 device = "Mac";
                 os = "macOS";
@@ -132,6 +136,7 @@ async function getClientDeviceInfo() {
         }
     }
 
+    // Browser Detection
     if (/chrome|crios/i.test(ua) && !/edge|opr/i.test(ua)) browser = "Chrome";
     else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) browser = "Safari";
     else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
@@ -146,6 +151,7 @@ async function recordActivity(action, details = "") {
         const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
         const userName = currentUser.name || currentUser.username || currentUser.full_name || "Kim Bryan Hernandez";
         
+        // Tawagin ang async device detector para makuha ang tamang device/OS/browser info
         const clientInfo = await getClientDeviceInfo();
 
         await fetch("/api/logs", {
@@ -167,9 +173,11 @@ async function recordActivity(action, details = "") {
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- REAL-TIME LOGIN / PAGE OPEN LOG ---
     const currentUserForLog = JSON.parse(localStorage.getItem("currentUser")) || {};
     const roleText = currentUserForLog.role ? ` (${currentUserForLog.role.toUpperCase()})` : "";
     recordActivity("Opened Dashboard", `User active on page${roleText}`);
+    // ----------------------------------------
 
     updateLiveCalendar();
     setInterval(updateLiveCalendar, 60000);
@@ -278,12 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tableBody) {
         tableBody.addEventListener('input', () => {
             saveProjects();
-            updateCurrentMonthHasData();
+            updateCurrentMonthHasData(); // Awtomatikong mag-green kapag may tinype
         });
 
         tableBody.addEventListener('change', (e) => {
             saveProjects();
-            updateCurrentMonthHasData();
+            updateCurrentMonthHasData(); // Awtomatikong mag-green kapag nagpalit ng dropdown o select
 
             if (e.target.classList.contains('status-select')) {
                 updateStatusColor(e.target);
@@ -339,6 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Siguraduhing ma-apply ang kulay sa lahat ng type-select pagka-load ng page
     document.querySelectorAll(".type-select").forEach(select => {
         updateTypeColor(select);
     });
@@ -878,11 +887,12 @@ async function updateMonthHasDataUI(hasDataMonths = null) {
         }
 
         // 2. Suriin din ang server-side cache (kung online mode)
-        if (!LOCAL_MODE && hasDataMonths && hasDataMonths[monthName] === true) {
+        const months = hasDataMonths ?? cachedHasDataMonths ?? {};
+        if (!LOCAL_MODE && months[monthName] === true) {
             hasData = true;
         }
 
-        // 3. Kung ito ang kasalukuyang buwang nakabukas at may mga binago sa DOM ngayon
+        // 3. Kung ito ang active month at may temporary changes sa DOM ngayon
         if (monthName === currentMonth && monthHasData()) {
             hasData = true;
         }
@@ -1014,12 +1024,14 @@ function updateStatusColor(select) {
 function updateTypeColor(select) {
     if (!select) return;
 
+    // Alisin muna ang mga lumang classes
     select.classList.remove(
         "type-basic", "type-romantic", "type-upbeat",
         "type-slow", "type-normal", "type-fast", "type-not-set",
         "type-proposal", "type-montage", "type-pre-wedding", "type-pre_wedding"
     );
 
+    // I-reset ang inline styles
     select.style.backgroundColor = "";
     select.style.color = "";
 
@@ -1348,7 +1360,7 @@ watchLinkInput?.addEventListener("input", () => {
     activeWatchButton.dataset.watchLink = watchLinkInput.value.trim();
     activeWatchButton.querySelector(".play-icon")?.classList.toggle("has-link", watchLinkInput.value.trim() !== "");
     saveProjects();
-    updateCurrentMonthHasData();
+    updateCurrentMonthHasData(); // Mag-green pag may in-attach na watch link
     recordActivity("Attached Watch Link", "Updated video link");
 });
 
@@ -1371,7 +1383,7 @@ filesLinkInput?.addEventListener("input", () => {
     activeFilesButton.dataset.filesLink = filesLinkInput.value.trim();
     activeFilesButton.classList.toggle("has-link", filesLinkInput.value.trim() !== "");
     saveProjects();
-    updateCurrentMonthHasData();
+    updateCurrentMonthHasData(); // Mag-green pag may in-attach na files link
     recordActivity("Attached Files Link", "Updated raw files link");
 });
 
@@ -1395,7 +1407,7 @@ songLinkInput?.addEventListener("input", () => {
     activeSongInput.dataset.songLink = songLinkInput.value.trim();
     updateSongLinkStyle(activeSongInput);
     saveProjects();
-    updateCurrentMonthHasData();
+    updateCurrentMonthHasData(); // Mag-green pag may in-attach na song link
     recordActivity("Attached Song Link", "Updated song link");
 });
 
