@@ -170,77 +170,6 @@ async function recordActivity(action, details = "") {
     }
 }
 
-// ==================================
-// NOTIFICATION SOUND & CHECKER
-// ==================================
-function playNotificationSound() {
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 note
-        oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5 note
-
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.3);
-    } catch (e) {
-        console.log("Audio autoplay prevented or not supported:", e);
-    }
-}
-
-async function checkNewLogsCount() {
-    try {
-        const res = await fetch("/api/logs");
-        if (!res.ok) return;
-        const data = await res.json();
-        const logs = data.logs || [];
-        const badgeEl = document.getElementById("notificationBadge");
-        const dropdown = document.getElementById("notificationDropdown");
-
-        const lastSeen = localStorage.getItem("kbh_last_seen_log");
-        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
-
-        const newLogs = logs.filter(log => {
-            const name = (log.user_name || "").toLowerCase();
-            if (name.includes("admin") || name.includes("kim bryan hernandez")) return false;
-
-            if (log.created_at) {
-                let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
-                return new Date(dStr).getTime() > lastSeenTime;
-            }
-            return false;
-        });
-
-        const previousNewCount = parseInt(localStorage.getItem("kbh_prev_new_logs_count") || "0");
-
-        if (newLogs.length > 0) {
-            // Kung nadagdagan ang bagong logs (may bago si Yong), patugtugin ang tunog!
-            if (newLogs.length > previousNewCount) {
-                playNotificationSound();
-            }
-
-            if (dropdown && dropdown.style.display !== "block") {
-                if (badgeEl) {
-                    badgeEl.textContent = newLogs.length;
-                    badgeEl.style.display = "inline-block";
-                }
-            }
-        } else {
-            if (badgeEl) badgeEl.style.display = "none";
-        }
-
-        localStorage.setItem("kbh_prev_new_logs_count", newLogs.length);
-    } catch (e) {}
-}
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- REAL-TIME LOGIN / PAGE OPEN LOG ---
@@ -251,8 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateLiveCalendar();
     setInterval(updateLiveCalendar, 60000);
-    setInterval(checkNewLogsCount, 3000);
-    checkNewLogsCount();
 
     const settingsBtn = document.getElementById("settingsMenu");
 
