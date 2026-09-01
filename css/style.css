@@ -2844,7 +2844,7 @@ input[type="url"]::placeholder{
         border-radius: 6px !important;
     }
 
-    /* Table Wrapper: Normal Flow na (Hindi na naka-freeze ang first column) */
+    /* Table Wrapper */
     .table-wrapper {
         background: rgba(24, 24, 27, 0.75);
         backdrop-filter: blur(16px);
@@ -2861,7 +2861,7 @@ input[type="url"]::placeholder{
     }
 
     /* ==========================================================
-       MIDDLE VIEW & STATUS TEXT GINAWANG PUTI PARA KITANG-KITA
+       TEXT COLORS & COUPLE NAME FIX
        ========================================================== */
     .project-table td, 
     .project-table th,
@@ -2871,9 +2871,18 @@ input[type="url"]::placeholder{
         color: #ffffff !important;
     }
 
-    /* Ibalik ang tamang kulay sa mga text/inputs na may sariling background para mabasa */
-    .couple-name {
-        color: #222222 !important;
+    /* Explicit na itim at kitang-kita ang text sa couple name boxes */
+    .couple-name,
+    input.couple-name,
+    [contenteditable="true"].couple-name {
+        color: #111827 !important;
+        background-color: #ffffff !important;
+        font-weight: 700 !important;
+    }
+
+    .couple-name:empty::before,
+    .couple-name::placeholder {
+        color: #9ca3af !important;
     }
 
     .status-select,
