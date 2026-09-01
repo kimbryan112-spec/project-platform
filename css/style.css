@@ -2699,12 +2699,13 @@ input[type="url"]::placeholder{
         box-sizing: border-box;
     }
 
-    /* Compact Top Header: Year dropdown sa kaliwa, Media Player + Notification Bell sa kanan */
+    /* Compact Top Header & Notification Bell sa pagitan ng Media at Logo */
     .topbar {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
         background: rgba(24, 24, 27, 0.85);
         backdrop-filter: blur(12px);
         padding: 6px 10px;
@@ -2713,69 +2714,27 @@ input[type="url"]::placeholder{
         border: 1px solid rgba(255, 255, 255, 0.08);
         position: relative;
         z-index: 50;
+        gap: 8px;
     }
 
     .topbar-right {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+        order: 2;
     }
 
-    /* Itago ang Next Year button sa mobile view */
-    .next-year-btn {
-        display: none !important;
-    }
-
-    /* Inilipat at pinagsama ang Media Player sa tabi ng Notification Bell sa kanan */
-    .music-player {
-        position: relative !important;
-        top: auto !important;
-        right: auto !important;
-        width: auto !important;
-        background: rgba(0, 0, 0, 0.3);
-        padding: 2px 4px;
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        display: flex;
-        align-items: center;
-        gap: 2px;
-        order: 1;
-    }
-
-    .music-controls {
-        margin-bottom: 0 !important;
-        gap: 2px !important;
-    }
-
-    .music-btn {
-        width: 18px !important;
-        height: 18px !important;
-        font-size: 7px !important;
-    }
-
-    .music-btn.play {
-        width: 22px !important;
-        height: 22px !important;
-        font-size: 9px !important;
-    }
-
-    .volume-row, .volume-icon {
-        display: none !important;
-    }
-
-    /* Notification Bell sa tabi ng Media Player */
     .notification-wrapper {
         position: relative !important;
         display: inline-flex !important;
         margin-right: 0 !important;
         z-index: 100 !important;
-        order: 2;
     }
 
     #notificationBell {
-        width: 28px !important;
-        height: 28px !important;
-        font-size: 12px !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 14px !important;
     }
 
     #notificationDropdown {
@@ -2788,12 +2747,13 @@ input[type="url"]::placeholder{
     .topbar-left {
         flex-direction: column;
         gap: 0;
+        order: 1;
     }
 
-    /* Itago ang salitang Dashboard sa top bar/page title kapag mobile */
-    .page-title h1,
-    .page-title {
-        display: none !important;
+    .page-title h1 {
+        font-size: 14px !important;
+        font-weight: 800;
+        color: #ffffff;
     }
 
     .page-title p {
@@ -2801,6 +2761,46 @@ input[type="url"]::placeholder{
     }
 
     .year-header {
+        display: none !important;
+    }
+
+    /* Music Player inilipat at isiniksik sa itaas katabi ng Year */
+    .music-player {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        width: auto !important;
+        margin: 0 !important;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex !important;
+        align-items: center;
+        gap: 4px;
+        order: 3;
+    }
+
+    .music-controls {
+        margin-bottom: 0 !important;
+        gap: 2px !important;
+        display: flex !important;
+    }
+
+    .music-btn {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 8px !important;
+    }
+
+    .music-btn.play {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 10px !important;
+    }
+
+    .volume-row, .volume-icon {
         display: none !important;
     }
 
@@ -2853,20 +2853,56 @@ input[type="url"]::placeholder{
         border-radius: 6px !important;
     }
 
-    /* Table Wrapper */
+    /* Table Wrapper & Excel-Style Freeze First Column */
     .table-wrapper {
+        position: relative;
         background: rgba(24, 24, 27, 0.75);
         backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         width: 100%;
+        max-height: calc(100vh - 240px);
+        overflow-y: auto;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
 
     .project-table {
+        width: max-content;
         min-width: 1100px;
+        border-collapse: collapse;
+        table-layout: auto;
+    }
+
+    /* Freeze First Column (COUPLE'S) */
+    .project-table th:nth-child(1),
+    .project-table td:nth-child(1) {
+        position: sticky;
+        left: 0;
+        z-index: 30;
+        background-color: #18181b !important;
+        border-right: 2px solid #3b82f6;
+    }
+
+    .project-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+
+    .project-table thead th:nth-child(1) {
+        z-index: 40;
+    }
+
+    .couple-cell {
+        width: 220px !important;
+        min-width: 220px !important;
+    }
+
+    .project-table th:not(:nth-child(1)),
+    .project-table td:not(:nth-child(1)) {
+        min-width: 140px;
     }
 
     /* ==========================================================
@@ -2920,5 +2956,19 @@ input[type="url"]::placeholder{
 
     .sidebar {
         height: 50px;
+    }
+
+    .table-wrapper {
+        max-height: calc(100vh - 170px);
+    }
+
+    .couple-cell {
+        width: 240px !important;
+        min-width: 240px !important;
+    }
+
+    .project-table th:not(:nth-child(1)),
+    .project-table td:not(:nth-child(1)) {
+        min-width: 160px;
     }
 }
