@@ -366,9 +366,9 @@ select{
 .type-select option[value="PRE-WEDDING"],
 .type-pre-wedding,
 .type-pre_wedding {
-    background-color: #ffe4e6 !important;
-    color: #9f1239 !important;
-    font-weight: 700;
+    background-color: transparent !important;
+    color: inherit !important;
+    font-weight: normal !important;
 }
 
 /* ==================================
