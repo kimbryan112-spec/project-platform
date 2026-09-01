@@ -3,162 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Project Platform - Settings</title>
     <link rel="stylesheet" href="../css/style.css">
-    
-    <!-- Compact & Consistent Styles -->
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
-            background: #f5f7fb;
-        }
-        #app {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-        .sidebar {
-            width: 240px;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            background: #1f2937;
-            color: #fff;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .main {
-            flex: 1;
-            height: 100vh;
-            overflow-y: auto;
-            padding: 24px 32px;
-            box-sizing: border-box;
-            background: #f5f7fb;
-        }
-        .settings-dashboard {
-            width: 100%;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding-bottom: 40px;
-        }
-        .settings-wrapper {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-top: 15px;
-        }
-        .settings-card {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 16px 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        }
-        .settings-card.full-width {
-            grid-column: span 2;
-        }
-        .settings-card .settings-title {
-            margin-bottom: 12px;
-        }
-        .settings-card .settings-title h2 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1f2937;
-            margin: 0;
-        }
-        .settings-card .settings-title p {
-            margin: 2px 0 0 0;
-            color: #6b7280;
-            font-size: 12px;
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        .info-box {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .info-box span {
-            display: block;
-            font-size: 11px;
-            color: #6b7280;
-            margin-bottom: 2px;
-        }
-        .info-box strong {
-            display: block;
-            font-size: 13px;
-            color: #111827;
-            font-weight: 700;
-        }
-        .settings-form {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .settings-form select, 
-        .settings-form input,
-        .settings-card input[type="file"],
-        .settings-card input[type="text"] {
-            height: 36px;
-            padding: 0 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: #fff;
-            font-size: 13px;
-            outline: none;
-            box-sizing: border-box;
-        }
-        .settings-form select:focus,
-        .settings-card input:focus {
-            border-color: #2563eb;
-        }
-        
-        /* Compact 3D Buttons na kasinlaki ng sa Dashboard/Admin */
-        .settings-form button,
-        .settings-card > button {
-            height: 36px;
-            padding: 0 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        /* Custom 3D Button Colors para sa Settings */
-        .btn-3d-danger {
-            border: 1px solid #991b1b !important;
-            background: linear-gradient(to bottom, #f87171 0%, #ef4444 55%, #dc2626 100%) !important;
-            color: #fff !important;
-        }
-        .btn-3d-warning {
-            border: 1px solid #b45309 !important;
-            background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 55%, #d97706 100%) !important;
-            color: #fff !important;
-        }
-        .btn-3d-primary {
-            border: 1px solid #1d4ed8 !important;
-            background: linear-gradient(to bottom, #60a5fa 0%, #3b82f6 55%, #2563eb 100%) !important;
-            color: #fff !important;
-        }
-        .btn-3d-success {
-            border: 1px solid #15803d !important;
-            background: linear-gradient(to bottom, #4ade80 0%, #22c55e 55%, #16a34a 100%) !important;
-            color: #fff !important;
-        }
-    </style>
 </head>
 
 <body>
@@ -171,7 +18,7 @@
     <aside class="sidebar">
         <div class="logo">
             <h2>PROJECT PLATFORM</h2>
-            <p>KBHFILMS</p>
+            <p><strong>KBHFILMS</strong></p>
             <span class="app-version">Version 1.2.8</span>
         </div>
 
@@ -219,14 +66,14 @@
 
             <div class="topbar-right">
                 <!-- Notification Bell / Activity Center -->
-                <div class="notification-wrapper" style="position: relative; display: inline-block; margin-right: 15px; cursor: pointer;">
-                    <div id="notificationBell" style="font-size: 18px; background: #f8fafc; width: 38px; height: 38px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">
+                <div class="notification-wrapper">
+                    <div id="notificationBell">
                         🔔
                     </div>
-                    <span id="notificationBadge" style="position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 10px; display: none;">0</span>
+                    <span id="notificationBadge">0</span>
                     
-                    <div id="notificationDropdown" style="display: none; position: absolute; right: 0; top: 48px; width: 340px; background: #ffffff; border-radius: 12px; box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15); z-index: 1000; overflow: hidden;">
-                        <div style="background: #2563eb; color: white; padding: 12px 16px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 14px;">
+                    <div id="notificationDropdown">
+                        <div class="dropdown-header">
                             <span>Activity Center</span>
                             <span style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
                         </div>
@@ -246,7 +93,7 @@
 
         <!-- =========================
         SETTINGS CONTENT START
-        ========================= -->
+        ======================== -->
         <div class="settings-dashboard">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
                 <div>
@@ -258,7 +105,7 @@
             <div class="settings-wrapper">
 
                 <!-- DATABASE STATUS (Full Width) -->
-                <div class="settings-card full-width">
+                <div class="settings-card full-width" style="grid-column: span 2;">
                     <div class="settings-title">
                         <h2>🗄 Database Status</h2>
                         <p>Cloudflare D1 Information</p>
@@ -322,7 +169,7 @@
 
                         <select id="resetMonthYear" style="width: 85px;"></select>
 
-                        <button id="resetMonthBtn" class="btn-3d btn-3d-danger">
+                        <button id="resetMonthBtn" class="btn-3d" style="border: 1px solid #991b1b !important; background: linear-gradient(to bottom, #f87171 0%, #ef4444 55%, #dc2626 100%) !important; color: #fff !important;">
                             Reset Month
                         </button>
                     </div>
@@ -338,7 +185,7 @@
                     <div class="settings-form">
                         <select id="resetYear" style="flex: 1;"></select>
 
-                        <button id="resetYearBtn" class="btn-3d btn-3d-warning">
+                        <button id="resetYearBtn" class="btn-3d" style="border: 1px solid #b45309 !important; background: linear-gradient(to bottom, #fbbf24 0%, #f59e0b 55%, #d97706 100%) !important; color: #fff !important;">
                             Reset Year
                         </button>
                     </div>
@@ -353,7 +200,7 @@
 
                     <div class="settings-form">
                         <div style="flex: 1; font-size: 12px; color: #6b7280;">Export current records as JSON</div>
-                        <button id="backupBtn" class="btn-3d btn-3d-primary">
+                        <button id="backupBtn" class="btn-3d" style="border: 1px solid #1d4ed8 !important; background: linear-gradient(to bottom, #60a5fa 0%, #3b82f6 55%, #2563eb 100%) !important; color: #fff !important;">
                             Download Backup
                         </button>
                     </div>
@@ -367,23 +214,23 @@
                     </div>
 
                     <div class="settings-form">
-                        <input id="restoreFile" type="file" accept=".json" style="flex: 1; padding: 4px; font-size: 11px;">
-                        <button id="restoreBtn" class="btn-3d btn-3d-success">
+                        <input id="restoreFile" type="file" accept=".json" style="flex: 1; padding: 4px; font-size: 11px; height: 36px; border: 1px solid #d1d5db; border-radius: 6px;">
+                        <button id="restoreBtn" class="btn-3d" style="border: 1px solid #15803d !important; background: linear-gradient(to bottom, #4ade80 0%, #22c55e 55%, #16a34a 100%) !important; color: #fff !important;">
                             Restore
                         </button>
                     </div>
                 </div>
 
                 <!-- DANGER ZONE (Full Width) -->
-                <div class="settings-card full-width danger-zone" style="background: #fff5f5; border-color: #fca5a5;">
+                <div class="settings-card full-width danger-zone" style="grid-column: span 2; background: #fff5f5; border-color: #fca5a5;">
                     <div class="settings-title">
                         <h2 style="color: #b91c1c;">☠ Danger Zone</h2>
                         <p>Permanently delete EVERYTHING from the system.</p>
                     </div>
 
                     <div class="settings-form">
-                        <input id="confirmDelete" type="text" placeholder="Type RESET to confirm" style="flex: 1; max-width: 250px;">
-                        <button id="deleteAllBtn" class="btn-3d btn-3d-danger">
+                        <input id="confirmDelete" type="text" placeholder="Type RESET to confirm" style="flex: 1; max-width: 250px; height: 36px; border: 1px solid #d1d5db; border-radius: 6px; padding: 0 10px;">
+                        <button id="deleteAllBtn" class="btn-3d" style="border: 1px solid #991b1b !important; background: linear-gradient(to bottom, #f87171 0%, #ef4444 55%, #dc2626 100%) !important; color: #fff !important;">
                             DELETE EVERYTHING
                         </button>
                     </div>

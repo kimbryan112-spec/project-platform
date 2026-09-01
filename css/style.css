@@ -2365,21 +2365,16 @@ input[type="url"]::placeholder{
 }
 
 .music-player{
-    position:absolute;
-    top:5px;
-    right:650px;
+    position:relative;
     width:165px;
     padding:0;
     background:transparent;
     border:none;
-    border-radius:0;
-    box-shadow:none;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
     z-index:100;
-    backdrop-filter:none;
 }
 
 .music-controls{
