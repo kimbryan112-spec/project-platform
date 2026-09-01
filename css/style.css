@@ -2699,6 +2699,13 @@ input[type="url"]::placeholder{
         box-sizing: border-box;
     }
 
+    /* Itago nang buo ang Next Year button sa mobile view */
+    .next-year-btn,
+    button.next-year-btn,
+    #nextYearBtn {
+        display: none !important;
+    }
+
     /* Compact Top Header & Notification Bell sa pagitan ng Media at Logo */
     .topbar {
         display: flex;
@@ -2764,7 +2771,7 @@ input[type="url"]::placeholder{
         display: none !important;
     }
 
-    /* Music Player inilipat at isiniksik sa itaas katabi ng Year */
+    /* Music Player napunta sa dating pwesto ng Next Year button sa itaas */
     .music-player {
         position: relative !important;
         top: auto !important;
