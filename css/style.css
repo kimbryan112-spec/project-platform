@@ -1,5 +1,5 @@
 /* ==================================
-   RESET
+    RESET
 ================================== */
 
 *{
@@ -26,7 +26,7 @@ select{
 }
 
 /* ==================================
-   LAYOUT
+    LAYOUT
 ================================== */
 
 #app{
@@ -41,7 +41,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR
+    SIDEBAR
 ================================== */
 
 .sidebar{
@@ -54,7 +54,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR LOGO
+    SIDEBAR LOGO
 ================================== */
 
 .logo{
@@ -84,7 +84,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR NAVIGATION
+    SIDEBAR NAVIGATION
 ================================== */
 
 .sidebar nav{
@@ -108,7 +108,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR + BTN-3D OVERRIDE
+    SIDEBAR + BTN-3D OVERRIDE
 ================================== */
 
 .sidebar .btn-3d{
@@ -131,7 +131,7 @@ select{
 }
 
 /* ==================================
-   ACTIVE PAGE
+    ACTIVE PAGE
 ================================== */
 
 .sidebar nav a.active,
@@ -146,7 +146,7 @@ select{
 }
 
 /* ==================================
-   INACTIVE PAGE
+    INACTIVE PAGE
 ================================== */
 
 .sidebar nav a:not(.active),
@@ -161,7 +161,7 @@ select{
 }
 
 /* ==================================
-   TOPBAR
+    TOPBAR
 ================================== */
 
 .topbar{
@@ -196,7 +196,7 @@ select{
 }
 
 /* ==================================
-   TABLE
+    TABLE
 ================================== */
 
 .table-wrapper{
@@ -260,7 +260,7 @@ select{
 }
 
 /* ==================================
-   COLUMN WIDTHS
+    COLUMN WIDTHS
 ================================== */
 
 .project-table th:nth-child(1),
@@ -300,7 +300,7 @@ select{
 }
 
 /* ==================================
-   INPUTS
+    INPUTS
 ================================== */
 
 .text-input{
@@ -345,7 +345,7 @@ select{
 }
 
 /* ==========================================================
-   KULAY PARA SA PROPOSAL AT MONTAGE SA TYPE DROPDOWN
+    KULAY PARA SA PROPOSAL, MONTAGE, AT PRE WEDDING SA TYPE DROPDOWN
    ========================================================== */
 .type-select option[value="PROPOSAL"],
 .type-proposal {
@@ -361,8 +361,18 @@ select{
     font-weight: 700;
 }
 
+.type-select option[value="PRE WEDDING"],
+.type-select option[value="PRE_WEDDING"],
+.type-select option[value="PRE-WEDDING"],
+.type-pre-wedding,
+.type-pre_wedding {
+    background-color: #ffe4e6 !important;
+    color: #9f1239 !important;
+    font-weight: 700;
+}
+
 /* ==================================
-   DRONE SELECT + SEARCH
+    DRONE SELECT + SEARCH
 ================================== */
 
 .drone-cell{
@@ -455,7 +465,7 @@ select{
 }
 
 /* ==================================
-   SONG CARD
+    SONG CARD
 ================================== */
 
 .song-cell{
@@ -519,7 +529,7 @@ select{
 }
 
 /* ==================================
-   DASHBOARD ONLY
+    DASHBOARD ONLY
 ================================== */
 
 .dashboard-song-actions{
@@ -587,7 +597,7 @@ select{
 }
 
 /* ==================================
-   LINKS
+    LINKS
 ================================== */
 
 .project-table a{
@@ -600,7 +610,7 @@ select{
 }
 
 /* ==================================
-   SIDEBAR FOOTER
+    SIDEBAR FOOTER
 ================================== */
 
 .sidebar-footer{
@@ -642,7 +652,7 @@ select{
 }
 
 /* ==================================
-   LOGOUT CONFIRM POPUP
+    LOGOUT CONFIRM POPUP
 ================================== */
 
 .logout-wrapper{
@@ -734,7 +744,7 @@ select{
 }
 
 /* ==========================
-   CHECK BUTTON (3D)
+    CHECK BUTTON (3D)
 ========================== */
 
 .raw-check-btn,
@@ -762,7 +772,7 @@ select{
 }
 
 /* ==================================
-   YEAR + MONTH NAVIGATION
+    YEAR + MONTH NAVIGATION
 ================================== */
 
 .year-month-panel{
@@ -811,7 +821,7 @@ select{
 }
 
 /* ==================================
-   LIVE CALENDAR
+    LIVE CALENDAR
 ================================== */
 
 .live-calendar{
@@ -878,7 +888,7 @@ select{
 }
 
 /* ==========================
-   MONTH BUTTON (DEFAULT)
+    MONTH BUTTON (DEFAULT)
 ========================== */
 
 .month-btn{
@@ -907,7 +917,7 @@ select{
 }
 
 /* ==========================
-   HAS DATA (GREEN)
+    HAS DATA (GREEN)
 ========================== */
 
 .month-btn.has-data{
@@ -921,7 +931,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE
+    ACTIVE
 ========================== */
 
 .month-btn.active{
@@ -930,7 +940,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE + HAS DATA
+    ACTIVE + HAS DATA
 ========================== */
 
 .month-btn.active.has-data{
@@ -946,7 +956,7 @@ select{
 }
 
 /* ==========================
-   LOCKED
+    LOCKED
 ========================== */
 
 .month-btn.locked{
@@ -955,7 +965,7 @@ select{
 }
 
 /* ==========================
-   LOCKED + HAS DATA
+    LOCKED + HAS DATA
 ========================== */
 
 .month-btn.locked.has-data{
@@ -964,7 +974,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE + LOCKED
+    ACTIVE + LOCKED
 ========================== */
 
 .month-btn.active.locked{
@@ -975,7 +985,7 @@ select{
 }
 
 /* ==========================
-   ACTIVE + LOCKED + HAS DATA
+    ACTIVE + LOCKED + HAS DATA
 ========================== */
 
 .month-btn.active.locked.has-data{
@@ -1005,7 +1015,7 @@ select{
 }
 
 /* ==========================================
-   MONTH RIGHT-CLICK CONTEXT MENU
+    MONTH RIGHT-CLICK CONTEXT MENU
 ========================================== */
 
 .month-context-menu {
@@ -1059,7 +1069,7 @@ select{
 }
 
 /* ==================================
-   REUSABLE BUTTONS (3D)
+    REUSABLE BUTTONS (3D)
 ================================== */
 
 .btn-3d{
@@ -1101,7 +1111,7 @@ select{
 }
 
 /* ==========================
-   COUPLE CELL
+    COUPLE CELL
 ========================== */
 
 .couple-cell{
@@ -1140,7 +1150,7 @@ select{
 }
 
 /* ==================================
-   BUTTON BASE
+    BUTTON BASE
 ================================== */
 
 .watch-btn{
@@ -1164,7 +1174,7 @@ select{
 }
 
 /* ==================================
-   WATCH
+    WATCH
 ================================== */
 
 .watch-btn{
@@ -1273,7 +1283,7 @@ select{
 }
 
 /* ==================================
-   COMMENTS MODAL
+    COMMENTS MODAL
 ================================== */
 
 #commentsTextarea{
@@ -1297,7 +1307,7 @@ select{
 }
 
 /* ==================================
-   PROJECT CONCERNS MODE
+    PROJECT CONCERNS MODE
 ================================== */
 
 #commentsModal.concerns-mode .modal-content{
@@ -1451,7 +1461,7 @@ select{
 }
 
 /* ==================================
-   WATCH CONTEXT MENU
+    WATCH CONTEXT MENU
 ================================== */
 
 #watchContextMenu{
@@ -1483,7 +1493,7 @@ select{
 }
 
 /* ==================================
-   WATCH LINK MODAL
+    WATCH LINK MODAL
 ================================== */
 
 #watchLinkInput{
@@ -1523,7 +1533,7 @@ select{
 }
 
 /* ==================================
-   LOGIN PAGE
+    LOGIN PAGE
 ================================== */
 
 .login-container{
@@ -1830,7 +1840,7 @@ select{
 }
 
 /* ==================================
-   PROJECT STATUS COLORS
+    PROJECT STATUS COLORS
 ================================== */
 
 .status-planned{
@@ -1870,7 +1880,7 @@ select{
 }
 
 /* ==================================
-   PROJECT TYPE COLORS
+    PROJECT TYPE COLORS
 ================================== */
 
 .type-basic{
@@ -1916,7 +1926,7 @@ select{
 }
 
 /* ==================================
-   PROFILE LOGO (TOPBAR)
+    PROFILE LOGO (TOPBAR)
 ================================== */
 
 .profile{
@@ -1950,7 +1960,7 @@ select{
 }
 
 /* =====================================================
-   SETTINGS PAGE
+    SETTINGS PAGE
 ===================================================== */
 
 .settings-dashboard{
@@ -2562,7 +2572,7 @@ input[type="url"]::placeholder{
 }
 
 /* ==========================================
-   ACTIVITY CENTER & NOTIFICATION DROPDOWN STYLES
+    ACTIVITY CENTER & NOTIFICATION DROPDOWN STYLES
    ========================================== */
 .notification-wrapper {
     position: relative;
@@ -2654,7 +2664,7 @@ input[type="url"]::placeholder{
 }
 
 /* ==================================
-   MODERN MOBILE APP & ROTATE VIEW STYLES
+    MODERN MOBILE APP & ROTATE VIEW STYLES
 ================================== */
 @media screen and (max-width: 900px) {
     body {
@@ -2668,7 +2678,6 @@ input[type="url"]::placeholder{
         width: 100%;
     }
 
-    /* Fixed Bottom Navigation (App style para sa Portrait & Landscape) */
     .sidebar {
         position: fixed;
         bottom: 0;
@@ -2709,14 +2718,12 @@ input[type="url"]::placeholder{
         border-radius: 8px;
     }
 
-    /* Main Area: Diretto sa Table ang Unang Salubong */
     .main {
         padding: 8px 8px 75px 8px !important;
         width: 100% !important;
         box-sizing: border-box;
     }
 
-    /* Compact Top Header & Music Player */
     .topbar {
         display: flex;
         flex-direction: row;
@@ -2784,7 +2791,6 @@ input[type="url"]::placeholder{
         display: none !important;
     }
 
-    /* Months Panel (Lilitaw sa ibaba ng topbar kapag nag-scroll ka ng konti pababa) */
     .year-month-panel {
         background: rgba(24, 24, 27, 0.8);
         backdrop-filter: blur(14px);
@@ -2825,7 +2831,6 @@ input[type="url"]::placeholder{
         justify-content: center;
     }
 
-    /* Table Wrapper: Smooth Horizontal Swipe View (Portrait & Landscape Rotate) */
     .table-wrapper {
         background: rgba(24, 24, 27, 0.75);
         backdrop-filter: blur(16px);
@@ -2842,7 +2847,6 @@ input[type="url"]::placeholder{
     }
 }
 
-/* Karagdagang Optimization para sa Landscape / Rotate View (Phone Naka-Higa) */
 @media screen and (max-width: 900px) and (orientation: landscape) {
     .main {
         padding: 6px 6px 65px 6px !important;

@@ -285,10 +285,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tableBody) {
         tableBody.addEventListener('input', () => {
             saveProjects();
+            updateCurrentMonthHasData(); // Awtomatikong mag-green kapag may tinype
         });
 
         tableBody.addEventListener('change', (e) => {
             saveProjects();
+            updateCurrentMonthHasData(); // Awtomatikong mag-green kapag nagpalit ng dropdown o select
 
             if (e.target.classList.contains('status-select')) {
                 updateStatusColor(e.target);
@@ -343,6 +345,11 @@ document.addEventListener('DOMContentLoaded', () => {
             maximizeWatch.style.display = "inline-flex";
         }
     }
+
+    // Siguraduhing ma-apply ang kulay sa lahat ng type-select pagka-load ng page
+    document.querySelectorAll(".type-select").forEach(select => {
+        updateTypeColor(select);
+    });
 });
 
 /* ==================================
@@ -505,6 +512,7 @@ function populateRow(row, data) {
 
     updateRowProgress(row);
     updateStatusColor(cells[1]?.querySelector('.status-select'));
+    updateTypeColor(cells[2]?.querySelector('.type-select'));
     document.querySelectorAll('.dashboard-song-status').forEach(updateSongStatusColor);
 }
 
@@ -814,16 +822,20 @@ function monthHasData() {
         if (!data) return false;
 
         return (
-            data.coupleName.trim() ||
-            data.rawFiles.trim() ||
-            data.instruction.trim() ||
-            data.concerns.trim() ||
-            data.watchLink.trim() ||
-            data.filesLink.trim() ||
-            data.song1.title.trim() || data.song1.link.trim() || data.song1.notes.trim() ||
-            data.song2.title.trim() || data.song2.link.trim() || data.song2.notes.trim() ||
-            data.song3.title.trim() || data.song3.link.trim() || data.song3.notes.trim() ||
-            data.teaserSong.title.trim() || data.teaserSong.link.trim() || data.teaserSong.notes.trim()
+            (data.coupleName && data.coupleName.trim() !== "") ||
+            (data.status && data.status !== "PLANNED") ||
+            (data.type && data.type !== "NOT SET" && data.type !== "") ||
+            (data.rawFiles && data.rawFiles.trim() !== "") ||
+            (data.drone && data.drone !== "NO DRONE") ||
+            (data.instruction && data.instruction.trim() !== "") ||
+            (data.concerns && data.concerns.trim() !== "") ||
+            (data.watchLink && data.watchLink.trim() !== "") ||
+            (data.filesLink && data.filesLink.trim() !== "") ||
+            (data.song1 && (data.song1.title.trim() || data.song1.link.trim() || data.song1.status || data.song1.notes.trim())) ||
+            (data.song2 && (data.song2.title.trim() || data.song2.link.trim() || data.song2.status || data.song2.notes.trim())) ||
+            (data.song3 && (data.song3.title.trim() || data.song3.link.trim() || data.song3.status || data.song3.notes.trim())) ||
+            (data.teaserSong && (data.teaserSong.title.trim() || data.teaserSong.link.trim() || data.teaserSong.status || data.teaserSong.notes.trim())) ||
+            (data.progress && data.progress > 0)
         );
     });
 }
@@ -847,20 +859,38 @@ async function updateMonthHasDataUI(hasDataMonths = null) {
 
     if (LOCAL_MODE) {
         document.querySelectorAll(".month-btn").forEach(btn => {
-            const key = `projects_${currentYear}_${btn.dataset.month}`;
+            const monthName = btn.dataset.month;
+            const key = `projects_${currentYear}_${monthName}`;
             let hasData = false;
             const saved = localStorage.getItem(key);
 
             if (saved) {
                 try {
                     const projects = JSON.parse(saved);
-                    hasData = projects.some(project =>
-                        (project.coupleName || "").trim() !== "" ||
-                        (project.rawFiles || "").trim() !== ""
+                    // Gumamit ng katulad na pagsusuri para sa local storage items
+                    hasData = projects.some(data => 
+                        (data.coupleName && data.coupleName.trim() !== "") ||
+                        (data.status && data.status !== "PLANNED") ||
+                        (data.type && data.type !== "NOT SET" && data.type !== "") ||
+                        (data.rawFiles && data.rawFiles.trim() !== "") ||
+                        (data.drone && data.drone !== "NO DRONE") ||
+                        (data.instruction && data.instruction.trim() !== "") ||
+                        (data.concerns && data.concerns.trim() !== "") ||
+                        (data.watchLink && data.watchLink.trim() !== "") ||
+                        (data.filesLink && data.filesLink.trim() !== "") ||
+                        (data.song1 && (data.song1.title.trim() || data.song1.link.trim() || data.song1.status || data.song1.notes.trim())) ||
+                        (data.song2 && (data.song2.title.trim() || data.song2.link.trim() || data.song2.status || data.song2.notes.trim())) ||
+                        (data.song3 && (data.song3.title.trim() || data.song3.link.trim() || data.song3.status || data.song3.notes.trim())) ||
+                        (data.teaserSong && (data.teaserSong.title.trim() || data.teaserSong.link.trim() || data.teaserSong.status || data.teaserSong.notes.trim())) ||
+                        (data.progress && data.progress > 0)
                     );
                 } catch (err) {
                     console.error(err);
                 }
+            }
+            // Kung ito ang active month at may temporary changes ngayon, pwedeng direktang icheck ang DOM
+            if (monthName === currentMonth && monthHasData()) {
+                hasData = true;
             }
             btn.classList.toggle("has-data", hasData);
         });
@@ -871,7 +901,8 @@ async function updateMonthHasDataUI(hasDataMonths = null) {
 
     document.querySelectorAll(".month-btn").forEach(btn => {
         btn.classList.remove("has-data");
-        if (months[btn.dataset.month] === true) {
+        const m = btn.dataset.month;
+        if (months[m] === true || (m === currentMonth && monthHasData())) {
             btn.classList.add("has-data");
         }
     });
@@ -1000,23 +1031,62 @@ function updateStatusColor(select) {
 function updateTypeColor(select) {
     if (!select) return;
 
+    // Alisin muna ang mga lumang classes
     select.classList.remove(
         "type-basic", "type-romantic", "type-upbeat",
         "type-slow", "type-normal", "type-fast", "type-not-set",
-        "type-proposal", "type-montage"
+        "type-proposal", "type-montage", "type-pre-wedding", "type-pre_wedding"
     );
 
-    switch (select.value) {
-        case "BASIC HIGHLIGHTS": select.classList.add("type-basic"); break;
-        case "ROMANTIC CINEMATIC": select.classList.add("type-romantic"); break;
-        case "UPBEAT CINEMATIC": select.classList.add("type-upbeat"); break;
-        case "SLOW CLASSICAL": select.classList.add("type-slow"); break;
-        case "NORMAL CLASSICAL": select.classList.add("type-normal"); break;
-        case "FAST CLASSICAL": select.classList.add("type-fast"); break;
-        case "PROPOSAL": select.classList.add("type-proposal"); break;
-        case "MONTAGE": select.classList.add("type-montage"); break;
-        default: select.classList.add("type-not-set");
+    // I-reset ang inline styles
+    select.style.backgroundColor = "";
+    select.style.color = "";
+
+    const val = (select.value || "").trim().toUpperCase();
+
+    if (val === "PROPOSAL") {
+        select.classList.add("type-proposal");
+        select.style.backgroundColor = "#e0f2fe";
+        select.style.color = "#0369a1";
+    } else if (val === "MONTAGE") {
+        select.classList.add("type-montage");
+        select.style.backgroundColor = "#fae8ff";
+        select.style.color = "#a21caf";
+    } else if (val === "PRE WEDDING" || val === "PRE_WEDDING" || val === "PRE-WEDDING") {
+        select.classList.add("type-pre-wedding");
+        select.style.backgroundColor = "#ffe4e6";
+        select.style.color = "#9f1239";
+    } else if (val === "BASIC HIGHLIGHTS") {
+        select.classList.add("type-basic");
+        select.style.backgroundColor = "#dbeafe";
+        select.style.color = "#1d4ed8";
+    } else if (val === "ROMANTIC CINEMATIC") {
+        select.classList.add("type-romantic");
+        select.style.backgroundColor = "#ffe4e6";
+        select.style.color = "#be123c";
+    } else if (val === "UPBEAT CINEMATIC") {
+        select.classList.add("type-upbeat");
+        select.style.backgroundColor = "#dcfce7";
+        select.style.color = "#15803d";
+    } else if (val === "SLOW CLASSICAL") {
+        select.classList.add("type-slow");
+        select.style.backgroundColor = "#ede9fe";
+        select.style.color = "#6d28d9";
+    } else if (val === "NORMAL CLASSICAL") {
+        select.classList.add("type-normal");
+        select.style.backgroundColor = "#fef3c7";
+        select.style.color = "#92400e";
+    } else if (val === "FAST CLASSICAL") {
+        select.classList.add("type-fast");
+        select.style.backgroundColor = "#fee2e2";
+        select.style.color = "#b91c1c";
+    } else {
+        select.classList.add("type-not-set");
+        select.style.backgroundColor = "#f3f4f6";
+        select.style.color = "#374151";
     }
+    
+    select.style.fontWeight = "700";
 }
 
 function updateSongStatusColor(select) {
@@ -1297,6 +1367,7 @@ watchLinkInput?.addEventListener("input", () => {
     activeWatchButton.dataset.watchLink = watchLinkInput.value.trim();
     activeWatchButton.querySelector(".play-icon")?.classList.toggle("has-link", watchLinkInput.value.trim() !== "");
     saveProjects();
+    updateCurrentMonthHasData(); // Mag-green pag may in-attach na watch link
     recordActivity("Attached Watch Link", "Updated video link");
 });
 
@@ -1319,6 +1390,7 @@ filesLinkInput?.addEventListener("input", () => {
     activeFilesButton.dataset.filesLink = filesLinkInput.value.trim();
     activeFilesButton.classList.toggle("has-link", filesLinkInput.value.trim() !== "");
     saveProjects();
+    updateCurrentMonthHasData(); // Mag-green pag may in-attach na files link
     recordActivity("Attached Files Link", "Updated raw files link");
 });
 
@@ -1342,6 +1414,7 @@ songLinkInput?.addEventListener("input", () => {
     activeSongInput.dataset.songLink = songLinkInput.value.trim();
     updateSongLinkStyle(activeSongInput);
     saveProjects();
+    updateCurrentMonthHasData(); // Mag-green pag may in-attach na song link
     recordActivity("Attached Song Link", "Updated song link");
 });
 
@@ -1350,6 +1423,7 @@ songTitleInput?.addEventListener("input", () => {
 
     activeSongInput.value = songTitleInput.value;
     saveProjects();
+    updateCurrentMonthHasData();
     recordActivity("Updated Song Title", `Song: ${songTitleInput.value}`);
 });
 
@@ -1396,6 +1470,7 @@ document.addEventListener("DOMContentLoaded", () => {
         instructionBtn.dataset.notes = instructionTextarea.value;
         instructionBtn.style.background = instructionTextarea.value.trim() ? "#22c55e" : "#ff7a1a";
         saveProjects();
+        updateCurrentMonthHasData();
         recordActivity("Updated Special Instructions", "Edited instruction notes");
     });
 });
@@ -1439,6 +1514,7 @@ commentsTextarea?.addEventListener("input", () => {
     activeNotesButton.dataset.notes = commentsTextarea.value;
     activeNotesButton.classList.toggle("has-comments", commentsTextarea.value.trim() !== "");
     saveProjects();
+    updateCurrentMonthHasData();
     recordActivity("Updated Comments / Concerns", "Edited notes");
 });
 
@@ -1781,6 +1857,7 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
                 suggestions.innerHTML = "";
                 suggestions.classList.remove("show");
                 saveProjects();
+                updateCurrentMonthHasData();
                 recordActivity("Selected Drone via Search", `Drone -> ${option.value}`);
             });
 
@@ -1792,6 +1869,7 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
 
     select.addEventListener("change", () => {
         updateDroneColor(select);
+        updateCurrentMonthHasData();
     });
 
     document.addEventListener("click", (e) => {
@@ -1860,6 +1938,7 @@ document.querySelectorAll(".progress-slider").forEach(slider => {
     slider.addEventListener("input", () => {
         updateRowProgress(slider.closest("tr"));
         saveProjects();
+        updateCurrentMonthHasData();
     });
 });
 
@@ -1885,6 +1964,7 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
         if (tbody) {
             setTimeout(() => { tbody.style.opacity = "1"; }, 50);
         }
+        updateCurrentMonthHasData();
         return false;
     }
 
@@ -1909,12 +1989,14 @@ function restoreProjectsLocal(year = currentYear, month = currentMonth) {
                 tbody.style.opacity = "1";
             });
         }
+        updateCurrentMonthHasData();
         return true;
     } catch (e) {
         console.error("[LOCAL RESTORE]", e);
         if (tbody) {
             tbody.style.opacity = "1";
         }
+        updateCurrentMonthHasData();
         return false;
     }
 }
