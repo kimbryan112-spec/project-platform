@@ -2636,9 +2636,9 @@ input[type="url"]::placeholder{
     background: #f8fafc;
 }
 
-/* ==========================================================
-   MODERN MOBILE APP & NORMAL FLOW VIEW STYLES
-   ========================================================== */
+/* ==================================
+   MODERN MOBILE APP & ROTATE VIEW STYLES
+================================== */
 @media screen and (max-width: 900px) {
     body {
         background-color: #0c0a09;
@@ -2692,64 +2692,63 @@ input[type="url"]::placeholder{
         border-radius: 8px;
     }
 
-    /* Main Area */
+    /* Main Area: Diretto sa Table ang Unang Salubong */
     .main {
         padding: 8px 8px 75px 8px !important;
         width: 100% !important;
         box-sizing: border-box;
     }
 
-    /* Itago nang buo ang Administrator text, page title, at Next Year button sa mobile view */
-    .next-year-btn,
-    button.next-year-btn,
-    #nextYearBtn,
-    .topbar-left,
-    .page-title,
-    .user-name,
-    .user-role {
-        display: none !important;
-    }
-
-    /* Compact Top Header: Media Player sa Kaliwa, Notification Bell sa Kanan */
+    /* Compact Top Header & Music Player */
     .topbar {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
         background: rgba(24, 24, 27, 0.85);
         backdrop-filter: blur(12px);
         padding: 6px 10px;
         border-radius: 10px;
         margin-bottom: 8px;
         border: 1px solid rgba(255, 255, 255, 0.08);
-        position: relative;
-        z-index: 50;
-        gap: 8px;
     }
 
-    /* Music Player nasa pinakataas (pumalit sa Administrator text) */
+    .topbar-left {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .page-title h1 {
+        font-size: 14px !important;
+        font-weight: 800;
+        color: #ffffff;
+    }
+
+    .page-title p {
+        display: none !important;
+    }
+
+    .year-header {
+        display: none !important;
+    }
+
     .music-player {
         position: relative !important;
         top: auto !important;
         right: auto !important;
-        left: auto !important;
         width: auto !important;
-        margin: 0 !important;
         background: rgba(0, 0, 0, 0.3);
         padding: 2px 6px;
         border-radius: 6px;
         border: 1px solid rgba(255, 255, 255, 0.06);
-        display: flex !important;
+        display: flex;
         align-items: center;
         gap: 4px;
-        order: 1;
     }
 
     .music-controls {
         margin-bottom: 0 !important;
         gap: 2px !important;
-        display: flex !important;
     }
 
     .music-btn {
@@ -2768,60 +2767,14 @@ input[type="url"]::placeholder{
         display: none !important;
     }
 
-    .topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        order: 2;
-    }
-
-    .notification-wrapper {
-        position: relative !important;
-        display: inline-flex !important;
-        margin-right: 0 !important;
-        z-index: 100 !important;
-    }
-
-    #notificationBell {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 14px !important;
-    }
-
-    #notificationDropdown {
-        right: 0 !important;
-        left: auto !important;
-        width: 280px !important;
-        z-index: 99999 !important;
-    }
-
-    .year-header {
-        display: none !important;
-    }
-
-    /* Year Panel & Legend (No data yet / Has data) */
+    /* Months Panel (Lilitaw sa ibaba ng topbar kapag nag-scroll ka ng konti pababa) */
     .year-month-panel {
         background: rgba(24, 24, 27, 0.8);
         backdrop-filter: blur(14px);
-        padding: 8px 10px;
+        padding: 6px 8px;
         border-radius: 10px;
         margin-bottom: 8px;
         border: 1px solid rgba(255, 255, 255, 0.08);
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-    }
-
-    .month-legend {
-        display: flex !important;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 12px;
-        font-size: 11px;
-        color: #a1a1aa;
-        margin-top: 2px;
-        margin-left: 2px;
     }
 
     .month-buttons {
@@ -2830,7 +2783,6 @@ input[type="url"]::placeholder{
         overflow-x: auto;
         gap: 6px;
         padding-bottom: 2px;
-        width: 100%;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
@@ -2848,92 +2800,32 @@ input[type="url"]::placeholder{
         border-radius: 6px !important;
     }
 
-    /* Table Wrapper & Excel-Style Freeze First Column */
+    .month-legend {
+        font-size: 10px;
+        gap: 10px;
+        margin-bottom: 2px;
+        color: #a1a1aa;
+        justify-content: center;
+    }
+
+    /* Table Wrapper: Smooth Horizontal Swipe View (Portrait & Landscape Rotate) */
     .table-wrapper {
-        position: relative;
         background: rgba(24, 24, 27, 0.75);
         backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         width: 100%;
-        max-height: calc(100vh - 240px);
-        overflow-y: auto;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
 
     .project-table {
-        width: max-content;
         min-width: 1100px;
-        border-collapse: collapse;
-        table-layout: auto;
-    }
-
-    /* Freeze First Column (COUPLE'S) */
-    .project-table th:nth-child(1),
-    .project-table td:nth-child(1) {
-        position: sticky;
-        left: 0;
-        z-index: 30;
-        background-color: #18181b !important;
-        border-right: 2px solid #3b82f6;
-    }
-
-    .project-table thead th {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-    }
-
-    .project-table thead th:nth-child(1) {
-        z-index: 40;
-    }
-
-    .couple-cell {
-        width: 220px !important;
-        min-width: 220px !important;
-    }
-
-    .project-table th:not(:nth-child(1)),
-    .project-table td:not(:nth-child(1)) {
-        min-width: 140px;
-    }
-
-    /* ==========================================================
-       TEXT COLORS & COUPLE NAME FIX
-       ========================================================== */
-    .project-table td, 
-    .project-table th,
-    .timeline-percent,
-    .project-table span,
-    .project-table div {
-        color: #ffffff !important;
-    }
-
-    /* Explicit na itim at kitang-kita ang text sa couple name boxes */
-    .couple-name,
-    input.couple-name,
-    [contenteditable="true"].couple-name {
-        color: #111827 !important;
-        background-color: #ffffff !important;
-        font-weight: 700 !important;
-    }
-
-    .couple-name:empty::before,
-    .couple-name::placeholder {
-        color: #9ca3af !important;
-    }
-
-    .status-select,
-    .type-select,
-    .text-input,
-    .dashboard-song-status {
-        color: #1f2937 !important;
     }
 }
 
-/* Landscape / Rotate View Optimization */
+/* Karagdagang Optimization para sa Landscape / Rotate View (Phone Naka-Higa) */
 @media screen and (max-width: 900px) and (orientation: landscape) {
     .main {
         padding: 6px 6px 65px 6px !important;
@@ -2951,19 +2843,5 @@ input[type="url"]::placeholder{
 
     .sidebar {
         height: 50px;
-    }
-
-    .table-wrapper {
-        max-height: calc(100vh - 170px);
-    }
-
-    .couple-cell {
-        width: 240px !important;
-        min-width: 240px !important;
-    }
-
-    .project-table th:not(:nth-child(1)),
-    .project-table td:not(:nth-child(1)) {
-        min-width: 160px;
     }
 }
