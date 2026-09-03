@@ -1,12 +1,38 @@
+/* ==================================
+    PROJECTS API (Optimized with Workers KV Cache)
+    GET /api/projects?year=YYYY&month=M
+    POST /api/projects?year=YYYY&month=M
+================================== */
+
+import { getCache, setCache, deleteCache } from "../lib/cache.js";
+
 export async function onRequestGet(context) {
     try {
         const url = new URL(context.request.url);
         const year = Number(url.searchParams.get("year")) || new Date().getFullYear();
         const month = Number(url.searchParams.get("month")) || (new Date().getMonth() + 1);
 
-        console.log(`[GET] ${year}-${month}`);
+        const cacheKey = `projects_${year}_${month}`;
+        const kv = context.env.CACHE;
 
-        // 1. Kunin ang projects para sa kasalukuyang buwan
+        // 1. Subukang kunin muna ang data sa Workers KV cache para iwas-D1 read
+        const cachedData = await getCache(kv, cacheKey);
+        if (cachedData) {
+            console.log(`[CACHE HIT] Projects for ${year}-${month}`);
+            return new Response(
+                JSON.stringify(cachedData),
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cache-Control": "private, max-age=10"
+                    }
+                }
+            );
+        }
+
+        console.log(`[CACHE MISS / D1 FETCH] Projects for ${year}-${month}`);
+
+        // 2. Kung walang cache, kunin sa D1 Database
         const projectsQuery = context.env.DB.prepare(`
             SELECT *
             FROM projects
@@ -15,14 +41,12 @@ export async function onRequestGet(context) {
             ORDER BY row_index ASC
         `).bind(year, month);
 
-        // 2. Kunin ang locked months
         const locksQuery = context.env.DB.prepare(`
             SELECT project_year, project_month, locked
             FROM month_locks
             WHERE locked = 1
         `);
 
-        // 3. Optimal check para sa hasDataMonths
         const hasDataQuery = context.env.DB.prepare(`
             SELECT DISTINCT project_month
             FROM projects
@@ -33,7 +57,6 @@ export async function onRequestGet(context) {
               )
         `).bind(year);
 
-        // Isagawa nang sabay-sabay (Parallel Execution) para mabawasan ang latency at DB overhead
         const [projectsResult, locksResult, hasDataResult] = await Promise.all([
             projectsQuery.all(),
             locksQuery.all(),
@@ -107,12 +130,17 @@ export async function onRequestGet(context) {
             monthLocked: monthLocks[`${year}_${monthNames[month]}`] || false
         }));
 
+        const responsePayload = {
+            projects: data,
+            lockedMonths: monthLocks,
+            hasDataMonths
+        };
+
+        // 3. I-save sa Workers KV cache (May TTL na 300 seconds / 5 minutes)
+        await setCache(kv, cacheKey, responsePayload, 300);
+
         return new Response(
-            JSON.stringify({
-                projects: data,
-                lockedMonths: monthLocks,
-                hasDataMonths
-            }),
+            JSON.stringify(responsePayload),
             {
                 headers: {
                     "Content-Type": "application/json",
@@ -149,7 +177,6 @@ export async function onRequestPost(context) {
 
         console.log(`[POST] Saving ${projects.length} row(s) for ${year}-${month}`);
 
-        // Gumamit ng batch statements para sa mas mabilis at mas kaunting database transaction overhead
         const statements = projects.map(row => {
             return context.env.DB.prepare(`
                 INSERT INTO projects (
@@ -221,7 +248,6 @@ export async function onRequestPost(context) {
                 row.song1?.status || "",
                 row.song1?.notes || "",
                 row.song2?.title || "",
-                row.song2?.value || row.song2?.link || "", // safe fallback if any
                 row.song2?.link || "",
                 row.song2?.status || "",
                 row.song2?.notes || "",
@@ -239,6 +265,9 @@ export async function onRequestPost(context) {
         if (statements.length > 0) {
             await context.env.DB.batch(statements);
         }
+
+        // 4. I-invalidate/Burahin ang lumang cache para sa partikular na taon at buwan na ito
+        await deleteCache(context.env.CACHE, `projects_${year}_${month}`);
 
         return new Response(
             JSON.stringify({ success: true }),

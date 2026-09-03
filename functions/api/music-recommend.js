@@ -1,4 +1,25 @@
 import { askOpenAI } from "../lib/openai";
+import { getCache, setCache } from "../lib/cache.js";
+
+// Helper para gumawa ng maikling deterministic cache key batay sa project attributes
+async function generateCacheKey(project) {
+    const rawString = [
+        project.coupleName || "",
+        project.type || "",
+        project.status || "",
+        project.instruction || "",
+        project.concerns || "",
+        project.drone || "",
+        project.rawFiles || ""
+    ].join("_").toLowerCase();
+
+    const msgBuffer = new TextEncoder().encode(rawString);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+    return `music_rec_${hashHex}`;
+}
 
 export async function onRequestPost(context) {
     try {
@@ -18,6 +39,32 @@ export async function onRequestPost(context) {
         if (!apiKey) {
             throw new Error("OPENAI_API_KEY is not configured in Cloudflare environment variables.");
         }
+
+        const kv = env.CACHE;
+
+        // 1. Suriin ang Workers KV Cache para iwas paulit-ulit na OpenAI API call (7 Days TTL)
+        if (kv) {
+            try {
+                const cacheKey = await generateCacheKey(project);
+                const cachedRecommendation = await getCache(kv, cacheKey);
+                if (cachedRecommendation) {
+                    console.log("[CACHE HIT] Music recommendation retrieved from KV cache.");
+                    return new Response(
+                        JSON.stringify(cachedRecommendation),
+                        { 
+                            headers: { 
+                                "Content-Type": "application/json", 
+                                "Cache-Control": "private, max-age=60" 
+                            } 
+                        }
+                    );
+                }
+            } catch (kvReadErr) {
+                console.error("[KV CACHE READ ERROR]:", kvReadErr);
+            }
+        }
+
+        console.log("[CACHE MISS] Generating new AI music recommendation...");
 
         // Verified Musicbed Catalog Database
         const musicbedCatalog = [
@@ -118,13 +165,26 @@ Return ONLY a valid JSON object with this exact structure:
             projectInstruction !== "None" ? "✔ Custom Instructions Applied" : "✔ Standard Flow"
         ];
 
+        const finalResponsePayload = {
+            success: true,
+            analysis: analysisBadges,
+            songs: verifiedSongs,
+            whyText: String(aiResult.whyText || `Curated specifically for ${coupleName} matching professional wedding standards.`).trim()
+        };
+
+        // 2. I-save sa Workers KV Cache (TTL: 7 Days / 604800 seconds)
+        if (kv) {
+            try {
+                const cacheKey = await generateCacheKey(project);
+                await setCache(kv, cacheKey, finalResponsePayload, 604800);
+                console.log("[CACHE CREATED] Music recommendation cached in KV for 7 days.");
+            } catch (kvWriteErr) {
+                console.error("[KV CACHE WRITE ERROR]:", kvWriteErr);
+            }
+        }
+
         return new Response(
-            JSON.stringify({
-                success: true,
-                analysis: analysisBadges,
-                songs: verifiedSongs,
-                whyText: String(aiResult.whyText || `Curated specifically for ${coupleName} matching professional wedding standards.`).trim()
-            }),
+            JSON.stringify(finalResponsePayload),
             {
                 headers: { 
                     "Content-Type": "application/json",

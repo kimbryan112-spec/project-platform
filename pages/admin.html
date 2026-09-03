@@ -385,6 +385,8 @@ const IS_ADMIN = true;
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>
+let activeLogFetchController = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     const bell = document.getElementById("notificationBell");
     const dropdown = document.getElementById("notificationDropdown");
@@ -415,16 +417,28 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    setInterval(checkNewLogsCount, 3000);
+    // Single initial check instead of aggressive constant polling
     checkNewLogsCount();
+
+    // Browser visibility optimization: pause/resume background tasks when tab is hidden
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+            checkNewLogsCount();
+        }
+    });
 });
 
 async function fetchActivityLogs() {
     const listEl = document.getElementById("notificationList");
     const badgeEl = document.getElementById("notificationBadge");
     
+    if (activeLogFetchController) {
+        activeLogFetchController.abort();
+    }
+    activeLogFetchController = new AbortController();
+
     try {
-        const res = await fetch("/api/logs");
+        const res = await fetch("/api/logs", { signal: activeLogFetchController.signal });
         if (!res.ok) return;
         const data = await res.json();
         const logs = data.logs || [];
@@ -485,11 +499,16 @@ async function fetchActivityLogs() {
             listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
         }
     } catch (err) {
-        console.error("Error fetching logs:", err);
+        if (err.name !== 'AbortError') {
+            console.error("Error fetching logs:", err);
+        }
+    } finally {
+        activeLogFetchController = null;
     }
 }
 
 async function checkNewLogsCount() {
+    if (document.hidden) return; // Skip background checks if tab is hidden
     try {
         const res = await fetch("/api/logs");
         if (!res.ok) return;
