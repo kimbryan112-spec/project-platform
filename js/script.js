@@ -720,7 +720,7 @@ async function loadProjects() {
 }
 
 // ==================================
-// ONLINE & LOCAL SAVE FUNCTIONS
+// ONLINE & LOCAL SAVE FUNCTIONS (Optimized Debounce)
 // ==================================
 let localSaveTimeout;
 let apiSaveTimeout;
@@ -737,6 +737,7 @@ function saveProjects() {
 
     clearTimeout(apiSaveTimeout);
 
+    // Pinalaki ang delay sa 1000ms (1 segundo) para hindi mag-trigger ng API requests sa bawat tipada o galaw
     apiSaveTimeout = setTimeout(async () => {
         const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
@@ -771,7 +772,7 @@ function saveProjects() {
         } catch (e) {
             console.error("[SAVE] Error saving projects to Cloudflare backend:", e);
         }
-    }, 500);
+    }, 1000);
 }
 
 function saveProjectsLocal() {
@@ -796,7 +797,7 @@ function saveProjectsLocal() {
 
         updateCurrentMonthHasData();
 
-    }, 300);
+    }, 400);
 }
 
 // ==================================
