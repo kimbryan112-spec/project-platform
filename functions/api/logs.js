@@ -5,6 +5,10 @@
 ================================== */
 
 import { getCache, setCache, deleteCache } from "../lib/cache.js";
+import { DEFAULT_HEADERS } from "../lib/constants.js";
+import { KV_CACHE_TTL, PAGINATION_CONFIG } from "../lib/config.js";
+
+const CACHE_BASE = "activity_logs_latest";
 
 export async function onRequestPost(context) {
     try {
@@ -22,7 +26,7 @@ export async function onRequestPost(context) {
         if (!env.DB) {
             return new Response(JSON.stringify({ error: "Database not connected" }), {
                 status: 500,
-                headers: { "Content-Type": "application/json" }
+                headers: DEFAULT_HEADERS.JSON
             });
         }
 
@@ -49,7 +53,7 @@ export async function onRequestPost(context) {
         // Invalidate / Burahin ang cached latest logs dahil may bagong activity na na-record
         if (env.CACHE) {
             try {
-                await deleteCache(env.CACHE, "activity_logs_latest");
+                await deleteCache(env.CACHE, CACHE_BASE);
             } catch (kvDelErr) {
                 console.error("[KV LOGS DELETE ERROR]:", kvDelErr);
             }
@@ -57,13 +61,13 @@ export async function onRequestPost(context) {
 
         return new Response(JSON.stringify({ success: true }), {
             status: 200,
-            headers: { "Content-Type": "application/json" }
+            headers: DEFAULT_HEADERS.JSON
         });
     } catch (err) {
         console.error("[LOGS POST ERROR]:", err.message);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), {
             status: 500,
-            headers: { "Content-Type": "application/json" }
+            headers: DEFAULT_HEADERS.JSON
         });
     }
 }
@@ -75,7 +79,7 @@ export async function onRequestGet(context) {
         if (!env.DB) {
             return new Response(JSON.stringify({ error: "Database not connected" }), {
                 status: 500,
-                headers: { "Content-Type": "application/json" }
+                headers: DEFAULT_HEADERS.JSON
             });
         }
 
@@ -83,13 +87,13 @@ export async function onRequestGet(context) {
         const limitParam = parseInt(url.searchParams.get("limit"), 10);
         const pageParam = parseInt(url.searchParams.get("page"), 10);
         
-        // Gamitin ang standard limit na 20 kung walang ibinigay na custom limit
-        const limit = !isNaN(limitParam) && limitParam > 0 ? Math.min(limitParam, 100) : 20;
+        // Gamitin ang standard pagination limits mula sa central config
+        const limit = !isNaN(limitParam) && limitParam > 0 ? Math.min(limitParam, PAGINATION_CONFIG.MAX_PAGE_SIZE) : PAGINATION_CONFIG.DEFAULT_PAGE_SIZE;
         const page = !isNaN(pageParam) && pageParam > 0 ? pageParam : 1;
         const offset = (page - 1) * limit;
 
         const kv = env.CACHE;
-        const cacheKey = `activity_logs_latest_${limit}_${page}`;
+        const cacheKey = `${CACHE_BASE}_${limit}_${page}`;
 
         // 1. Subukang basahin ang unang page mula sa Workers KV Cache (30s TTL) para iwas D1 read
         if (kv && page === 1) {
@@ -119,10 +123,10 @@ export async function onRequestGet(context) {
 
         const logs = results || [];
 
-        // 3. I-save sa Workers KV Cache kung ito ang unang page (TTL: 30 seconds)
+        // 3. I-save sa Workers KV Cache kung ito ang unang page (gamit ang central TTL)
         if (kv && page === 1) {
             try {
-                await setCache(kv, cacheKey, logs, 30);
+                await setCache(kv, cacheKey, logs, KV_CACHE_TTL.NOTIFICATIONS);
             } catch (kvWriteErr) {
                 console.error("[KV LOGS WRITE ERROR]:", kvWriteErr);
             }
@@ -139,7 +143,12 @@ export async function onRequestGet(context) {
         console.error("[LOGS GET ERROR]:", err.message);
         return new Response(JSON.stringify({ error: "Internal Server Error" }), {
             status: 500,
-            headers: { "Content-Type": "application/json" }
+            headers: DEFAULT_HEADERS.JSON
         });
     }
 }
+
+export default {
+    onRequestPost,
+    onRequestGet
+};

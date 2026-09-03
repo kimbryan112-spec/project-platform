@@ -1,5 +1,12 @@
+/* ==================================
+    AI MUSIC RECOMMENDATION API
+    POST /api/music-recommendation
+================================== */
+
 import { askOpenAI } from "../lib/openai";
 import { getCache, setCache } from "../lib/cache.js";
+import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
+import { KV_CACHE_TTL } from "../lib/config.js";
 
 // Helper para gumawa ng maikling deterministic cache key batay sa project attributes
 async function generateCacheKey(project) {
@@ -18,7 +25,7 @@ async function generateCacheKey(project) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-    return `music_rec_${hashHex}`;
+    return `${CACHE_PREFIXES.MUSIC}_${hashHex}`;
 }
 
 export async function onRequestPost(context) {
@@ -42,7 +49,7 @@ export async function onRequestPost(context) {
 
         const kv = env.CACHE;
 
-        // 1. Suriin ang Workers KV Cache para iwas paulit-ulit na OpenAI API call (7 Days TTL)
+        // 1. Suriin ang Workers KV Cache para iwas paulit-ulit na OpenAI API call
         if (kv) {
             try {
                 const cacheKey = await generateCacheKey(project);
@@ -172,7 +179,7 @@ Return ONLY a valid JSON object with this exact structure:
             whyText: String(aiResult.whyText || `Curated specifically for ${coupleName} matching professional wedding standards.`).trim()
         };
 
-        // 2. I-save sa Workers KV Cache (TTL: 7 Days / 604800 seconds)
+        // 2. I-save sa Workers KV Cache (7 Days TTL: 604800 seconds o nakabase sa config)
         if (kv) {
             try {
                 const cacheKey = await generateCacheKey(project);
@@ -186,10 +193,7 @@ Return ONLY a valid JSON object with this exact structure:
         return new Response(
             JSON.stringify(finalResponsePayload),
             {
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store"
-                }
+                headers: DEFAULT_HEADERS.NO_CACHE
             }
         );
 
@@ -202,7 +206,7 @@ Return ONLY a valid JSON object with this exact structure:
             }),
             {
                 status: 500,
-                headers: { "Content-Type": "application/json" }
+                headers: DEFAULT_HEADERS.JSON
             }
         );
     }

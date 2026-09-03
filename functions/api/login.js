@@ -5,6 +5,9 @@
     DELETE /api/login?token=X - Destroy session from KV on logout
 ================================== */
 
+import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
+import { KV_CACHE_TTL } from "../lib/config.js";
+
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
@@ -16,7 +19,7 @@ export async function onRequestPost(context) {
         if (!email || !password) {
             return new Response(
                 JSON.stringify({ success: false, message: "Email and password are required." }),
-                { status: 400, headers: { "Content-Type": "application/json" } }
+                { status: 400, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
@@ -32,7 +35,7 @@ export async function onRequestPost(context) {
         if (!user) {
             return new Response(
                 JSON.stringify({ success: false, message: "Invalid email or password." }),
-                { status: 401, headers: { "Content-Type": "application/json" } }
+                { status: 401, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
@@ -47,7 +50,7 @@ export async function onRequestPost(context) {
         if (!passwordValid) {
             return new Response(
                 JSON.stringify({ success: false, message: "Invalid email or password." }),
-                { status: 401, headers: { "Content-Type": "application/json" } }
+                { status: 401, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
@@ -65,13 +68,14 @@ export async function onRequestPost(context) {
             loginAt: new Date().toISOString()
         };
 
-        // 2. Store Session sa Workers KV (TTL: 86400 seconds / 24 hours)
-        if (env.KV_CACHE) {
+        // 2. Store Session sa Workers KV gamit ang centralized KV binding at TTL
+        const kv = env.CACHE || env.KV_CACHE;
+        if (kv) {
             try {
-                await env.KV_CACHE.put(
-                    `session:${token}`, 
+                await kv.put(
+                    `${CACHE_PREFIXES.SESSION}:${token}`, 
                     JSON.stringify(sessionPayload), 
-                    { expirationTtl: 86400 }
+                    { expirationTtl: KV_CACHE_TTL.SETTINGS } // Standard 24h session TTL
                 );
             } catch (kvErr) {
                 console.error("[KV SESSION ERROR] Failed to store session in KV:", kvErr);
@@ -88,10 +92,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store"
-                }
+                headers: DEFAULT_HEADERS.NO_CACHE
             }
         );
 
@@ -104,7 +105,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 500,
-                headers: { "Content-Type": "application/json" }
+                headers: DEFAULT_HEADERS.JSON
             }
         );
     }
@@ -116,33 +117,34 @@ export async function onRequestGet(context) {
         const { request, env } = context;
         const url = new URL(request.url);
         const token = url.searchParams.get("token");
+        const kv = env.CACHE || env.KV_CACHE;
 
-        if (!token || !env.KV_CACHE) {
+        if (!token || !kv) {
             return new Response(
                 JSON.stringify({ success: false, message: "Unauthorized" }),
-                { status: 401, headers: { "Content-Type": "application/json" } }
+                { status: 401, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
         // Basahin ang session mula sa KV sa halip na D1 (Zero D1 reads para sa page navigation)
-        const sessionData = await env.KV_CACHE.get(`session:${token}`, "json");
+        const sessionData = await kv.get(`${CACHE_PREFIXES.SESSION}:${token}`, "json");
 
         if (!sessionData) {
             return new Response(
                 JSON.stringify({ success: false, message: "Session expired or invalid." }),
-                { status: 401, headers: { "Content-Type": "application/json" } }
+                { status: 401, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
         return new Response(
             JSON.stringify({ success: true, user: sessionData }),
-            { headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } }
+            { headers: DEFAULT_HEADERS.NO_CACHE }
         );
 
     } catch (err) {
         return new Response(
             JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: DEFAULT_HEADERS.JSON }
         );
     }
 }
@@ -153,19 +155,20 @@ export async function onRequestDelete(context) {
         const { request, env } = context;
         const url = new URL(request.url);
         const token = url.searchParams.get("token");
+        const kv = env.CACHE || env.KV_CACHE;
 
-        if (token && env.KV_CACHE) {
-            await env.KV_CACHE.delete(`session:${token}`);
+        if (token && kv) {
+            await kv.delete(`${CACHE_PREFIXES.SESSION}:${token}`);
         }
 
         return new Response(
             JSON.stringify({ success: true, message: "Logged out successfully." }),
-            { headers: { "Content-Type": "application/json" } }
+            { headers: DEFAULT_HEADERS.JSON }
         );
     } catch (err) {
         return new Response(
             JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: DEFAULT_HEADERS.JSON }
         );
     }
 }

@@ -1,14 +1,5 @@
-/* ==================================
-    CACHE HELPER (Workers KV)
-    functions/lib/cache.js
-================================== */
+import { CACHE_PREFIXES } from "./constants.js";
 
-/**
- * Kumuha ng cache mula sa Workers KV
- * @param {KVNamespace} kv - Ang CACHE binding mula sa context.env
- * @param {string} key - Cache key
- * @returns {Promise<any|null>} - Parsed JSON data o null kung wala/error
- */
 export async function getCache(kv, key) {
     if (!kv) return null;
     try {
@@ -21,13 +12,6 @@ export async function getCache(kv, key) {
     }
 }
 
-/**
- * Mag-save ng data sa Workers KV na may automatic JSON stringify at TTL
- * @param {KVNamespace} kv - Ang CACHE binding mula sa context.env
- * @param {string} key - Cache key
- * @param {any} data - Data na ise-save
- * @param {number} [ttl=null] - Time-to-live sa seconds (optional)
- */
 export async function setCache(kv, key, data, ttl = null) {
     if (!kv) return;
     try {
@@ -41,11 +25,6 @@ export async function setCache(kv, key, data, ttl = null) {
     }
 }
 
-/**
- * Burahin ang isang partikular na cache key
- * @param {KVNamespace} kv - Ang CACHE binding mula sa context.env
- * @param {string} key - Cache key
- */
 export async function deleteCache(kv, key) {
     if (!kv) return;
     try {
@@ -55,11 +34,6 @@ export async function deleteCache(kv, key) {
     }
 }
 
-/**
- * Burahin ang lahat ng cache na may kaparehong prefix (bulk invalidation)
- * @param {KVNamespace} kv - Ang CACHE binding mula sa context.env
- * @param {string} prefix - Key prefix (halimbawa: "projects_", "settings_")
- */
 export async function clearCacheByPrefix(kv, prefix) {
     if (!kv) return;
     try {

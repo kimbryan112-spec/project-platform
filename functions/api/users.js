@@ -1,15 +1,9 @@
-/* ==================================
-    USER MANAGEMENT API (Optimized with Workers KV Cache)
-    GET /api/users - Retrieves all users (Cached with 12-hour TTL)
-    POST /api/users - Creates a new user & invalidates users list cache
-    PUT /api/users - Updates an existing user & invalidates users list cache
-    DELETE /api/users - Deletes a user & invalidates users list cache
-================================== */
-
 import { getCache, setCache, deleteCache } from "../lib/cache.js";
+import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
+import { KV_CACHE_TTL } from "../lib/config.js";
 
-const CACHE_KEY = "users_list";
-const CACHE_TTL = 43200; // 12 Hours
+const CACHE_KEY = `${CACHE_PREFIXES.USERS}_list`;
+const CACHE_TTL = KV_CACHE_TTL.USERS;
 
 export async function onRequestGet(context) {
     try {
@@ -21,14 +15,13 @@ export async function onRequestGet(context) {
             throw new Error("D1 Database binding (DB) is not configured.");
         }
 
-        // 1. Suriin muna ang Workers KV cache para iwas D1 read
         if (kv) {
             try {
                 const cachedUsers = await getCache(kv, CACHE_KEY);
                 if (cachedUsers) {
                     return new Response(
                         JSON.stringify({ success: true, users: cachedUsers }),
-                        { headers: { "Content-Type": "application/json", "Cache-Control": "private, max-age=60" } }
+                        { headers: DEFAULT_HEADERS.STANDARD_CACHE }
                     );
                 }
             } catch (kvReadErr) {
@@ -36,7 +29,6 @@ export async function onRequestGet(context) {
             }
         }
 
-        // 2. Kung walang cache, kunin sa D1 database (Optimized field selection)
         const { results } = await db.prepare(`
             SELECT id, email, name, role, permissions, created_at, updated_at
             FROM users
@@ -45,7 +37,6 @@ export async function onRequestGet(context) {
 
         const users = results || [];
 
-        // 3. I-save sa Workers KV Cache (TTL: 12 Hours)
         if (kv) {
             try {
                 await setCache(kv, CACHE_KEY, users, CACHE_TTL);
@@ -56,14 +47,14 @@ export async function onRequestGet(context) {
 
         return new Response(
             JSON.stringify({ success: true, users }),
-            { headers: { "Content-Type": "application/json", "Cache-Control": "private, max-age=60" } }
+            { headers: DEFAULT_HEADERS.STANDARD_CACHE }
         );
 
     } catch (err) {
         console.error("[USERS GET ERROR]:", err);
         return new Response(
             JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: DEFAULT_HEADERS.JSON }
         );
     }
 }
@@ -86,7 +77,7 @@ export async function onRequestPost(context) {
         if (!email || !password) {
             return new Response(
                 JSON.stringify({ success: false, message: "Email and password are required." }),
-                { status: 400, headers: { "Content-Type": "application/json" } }
+                { status: 400, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
@@ -95,7 +86,6 @@ export async function onRequestPost(context) {
             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `).bind(email, password, name, role, permissions).run();
 
-        // Invalidate / Burahin ang users list cache dahil nagbago ang data
         if (kv) {
             try {
                 await deleteCache(kv, CACHE_KEY);
@@ -106,14 +96,14 @@ export async function onRequestPost(context) {
 
         return new Response(
             JSON.stringify({ success: true, message: "User created successfully." }),
-            { headers: { "Content-Type": "application/json" } }
+            { headers: DEFAULT_HEADERS.JSON }
         );
 
     } catch (err) {
         console.error("[USERS POST ERROR]:", err);
         return new Response(
             JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: DEFAULT_HEADERS.JSON }
         );
     }
 }
@@ -131,7 +121,7 @@ export async function onRequestPut(context) {
         if (!userId) {
             return new Response(
                 JSON.stringify({ success: false, message: "User ID is required for update." }),
-                { status: 400, headers: { "Content-Type": "application/json" } }
+                { status: 400, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
@@ -154,7 +144,6 @@ export async function onRequestPut(context) {
             `).bind(name, role, permissions, userId).run();
         }
 
-        // Invalidate cache
         if (kv) {
             try {
                 await deleteCache(kv, CACHE_KEY);
@@ -165,14 +154,14 @@ export async function onRequestPut(context) {
 
         return new Response(
             JSON.stringify({ success: true, message: "User updated successfully." }),
-            { headers: { "Content-Type": "application/json" } }
+            { headers: DEFAULT_HEADERS.JSON }
         );
 
     } catch (err) {
         console.error("[USERS PUT ERROR]:", err);
         return new Response(
             JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: DEFAULT_HEADERS.JSON }
         );
     }
 }
@@ -190,7 +179,7 @@ export async function onRequestDelete(context) {
         if (!userId) {
             return new Response(
                 JSON.stringify({ success: false, message: "User ID is required for deletion." }),
-                { status: 400, headers: { "Content-Type": "application/json" } }
+                { status: 400, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
@@ -198,7 +187,6 @@ export async function onRequestDelete(context) {
             "DELETE FROM users WHERE id = ?"
         ).bind(userId).run();
 
-        // Invalidate cache
         if (kv) {
             try {
                 await deleteCache(kv, CACHE_KEY);
@@ -209,14 +197,14 @@ export async function onRequestDelete(context) {
 
         return new Response(
             JSON.stringify({ success: true, message: "User deleted successfully." }),
-            { headers: { "Content-Type": "application/json" } }
+            { headers: DEFAULT_HEADERS.JSON }
         );
 
     } catch (err) {
         console.error("[USERS DELETE ERROR]:", err);
         return new Response(
             JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            { status: 500, headers: DEFAULT_HEADERS.JSON }
         );
     }
 }

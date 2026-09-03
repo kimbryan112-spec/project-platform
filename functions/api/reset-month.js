@@ -3,6 +3,9 @@
     POST /api/reset-month
 ================================== */
 
+import { deleteCache } from "../lib/cache.js";
+import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
+
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
@@ -15,7 +18,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 500,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
@@ -38,7 +41,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 400,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
@@ -62,6 +65,17 @@ export async function onRequestPost(context) {
         .bind(year, month)
         .run();
 
+        // Invalidate Workers KV Cache para sa buwang ito at sa master list
+        const kv = env.CACHE;
+        if (kv) {
+            try {
+                await deleteCache(kv, `${CACHE_PREFIXES.PROJECTS}_${year}_${month}`);
+                await deleteCache(kv, `${CACHE_PREFIXES.PROJECTS}_all`);
+            } catch (kvDelErr) {
+                console.error("[KV RESET MONTH CACHE ERROR]:", kvDelErr);
+            }
+        }
+
         return new Response(
             JSON.stringify({
                 success: true,
@@ -70,10 +84,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store, no-cache, must-revalidate"
-                }
+                headers: DEFAULT_HEADERS.NO_CACHE
             }
         );
 
@@ -88,9 +99,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: DEFAULT_HEADERS.JSON
             }
         );
     }
