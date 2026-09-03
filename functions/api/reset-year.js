@@ -1,31 +1,62 @@
 /* ==================================
-   RESET YEAR API
-   POST /api/reset-year
+    RESET YEAR API
+    POST /api/reset-year
 ================================== */
 
 export async function onRequestPost(context) {
     try {
-        const { year } = await context.request.json();
+        const { request, env } = context;
+
+        if (!env.DB) {
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    message: "Database not connected."
+                }),
+                {
+                    status: 500,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
+        }
+
+        let body = {};
+        try {
+            body = await request.json();
+        } catch (e) {
+            body = {};
+        }
+
+        const year = Number(body.year);
+
+        if (!year) {
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    message: "Year is required."
+                }),
+                {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
+        }
 
         console.log(`[RESET YEAR] ${year}`);
 
-        const result = await context.env.DB.prepare(`
+        const result = await env.DB.prepare(`
             DELETE FROM projects
             WHERE project_year = ?
         `)
-        .bind(
-            Number(year)
-        )
+        .bind(year)
         .run();
 
-        // Opsyonal: Para ma-clear din ang lahat ng buwan na naka-lock sa taon na ito:
-        await context.env.DB.prepare(`
+        // Para ma-clear din ang lahat ng buwan na naka-lock sa taon na ito:
+        await env.DB.prepare(`
             DELETE FROM month_locks
             WHERE project_year = ?
         `)
-        .bind(
-            Number(year)
-        )
+        .bind(year)
         .run();
 
         return new Response(
@@ -35,20 +66,22 @@ export async function onRequestPost(context) {
                 deleted: result.meta?.changes || 0
             }),
             {
+                status: 200,
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store, no-cache, must-revalidate"
                 }
             }
         );
 
     }
     catch (err) {
-        console.error("[RESET YEAR]", err);
+        console.error("[RESET YEAR ERROR]:", err.message);
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message
+                message: "Internal Server Error"
             }),
             {
                 status: 500,

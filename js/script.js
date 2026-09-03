@@ -59,6 +59,12 @@ let currentMonthLocked = false;
 let cachedHasDataMonths = {};
 let monthLocks = {};
 
+// =========================================
+// IN-MEMORY CACHE & REQUEST DEDUPLICATION (OPTIMIZATION)
+// =========================================
+const projectMemoryCache = {};
+let activeProjectFetchController = null;
+
 // ===========================
 // LIVE CALENDAR
 // ===========================
@@ -667,7 +673,7 @@ function loadProjectsLocal() {
 }
 
 // ==================================
-// ONLINE LOAD FUNCTION
+// ONLINE LOAD FUNCTION (OPTIMIZED WITH IN-MEMORY CACHE & DEDUPLICATION)
 // ==================================
 async function loadProjects() {
     console.log("========== LOAD START ==========");
@@ -684,12 +690,28 @@ async function loadProjects() {
         return;
     }
 
+    const cacheKey = `${currentYear}_${currentMonth}`;
+
+    // Re-use in-memory cache if available to prevent redundant database read requests
+    if (projectMemoryCache[cacheKey]) {
+        console.log(`[LOAD] Using in-memory cache for ${cacheKey}`);
+        const cachedData = projectMemoryCache[cacheKey];
+        renderLoadedProjects(cachedData.projects, cachedData.lockedMonths, cachedHasDataMonths);
+        return;
+    }
+
+    // Cancel any ongoing identical fetch request to prevent duplicate concurrent queries
+    if (activeProjectFetchController) {
+        activeProjectFetchController.abort();
+    }
+    activeProjectFetchController = new AbortController();
+
     try {
         const response = await fetch(
-            `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
+            `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}`,
             {
-                cache: "no-store",
-                headers: { "Cache-Control": "no-cache" }
+                signal: activeProjectFetchController.signal,
+                headers: { "Cache-Control": "private, max-age=10" }
             }
         );
 
@@ -699,52 +721,62 @@ async function loadProjects() {
         }
 
         const responseData = await response.json();
-        const projectsData = responseData.projects || [];
+        
+        // Save to in-memory cache
+        projectMemoryCache[cacheKey] = responseData;
 
-        monthLocks = responseData.lockedMonths || {};
-        cachedHasDataMonths = responseData.hasDataMonths || {};
+        renderLoadedProjects(responseData.projects || [], responseData.lockedMonths || {}, responseData.hasDataMonths || {});
 
-        await updateMonthHasDataUI(cachedHasDataMonths);
-
-        if (!projectsData.length) {
-            clearProjectTable();
+    } catch (e) {
+        if (e.name !== 'AbortError') {
+            console.error("[LOAD] Error loading projects:", e);
         }
+    } finally {
+        activeProjectFetchController = null;
+    }
+}
 
-        const rows = document.querySelectorAll(".project-table tbody tr");
+function renderLoadedProjects(projectsData, locks, hasData) {
+    monthLocks = locks || {};
+    cachedHasDataMonths = hasData || {};
 
-        if (Array.isArray(projectsData) && projectsData.length > 0) {
-            let matchedCount = 0;
+    updateMonthHasDataUI(cachedHasDataMonths);
 
-            rows.forEach((row) => {
-                const rowId = parseInt(row.getAttribute("data-row-id"), 10);
-                const data = projectsData.find(p => p.rowId === rowId);
+    if (!projectsData.length) {
+        clearProjectTable();
+    }
 
-                if (data) {
-                    populateRow(row, data);
-                    matchedCount++;
-                }
-            });
+    const rows = document.querySelectorAll(".project-table tbody tr");
 
-            updateMonthLockUI();
-            await updateMonthHasDataUI(cachedHasDataMonths);
-            console.log(`[LOAD] Successfully matched ${matchedCount} rows`);
-        }
+    if (Array.isArray(projectsData) && projectsData.length > 0) {
+        let matchedCount = 0;
 
-        document.querySelectorAll(".month-btn").forEach(btn => {
-            const key = getMonthKey(currentYear, btn.dataset.month);
-            const locked = !!monthLocks[key];
-            if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
-                btn.classList.toggle("locked", locked);
-            } else {
-                btn.classList.remove("locked");
+        rows.forEach((row) => {
+            const rowId = parseInt(row.getAttribute("data-row-id"), 10);
+            const data = projectsData.find(p => p.rowId === rowId);
+
+            if (data) {
+                populateRow(row, data);
+                matchedCount++;
             }
         });
 
         updateMonthLockUI();
-
-    } catch (e) {
-        console.error("[LOAD] Error loading projects:", e);
+        updateMonthHasDataUI(cachedHasDataMonths);
+        console.log(`[LOAD] Successfully matched ${matchedCount} rows`);
     }
+
+    document.querySelectorAll(".month-btn").forEach(btn => {
+        const key = getMonthKey(currentYear, btn.dataset.month);
+        const locked = !!monthLocks[key];
+        if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
+            btn.classList.toggle("locked", locked);
+        } else {
+            btn.classList.remove("locked");
+        }
+    });
+
+    updateMonthLockUI();
 
     document.querySelectorAll(".status-select").forEach(updateStatusColor);
     document.querySelectorAll(".type-select").forEach(updateTypeColor);
@@ -754,7 +786,7 @@ async function loadProjects() {
 }
 
 // ==================================
-// ONLINE & LOCAL SAVE FUNCTIONS (Optimized Debounce)
+// ONLINE & LOCAL SAVE FUNCTIONS (Optimized Debounce & Cache Invalidation)
 // ==================================
 let localSaveTimeout;
 let apiSaveTimeout;
@@ -768,6 +800,10 @@ function saveProjects() {
 
     const saveYear = currentYear;
     const saveMonth = currentMonth;
+    const cacheKey = `${saveYear}_${saveMonth}`;
+
+    // Invalidate in-memory cache on write/save action
+    delete projectMemoryCache[cacheKey];
 
     clearTimeout(apiSaveTimeout);
 
@@ -1210,6 +1246,9 @@ document.getElementById("lockMonthBtn")?.addEventListener("click", async () => {
     locks[getMonthKey(currentYear, month)] = true;
     saveMonthLocks(locks);
 
+    // Invalidate memory cache on lock change
+    delete projectMemoryCache[getMonthKey(currentYear, month)];
+
     await saveMonthLock(currentYear, month, true);
     button.classList.add("locked");
     updateMonthLockUI();
@@ -1225,6 +1264,9 @@ document.getElementById("unlockMonthBtn")?.addEventListener("click", async () =>
     const locks = getMonthLocks();
     delete locks[getMonthKey(currentYear, month)];
     saveMonthLocks(locks);
+
+    // Invalidate memory cache on unlock change
+    delete projectMemoryCache[getMonthKey(currentYear, month)];
 
     await saveMonthLock(currentYear, month, false);
     button.classList.remove("locked");

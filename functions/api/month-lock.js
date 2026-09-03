@@ -1,13 +1,50 @@
 /* ==================================
-   MONTH LOCK API
-   POST /api/month-lock
+    MONTH LOCK API
+    POST /api/month-lock
 ================================== */
 
 export async function onRequestPost(context) {
     try {
-        const { year, month, locked } = await context.request.json();
+        const { request, env } = context;
 
-        await context.env.DB.prepare(`
+        if (!env.DB) {
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    message: "Database not connected."
+                }),
+                {
+                    status: 500,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
+        }
+
+        let body = {};
+        try {
+            body = await request.json();
+        } catch (e) {
+            body = {};
+        }
+
+        const year = Number(body.year);
+        const month = Number(body.month);
+        const locked = Boolean(body.locked);
+
+        if (!year || !month) {
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    message: "Year and month are required."
+                }),
+                {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
+        }
+
+        await env.DB.prepare(`
             INSERT INTO month_locks (
                 project_year,
                 project_month,
@@ -34,20 +71,21 @@ export async function onRequestPost(context) {
                 success: true
             }),
             {
+                status: 200,
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store, no-cache, must-revalidate"
                 }
             }
         );
 
     } catch (err) {
-        console.error("[MONTH LOCK ERROR]");
-        console.error(err);
+        console.error("[MONTH LOCK ERROR]:", err.message);
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message
+                message: "Internal Server Error"
             }),
             {
                 status: 500,

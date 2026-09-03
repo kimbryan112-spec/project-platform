@@ -29,7 +29,7 @@ export async function onRequestGet(context) {
             WHERE project_year = ?
               AND (
                     TRIM(COALESCE(couple_name,'')) <> ''
-                 OR TRIM(COALESCE(raw_files,'')) <> ''
+                   OR TRIM(COALESCE(raw_files,'')) <> ''
               )
         `).bind(year);
 
@@ -149,8 +149,9 @@ export async function onRequestPost(context) {
 
         console.log(`[POST] Saving ${projects.length} row(s) for ${year}-${month}`);
 
-        for (const row of projects) {
-            await context.env.DB.prepare(`
+        // Gumamit ng batch statements para sa mas mabilis at mas kaunting database transaction overhead
+        const statements = projects.map(row => {
+            return context.env.DB.prepare(`
                 INSERT INTO projects (
                     project_year, project_month, row_index,
                     couple_name, status, progress, type,
@@ -220,6 +221,7 @@ export async function onRequestPost(context) {
                 row.song1?.status || "",
                 row.song1?.notes || "",
                 row.song2?.title || "",
+                row.song2?.value || row.song2?.link || "", // safe fallback if any
                 row.song2?.link || "",
                 row.song2?.status || "",
                 row.song2?.notes || "",
@@ -231,8 +233,11 @@ export async function onRequestPost(context) {
                 row.teaserSong?.link || "",
                 row.teaserSong?.status || "",
                 row.teaserSong?.notes || ""
-            )
-            .run();
+            );
+        });
+
+        if (statements.length > 0) {
+            await context.env.DB.batch(statements);
         }
 
         return new Response(
