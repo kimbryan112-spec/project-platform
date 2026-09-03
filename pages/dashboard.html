@@ -160,7 +160,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Dinamikong pag-generate ng rows 1 to 6 para hindi siksik at mahaba ang HTML -->
                     <script>
                         const droneOptionsHTML = `
                             <option value="NO DRONE">NO DRONE</option>
@@ -187,7 +186,7 @@
                             <td class="song-cell">
                                 <div class="song-card">
                                     <input type="url" class="song-link">
-                                    <div class="dashboard-song-actions">
+                                    <div class="song-actions">
                                         <select class="dashboard-song-status">
                                             <option selected></option>
                                             <option>NEW</option>
@@ -196,7 +195,7 @@
                                             <option>RESERVED</option>
                                             <option>REQUESTED</option>
                                         </select>
-                                        <button type="button" class="secondary-btn comments-btn" data-comment-id="row1-teaser">💬 Comments</button>
+                                        <button class="generate-btn btn-3d">GENERATE</button>
                                     </div>
                                 </div>
                             </td>
@@ -269,6 +268,69 @@
     </main>
 </div>
 
+<!-- All Context Menus & Modals (Para sa Admin) -->
+<div id="monthContextMenu" class="month-context-menu">
+    <button id="lockMonthBtn">🔒 Lock Month</button>
+    <button id="unlockMonthBtn">🔓 Unlock Month</button>
+</div>
+
+<div id="watchContextMenu" class="month-context-menu">
+    <button id="attachWatchLinkBtn">📎 Attach Watch Link</button>
+</div>
+
+<div id="watchLinkModal" class="modal">
+    <div class="modal-content" style="max-width:600px;">
+        <div class="modal-header">
+            <h3>Attach Watch Link</h3>
+            <button id="closeWatchLinkModal">&times;</button>
+        </div>
+        <div style="padding:20px;">
+            <input id="watchLinkInput" type="url" placeholder="Paste Vimeo / Frame.io / YouTube link..." style="width:100%;height:40px;padding:10px;">
+            <p style="margin-top:10px;font-size:13px;color:#666;">Changes are saved automatically.</p>
+        </div>
+    </div>
+</div>
+
+<div id="filesContextMenu" class="month-context-menu">
+    <button id="attachFilesLinkBtn">📁 Attach Files Link</button>
+</div>
+
+<div id="filesLinkModal" class="modal">
+    <div class="modal-content" style="max-width:600px;">
+        <div class="modal-header">
+            <h3>Attach Files Link</h3>
+            <button id="closeFilesLinkModal">&times;</button>
+        </div>
+        <div style="padding:20px;">
+            <input id="filesLinkInput" type="url" placeholder="Paste Google Drive / Dropbox / OneDrive folder link..." style="width:100%;height:40px;padding:10px;">
+            <p style="margin-top:10px;font-size:13px;color:#666;">Changes are saved automatically.</p>
+        </div>
+    </div>
+</div>
+
+<div id="songContextMenu" class="context-menu">
+    <div id="attachSongLinkBtn">📎 Attach Song Link</div>
+</div>
+
+<div id="songLinkModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🎵 Attach Song Link</h3>
+            <button id="closeSongLinkModal" class="close-modal">✕</button>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
+            <div>
+                <label>Song Title</label>
+                <input id="songTitleInput" type="text" placeholder="Enter song title...">
+            </div>
+            <div>
+                <label>YouTube / Spotify Link</label>
+                <input id="songLinkInput" type="url" placeholder="Paste link...">
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Special Instructions Modal -->
 <div id="instructionModal" class="modal">
     <div class="modal-content">
@@ -280,18 +342,6 @@
     </div>
 </div>
 
-<!-- COMMENTS MODAL -->
-<div id="commentsModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Comments</h3>
-            <button id="closeCommentsModal">&times;</button>
-        </div>
-        <textarea id="commentsTextarea" placeholder="Write comments here..."></textarea>
-    </div>
-</div>
-
-<!-- WATCH MODAL -->
 <div id="watchModal" class="modal">
     <div id="watchBox" class="modal-content watch-box">
         <div id="watchHeader" class="modal-header">
@@ -336,6 +386,21 @@ if (!IS_ADMIN) {
     if (notifWrapper) {
         notifWrapper.style.display = "none";
     }
+
+    // Harangin o alisin ang mga Context Menu para sa Manager role para walang access sa link attachments at month lock
+    document.addEventListener("DOMContentLoaded", () => {
+        ['monthContextMenu', 'watchContextMenu', 'filesContextMenu', 'songContextMenu'].forEach(id => {
+            const menu = document.getElementById(id);
+            if (menu) menu.remove();
+        });
+
+        // Harangan ang right click sa mga elements na may kinalaman dito
+        document.addEventListener("contextmenu", (e) => {
+            if (!IS_ADMIN) {
+                e.preventDefault();
+            }
+        });
+    });
 } else {
     // Kung admin, isasama ang logic para sa pag-fetch ng activity logs ng bell
     document.addEventListener("DOMContentLoaded", () => {
