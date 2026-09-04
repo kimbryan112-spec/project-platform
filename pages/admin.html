@@ -42,8 +42,8 @@
 
         <div class="sidebar-footer">
             <div class="user-info">
-                <div class="user-name">Kim Bryan Hernandez</div>
-                <div class="user-role">Administrator</div>
+                <div class="user-name" id="userName">Kim Bryan Hernandez</div>
+                <div class="user-role" id="userRole">Administrator</div>
             </div>
 
             <div class="logout-wrapper">
@@ -370,11 +370,12 @@
 </div>
 
 <script>
+// Authentication & Role Check
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if (!currentUser) {
     window.location.href = "../login.html";
 }
-if (currentUser.role !== "admin") {
+if ((currentUser.role || "").toLowerCase() !== "admin") {
     alert("Access Denied.");
     window.location.href = "dashboard.html";
 }

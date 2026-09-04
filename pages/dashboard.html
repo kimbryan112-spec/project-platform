@@ -381,20 +381,17 @@ if (!IS_ADMIN) {
         adminMenu.style.display = "none";
     }
     
-    // Itatago ang notification bell wrapper kung hindi admin (Manager role)
     const notifWrapper = document.getElementById("dashboardNotificationWrapper");
     if (notifWrapper) {
         notifWrapper.style.display = "none";
     }
 
-    // Harangin o alisin ang mga Context Menu para sa Manager role para walang access sa link attachments at month lock
     document.addEventListener("DOMContentLoaded", () => {
         ['monthContextMenu', 'watchContextMenu', 'filesContextMenu', 'songContextMenu'].forEach(id => {
             const menu = document.getElementById(id);
             if (menu) menu.remove();
         });
 
-        // Harangan ang right click sa mga elements na may kinalaman dito
         document.addEventListener("contextmenu", (e) => {
             if (!IS_ADMIN) {
                 e.preventDefault();
@@ -402,7 +399,6 @@ if (!IS_ADMIN) {
         });
     });
 } else {
-    // Kung admin, isasama ang logic para sa pag-fetch ng activity logs ng bell
     document.addEventListener("DOMContentLoaded", () => {
         const bell = document.getElementById("notificationBell");
         const dropdown = document.getElementById("notificationDropdown");

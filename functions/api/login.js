@@ -5,17 +5,19 @@
 
 export async function onRequestPost(context) {
     try {
+        const { request, env } = context;
+
         let body = {};
         try {
-            body = await context.request.json();
+            body = await request.json();
         } catch (e) {
             body = {};
         }
 
-        const email = body.email || "";
-        const password = body.password || "";
+        const email = String(body.email || "").trim().toLowerCase();
+        const password = String(body.password || "");
 
-        if (!email.trim() || !password) {
+        if (!email || !password) {
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -28,7 +30,20 @@ export async function onRequestPost(context) {
             );
         }
 
-        const user = await context.env.DB.prepare(`
+        if (!env.DB) {
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    message: "Database not connected."
+                }),
+                {
+                    status: 500,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
+        }
+
+        const user = await env.DB.prepare(`
             SELECT
                 id,
                 fullname,
@@ -40,7 +55,7 @@ export async function onRequestPost(context) {
             WHERE email = ?
             LIMIT 1
         `)
-        .bind(email.trim().toLowerCase())
+        .bind(email)
         .first();
 
         if (!user) {
@@ -88,7 +103,7 @@ export async function onRequestPost(context) {
             Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toISOString();
 
-        await context.env.DB.prepare(`
+        await env.DB.prepare(`
             INSERT INTO sessions (
                 id,
                 user_id,
@@ -115,7 +130,10 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 200,
-                headers: { "Content-Type": "application/json" }
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store, no-cache, must-revalidate"
+                }
             }
         );
 
@@ -127,12 +145,12 @@ export async function onRequestPost(context) {
         return response;
 
     } catch (err) {
-        console.error("[LOGIN ERROR]", err);
+        console.error("[LOGIN ERROR]:", err.message);
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message || "Internal Server Error"
+                message: "Internal Server Error"
             }),
             {
                 status: 500,

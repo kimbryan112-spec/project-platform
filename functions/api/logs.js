@@ -6,7 +6,6 @@ export async function onRequestPost(context) {
         try {
             body = await request.json();
         } catch (e) {
-            // Kung sakaling hindi valid o walang laman ang JSON body
             body = {};
         }
         
@@ -19,16 +18,24 @@ export async function onRequestPost(context) {
             });
         }
 
+        // Sanitization and length trimming to protect D1 performance and prevent overflow
+        const sanitizedUserName = String(user_name || "Admin/User").trim().slice(0, 100);
+        const sanitizedAction = String(action || "Unknown Action").trim().slice(0, 150);
+        const sanitizedDetails = String(details || "").trim().slice(0, 500);
+        const sanitizedBrowser = String(browser || "Unknown Browser").trim().slice(0, 50);
+        const sanitizedOs = String(os || "Unknown OS").trim().slice(0, 50);
+        const sanitizedDevice = String(device || "Desktop").trim().slice(0, 50);
+
         await env.DB.prepare(`
             INSERT INTO activity_logs (user_name, action, details, browser, os, device)
             VALUES (?, ?, ?, ?, ?, ?)
         `).bind(
-            user_name || "Admin/User",
-            action || "Unknown Action",
-            details || "",
-            browser || "Unknown Browser",
-            os || "Unknown OS",
-            device || "Desktop"
+            sanitizedUserName,
+            sanitizedAction,
+            sanitizedDetails,
+            sanitizedBrowser,
+            sanitizedOs,
+            sanitizedDevice
         ).run();
 
         return new Response(JSON.stringify({ success: true }), {
@@ -36,7 +43,8 @@ export async function onRequestPost(context) {
             headers: { "Content-Type": "application/json" }
         });
     } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), {
+        console.error("[LOGS POST ERROR]:", err.message);
+        return new Response(JSON.stringify({ error: "Internal Server Error" }), {
             status: 500,
             headers: { "Content-Type": "application/json" }
         });
@@ -54,9 +62,12 @@ export async function onRequestGet(context) {
             });
         }
 
-        // Kunin ang huling 50 logs nang mabilis at episyente
+        // Kunin ang huling 50 logs nang mabilis at episyente na may limitadong field projection kung kinakailangan
         const { results } = await env.DB.prepare(`
-            SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 50
+            SELECT id, user_name, action, details, browser, os, device, created_at 
+            FROM activity_logs 
+            ORDER BY id DESC 
+            LIMIT 50
         `).all();
 
         return new Response(JSON.stringify({ logs: results || [] }), {
@@ -67,7 +78,8 @@ export async function onRequestGet(context) {
             }
         });
     } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), {
+        console.error("[LOGS GET ERROR]:", err.message);
+        return new Response(JSON.stringify({ error: "Internal Server Error" }), {
             status: 500,
             headers: { "Content-Type": "application/json" }
         });
