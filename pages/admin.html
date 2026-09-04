@@ -42,8 +42,8 @@
 
         <div class="sidebar-footer">
             <div class="user-info">
-                <div class="user-name" id="userName">Kim Bryan Hernandez</div>
-                <div class="user-role" id="userRole">Administrator</div>
+                <div class="user-name">Kim Bryan Hernandez</div>
+                <div class="user-role">Administrator</div>
             </div>
 
             <div class="logout-wrapper">
@@ -205,8 +205,7 @@
                             </td>
                         `;
 
-                        // Pinalaki mula 6 patungong 15 para masalo ang lahat ng D1 records
-                        for (let i = 1; i <= 15; i++) {
+                        for (let i = 1; i <= 6; i++) {
                             document.write(`
                                 <tr data-row-id="${i}">
                                     <td class="couple-cell">
@@ -371,12 +370,11 @@
 </div>
 
 <script>
-// Authentication & Role Check
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if (!currentUser) {
     window.location.href = "../login.html";
 }
-if ((currentUser.role || "").toLowerCase() !== "admin") {
+if (currentUser.role !== "admin") {
     alert("Access Denied.");
     window.location.href = "dashboard.html";
 }
@@ -386,8 +384,6 @@ const IS_ADMIN = true;
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>
-let activeLogFetchController = null;
-
 document.addEventListener("DOMContentLoaded", () => {
     const bell = document.getElementById("notificationBell");
     const dropdown = document.getElementById("notificationDropdown");
@@ -418,28 +414,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Single initial check instead of aggressive constant polling
+    setInterval(checkNewLogsCount, 3000);
     checkNewLogsCount();
-
-    // Browser visibility optimization: pause/resume background tasks when tab is hidden
-    document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) {
-            checkNewLogsCount();
-        }
-    });
 });
 
 async function fetchActivityLogs() {
     const listEl = document.getElementById("notificationList");
     const badgeEl = document.getElementById("notificationBadge");
     
-    if (activeLogFetchController) {
-        activeLogFetchController.abort();
-    }
-    activeLogFetchController = new AbortController();
-
     try {
-        const res = await fetch("/api/logs", { signal: activeLogFetchController.signal });
+        const res = await fetch("/api/logs");
         if (!res.ok) return;
         const data = await res.json();
         const logs = data.logs || [];
@@ -500,16 +484,11 @@ async function fetchActivityLogs() {
             listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
         }
     } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error("Error fetching logs:", err);
-        }
-    } finally {
-        activeLogFetchController = null;
+        console.error("Error fetching logs:", err);
     }
 }
 
 async function checkNewLogsCount() {
-    if (document.hidden) return; // Skip background checks if tab is hidden
     try {
         const res = await fetch("/api/logs");
         if (!res.ok) return;
@@ -543,7 +522,7 @@ async function checkNewLogsCount() {
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
+        navigator.serviceWorker.register("/service-worker.js")
             .then(reg => console.log("Service Worker registered:", reg.scope))
             .catch(err => console.error("Service Worker registration failed:", err));
     });

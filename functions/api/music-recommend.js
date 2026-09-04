@@ -1,43 +1,9 @@
-/* ==================================
-    AI MUSIC RECOMMENDATION API
-    POST /api/music-recommendation
-================================== */
-
 import { askOpenAI } from "../lib/openai";
-import { getCache, setCache } from "../lib/cache.js";
-import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
-import { KV_CACHE_TTL } from "../lib/config.js";
-
-// Helper para gumawa ng maikling deterministic cache key batay sa project attributes
-async function generateCacheKey(project) {
-    const rawString = [
-        project.coupleName || "",
-        project.type || "",
-        project.status || "",
-        project.instruction || "",
-        project.concerns || "",
-        project.drone || "",
-        project.rawFiles || ""
-    ].join("_").toLowerCase();
-
-    const msgBuffer = new TextEncoder().encode(rawString);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-
-    return `${CACHE_PREFIXES.MUSIC}_${hashHex}`;
-}
 
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
-        
-        let project = {};
-        try {
-            project = await request.json();
-        } catch (e) {
-            project = {};
-        }
+        const project = await request.json();
 
         console.log("[AI MUSIC DIRECTOR REQUEST]", project);
 
@@ -47,64 +13,30 @@ export async function onRequestPost(context) {
             throw new Error("OPENAI_API_KEY is not configured in Cloudflare environment variables.");
         }
 
-        const kv = env.CACHE;
-
-        // 1. Suriin ang Workers KV Cache para iwas paulit-ulit na OpenAI API call
-        if (kv) {
-            try {
-                const cacheKey = await generateCacheKey(project);
-                const cachedRecommendation = await getCache(kv, cacheKey);
-                if (cachedRecommendation) {
-                    console.log("[CACHE HIT] Music recommendation retrieved from KV cache.");
-                    return new Response(
-                        JSON.stringify(cachedRecommendation),
-                        { 
-                            headers: { 
-                                "Content-Type": "application/json", 
-                                "Cache-Control": "private, max-age=60" 
-                            } 
-                        }
-                    );
-                }
-            } catch (kvReadErr) {
-                console.error("[KV CACHE READ ERROR]:", kvReadErr);
-            }
-        }
-
-        console.log("[CACHE MISS] Generating new AI music recommendation...");
-
         // Verified Musicbed Catalog Database
         const musicbedCatalog = [
-            { title: "Bloom", artist: "The Light The Heat", mood: "Romantic", url: "https://www.musicbed.com/songs/bloom-the-light-the-heat/28451" },
-            { title: "Forever", artist: "Leif Vollebekk", mood: "Emotional", url: "https://www.musicbed.com/songs/forever-leif-vollebekk/15234" },
-            { title: "Golden Sky", artist: "Salt Of The Sound", mood: "Cinematic", url: "https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821" },
-            { title: "Home", artist: "Tony Anderson", mood: "Luxury", url: "https://www.musicbed.com/songs/home-tony-anderson/10492" },
-            { title: "Anchor", artist: "Ryan Taubert", mood: "Elegant", url: "https://www.musicbed.com/songs/anchor-ryan-taubert/11203" },
-            { title: "Rise", artist: "The Hunts", mood: "Happy", url: "https://www.musicbed.com/songs/rise-the-hunts/14892" },
-            { title: "Wildflower", artist: "The Gray Havens", mood: "Romantic", url: "https://www.musicbed.com/songs/wildflower-the-gray-havens/22104" }
+            { title: "Bloom", artist: "The Light The Heat", mood: "Romantic", url: "[https://www.musicbed.com/songs/bloom-the-light-the-heat/28451](https://www.musicbed.com/songs/bloom-the-light-the-heat/28451)" },
+            { title: "Forever", artist: "Leif Vollebekk", mood: "Emotional", url: "[https://www.musicbed.com/songs/forever-leif-vollebekk/15234](https://www.musicbed.com/songs/forever-leif-vollebekk/15234)" },
+            { title: "Golden Sky", artist: "Salt Of The Sound", mood: "Cinematic", url: "[https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821](https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821)" },
+            { title: "Home", artist: "Tony Anderson", mood: "Luxury", url: "[https://www.musicbed.com/songs/home-tony-anderson/10492](https://www.musicbed.com/songs/home-tony-anderson/10492)" },
+            { title: "Anchor", artist: "Ryan Taubert", mood: "Elegant", url: "[https://www.musicbed.com/songs/anchor-ryan-taubert/11203](https://www.musicbed.com/songs/anchor-ryan-taubert/11203)" },
+            { title: "Rise", artist: "The Hunts", mood: "Happy", url: "[https://www.musicbed.com/songs/rise-the-hunts/14892](https://www.musicbed.com/songs/rise-the-hunts/14892)" },
+            { title: "Wildflower", artist: "The Gray Havens", mood: "Romantic", url: "[https://www.musicbed.com/songs/wildflower-the-gray-havens/22104](https://www.musicbed.com/songs/wildflower-the-gray-havens/22104)" }
         ];
 
-        // Advanced Prompt para sa AI Music Director na may sanitized project properties
-        const coupleName = String(project.coupleName || "Not Specified").trim().slice(0, 100);
-        const projectType = String(project.type || "Not Specified").trim().slice(0, 100);
-        const projectStatus = String(project.status || "Planned").trim().slice(0, 50);
-        const projectInstruction = String(project.instruction || "None").trim().slice(0, 300);
-        const projectConcerns = String(project.concerns || "None").trim().slice(0, 300);
-        const projectDrone = String(project.drone || "NO DRONE").trim().slice(0, 50);
-        const projectRawFiles = String(project.rawFiles || "None").trim().slice(0, 200);
-
+        // Advanced Prompt para sa AI Music Director
         const prompt = `
 You are the Head Music Director of KBHFILMS.
 Your job is to recommend cinematic Musicbed songs for professional wedding films.
 
 Wedding Information:
-- Couple: ${coupleName}
-- Wedding Type: ${projectType}
-- Current Status: ${projectStatus}
-- Instructions: ${projectInstruction}
-- Concerns: ${projectConcerns}
-- Drone: ${projectDrone}
-- Raw Files: ${projectRawFiles}
+- Couple: ${project.coupleName || "Not Specified"}
+- Wedding Type: ${project.type || "Not Specified"}
+- Current Status: ${project.status || "Planned"}
+- Instructions: ${project.instruction || "None"}
+- Concerns: ${project.concerns || "None"}
+- Drone: ${project.drone || "NO DRONE"}
+- Raw Files: ${project.rawFiles || "None"}
 
 Requirements:
 Recommend EXACTLY 5 songs.
@@ -122,7 +54,7 @@ Return ONLY a valid JSON object with this exact structure:
   "analysis": {
     "style": "Luxury Emotional",
     "editingStyle": "Slow Cinematic",
-    "drone": ${projectDrone !== "NO DRONE"},
+    "drone": ${project.drone !== "NO DRONE"},
     "notes": "Custom tailored notes based on instructions."
   },
   "songs": [
@@ -153,52 +85,42 @@ Return ONLY a valid JSON object with this exact structure:
             );
 
             return {
-                title: String(song.title || "Untitled").trim().slice(0, 100),
-                artist: String(song.artist || "Unknown Artist").trim().slice(0, 100),
-                mood: String(song.mood || "Cinematic").trim().slice(0, 50),
-                energy: String(song.energy || "Medium").trim().slice(0, 50),
-                scene: String(song.scene || "Highlight").trim().slice(0, 50),
-                reason: String(song.reason || "Matched with wedding production style.").trim().slice(0, 200),
-                confidence: Number(song.confidence) || 95,
-                url: foundInCatalog ? foundInCatalog.url : "https://www.musicbed.com"
+                title: song.title || "Untitled",
+                artist: song.artist || "Unknown Artist",
+                mood: song.mood || "Cinematic",
+                energy: song.energy || "Medium",
+                scene: song.scene || "Highlight",
+                reason: song.reason || "Matched with wedding production style.",
+                confidence: song.confidence || 95,
+                url: foundInCatalog ? foundInCatalog.url : "[https://www.musicbed.com](https://www.musicbed.com)"
             };
         });
 
         // Bumuo ng badges para sa UI analysis section
         const analysisBadges = [
-            `✔ ${String(analysisData.style || projectType).trim()}`,
-            `✔ Editing: ${String(analysisData.editingStyle || "Professional").trim()}`,
-            projectDrone !== "NO DRONE" ? `✔ Drone: ${projectDrone}` : "✔ Standard Coverage",
-            projectInstruction !== "None" ? "✔ Custom Instructions Applied" : "✔ Standard Flow"
+            `✔ ${analysisData.style || project.type || "Cinematic Wedding"}`,
+            `✔ Editing: ${analysisData.editingStyle || "Professional"}`,
+            project.drone !== "NO DRONE" ? `✔ Drone: ${project.drone}` : "✔ Standard Coverage",
+            project.instruction ? "✔ Custom Instructions Applied" : "✔ Standard Flow"
         ];
 
-        const finalResponsePayload = {
-            success: true,
-            analysis: analysisBadges,
-            songs: verifiedSongs,
-            whyText: String(aiResult.whyText || `Curated specifically for ${coupleName} matching professional wedding standards.`).trim()
-        };
-
-        // 2. I-save sa Workers KV Cache (7 Days TTL: 604800 seconds o nakabase sa config)
-        if (kv) {
-            try {
-                const cacheKey = await generateCacheKey(project);
-                await setCache(kv, cacheKey, finalResponsePayload, 604800);
-                console.log("[CACHE CREATED] Music recommendation cached in KV for 7 days.");
-            } catch (kvWriteErr) {
-                console.error("[KV CACHE WRITE ERROR]:", kvWriteErr);
-            }
-        }
-
         return new Response(
-            JSON.stringify(finalResponsePayload),
+            JSON.stringify({
+                success: true,
+                analysis: analysisBadges,
+                songs: verifiedSongs,
+                whyText: aiResult.whyText || `Curated specifically for ${project.coupleName || "this project"} matching professional wedding standards.`
+            }),
             {
-                headers: DEFAULT_HEADERS.NO_CACHE
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store"
+                }
             }
         );
 
     } catch (err) {
-        console.error("[AI MUSIC ERROR]:", err.message);
+        console.error("[AI MUSIC ERROR]", err);
         return new Response(
             JSON.stringify({
                 success: false,
@@ -206,7 +128,7 @@ Return ONLY a valid JSON object with this exact structure:
             }),
             {
                 status: 500,
-                headers: DEFAULT_HEADERS.JSON
+                headers: { "Content-Type": "application/json" }
             }
         );
     }

@@ -7,12 +7,3 @@ pages_build_output_dir = "."
 binding = "DB"
 database_name = "wedding-db"
 database_id = "d5da608f-9f23-4bd7-a500-29235a6e063a"
-
-[[kv_namespaces]]
-binding = "CACHE"
-id = "e67630cff7ce4eb2ad401c3ffba70c7b"
-
-# ✅ STAGE 3 — Phase 2: R2 Bucket Binding Added
-[[r2_buckets]]
-binding = "MEDIA_BUCKET"
-bucket_name = "project-platform"

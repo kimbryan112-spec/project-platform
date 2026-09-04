@@ -7,7 +7,7 @@ const loginForm = document.getElementById("loginForm");
 const errorText = document.getElementById("loginError");
 
 if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
+    loginForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
         const emailInput = document.getElementById("email");
@@ -23,38 +23,35 @@ if (loginForm) {
         }
 
         // OFFLINE / LOCAL TESTING FALLBACK
-        const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-        if (isLocal) {
+        if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
             if (email === "adminyang@kbhfilms.com" && password === "Yangyang#12") {
                 const offlineUser = {
                     id: 1,
                     name: "Kim Bryan Hernandez",
                     fullname: "Kim Bryan Hernandez",
-                    email,
+                    email: email,
                     role: "admin"
                 };
                 localStorage.setItem("currentUser", JSON.stringify(offlineUser));
                 window.location.href = "pages/admin.html";
                 return;
-            } 
-            
-            if (email === "yongzhi@kbhfilms.com" && password === "yong2023") {
+            } else if (email === "yongzhi@kbhfilms.com" && password === "yong2023") {
                 const offlineUser = {
                     id: 2,
                     name: "Yong Zhi Ng",
                     fullname: "Yong Zhi Ng",
-                    email,
+                    email: email,
                     role: "Manager"
                 };
                 localStorage.setItem("currentUser", JSON.stringify(offlineUser));
                 window.location.href = "pages/dashboard.html"; 
                 return;
+            } else {
+                if (errorText) {
+                    errorText.textContent = "Invalid email or password.";
+                }
+                return;
             }
-
-            if (errorText) {
-                errorText.textContent = "Invalid email or password.";
-            }
-            return;
         }
 
         // ONLINE CLOUDFLARE / PRODUCTION API REQUEST
@@ -77,22 +74,22 @@ if (loginForm) {
             }
 
             const loggedInUser = data.user || {};
-            if (!loggedInUser.name) {
-                if (loggedInUser.fullname) {
-                    loggedInUser.name = loggedInUser.fullname;
-                } else if (email === "yongzhi@kbhfilms.com") {
-                    loggedInUser.name = "Yong Zhi Ng";
-                }
+            if (!loggedInUser.name && loggedInUser.fullname) {
+                loggedInUser.name = loggedInUser.fullname;
+            } else if (!loggedInUser.name && loggedInUser.email === "yongzhi@kbhfilms.com") {
+                loggedInUser.name = "Yong Zhi Ng";
             }
 
-            if ((loggedInUser.role || "").toLowerCase() === "manager") {
+            if (loggedInUser.role === "manager") {
                 loggedInUser.role = "Manager";
             }
 
-            localStorage.setItem("currentUser", JSON.stringify(loggedInUser));
+            localStorage.setItem(
+                "currentUser",
+                JSON.stringify(loggedInUser)
+            );
 
-            const userRole = (loggedInUser.role || "").toLowerCase();
-            if (userRole === "admin") {
+            if (loggedInUser.role === "admin" || loggedInUser.role === "Admin") {
                 window.location.href = "pages/admin.html";
             } else {
                 window.location.href = "pages/dashboard.html";
@@ -113,7 +110,9 @@ if (loginForm) {
 
 const createAccountLink = document.getElementById("createAccountLink");
 if (createAccountLink) {
-    createAccountLink.addEventListener("click", () => {
-        alert("Account creation is available for KBHFILMS team members only.");
+    createAccountLink.addEventListener("click", function () {
+        alert(
+            "Account creation is available for KBHFILMS team members only."
+        );
     });
 }

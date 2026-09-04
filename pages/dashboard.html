@@ -375,25 +375,26 @@ console.log("Current User:", currentUser);
 console.log("Role:", currentUser.role);
 console.log("IS_ADMIN:", IS_ADMIN);
 
-let activeLogFetchController = null;
-
 if (!IS_ADMIN) {
     const adminMenu = document.getElementById("adminMenu");
     if (adminMenu) {
         adminMenu.style.display = "none";
     }
     
+    // Itatago ang notification bell wrapper kung hindi admin (Manager role)
     const notifWrapper = document.getElementById("dashboardNotificationWrapper");
     if (notifWrapper) {
         notifWrapper.style.display = "none";
     }
 
+    // Harangin o alisin ang mga Context Menu para sa Manager role para walang access sa link attachments at month lock
     document.addEventListener("DOMContentLoaded", () => {
         ['monthContextMenu', 'watchContextMenu', 'filesContextMenu', 'songContextMenu'].forEach(id => {
             const menu = document.getElementById(id);
             if (menu) menu.remove();
         });
 
+        // Harangan ang right click sa mga elements na may kinalaman dito
         document.addEventListener("contextmenu", (e) => {
             if (!IS_ADMIN) {
                 e.preventDefault();
@@ -401,6 +402,7 @@ if (!IS_ADMIN) {
         });
     });
 } else {
+    // Kung admin, isasama ang logic para sa pag-fetch ng activity logs ng bell
     document.addEventListener("DOMContentLoaded", () => {
         const bell = document.getElementById("notificationBell");
         const dropdown = document.getElementById("notificationDropdown");
@@ -431,15 +433,8 @@ if (!IS_ADMIN) {
             });
         }
 
-        // Initial single check on startup instead of constant intervals
+        setInterval(checkNewLogsCount, 3000);
         checkNewLogsCount();
-
-        // Browser visibility optimization: pause background tasks when tab is hidden
-        document.addEventListener("visibilitychange", () => {
-            if (!document.hidden) {
-                checkNewLogsCount();
-            }
-        });
     });
 }
 
@@ -462,13 +457,8 @@ async function fetchActivityLogs() {
     const listEl = document.getElementById("notificationList");
     const badgeEl = document.getElementById("notificationBadge");
     
-    if (activeLogFetchController) {
-        activeLogFetchController.abort();
-    }
-    activeLogFetchController = new AbortController();
-
     try {
-        const res = await fetch("/api/logs", { signal: activeLogFetchController.signal });
+        const res = await fetch("/api/logs");
         if (!res.ok) return;
         const data = await res.json();
         const logs = data.logs || [];
@@ -529,16 +519,11 @@ async function fetchActivityLogs() {
             listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
         }
     } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error("Error fetching logs:", err);
-        }
-    } finally {
-        activeLogFetchController = null;
+        console.error("Error fetching logs:", err);
     }
 }
 
 async function checkNewLogsCount() {
-    if (document.hidden) return; // Skip background checks when tab is inactive
     try {
         const res = await fetch("/api/logs");
         if (!res.ok) return;
@@ -576,7 +561,7 @@ async function checkNewLogsCount() {
 <script>
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
+        navigator.serviceWorker.register("/service-worker.js")
             .then(reg => console.log("Service Worker registered:", reg.scope))
             .catch(err => console.error("Service Worker registration failed:", err));
     });

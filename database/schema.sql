@@ -86,30 +86,3 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
--- =========================
--- MEDIA FILES TABLE (Integration for upload.js & delete.js)
--- =========================
-CREATE TABLE IF NOT EXISTS media_files (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    project_id TEXT NOT NULL DEFAULT 'general',
-    filename TEXT NOT NULL,
-    original_filename TEXT NOT NULL,
-    mime_type TEXT NOT NULL,
-    size INTEGER NOT NULL DEFAULT 0,
-    r2_key TEXT NOT NULL UNIQUE,
-    uploaded_by TEXT NOT NULL DEFAULT '',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- =========================
--- NOTIFICATIONS TABLE (Integration for notifications.js)
--- =========================
-CREATE TABLE IF NOT EXISTS notifications (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT NOT NULL DEFAULT 'default',
-    message TEXT NOT NULL,
-    type TEXT NOT NULL DEFAULT 'info',
-    is_read INTEGER NOT NULL DEFAULT 0,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);

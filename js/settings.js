@@ -1,8 +1,14 @@
 /* ==================================
-    SETTINGS.JS
-    PART 1
-    INITIALIZATION
+   SETTINGS.JS
+   PART 1
+   INITIALIZATION
 ================================== */
+
+// =========================
+// STORAGE MODE
+// true = localStorage
+// false = Cloudflare API
+// =========================
 
 const LOCAL_MODE =
     location.hostname === "127.0.0.1" ||
@@ -13,6 +19,10 @@ console.log("SETTINGS PAGE");
 console.log("Host:", location.hostname);
 console.log("LOCAL_MODE:", LOCAL_MODE);
 console.log("================================");
+
+// ==================================
+// GLOBAL VARIABLES
+// ==================================
 
 let currentYear = new Date().getFullYear().toString();
 
@@ -178,10 +188,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ==================================
-    SETTINGS.JS
-    PART 2
-    DATABASE STATUS
+   SETTINGS.JS
+   PART 2
+   DATABASE STATUS
 ================================== */
+
+// ==================================
+// LOCAL STORAGE RECORD COUNT
+// ==================================
 
 function countLocalRecords() {
     let total = 0;
@@ -201,6 +215,10 @@ function countLocalRecords() {
     return total;
 }
 
+// ==================================
+// LOCAL STORAGE SIZE
+// ==================================
+
 function getLocalStorageSize() {
     let total = 0;
     for (let i = 0; i < localStorage.length; i++) {
@@ -211,6 +229,10 @@ function getLocalStorageSize() {
     }
     return (total / 1024).toFixed(2) + " KB";
 }
+
+// ==================================
+// LOAD DATABASE STATUS
+// ==================================
 
 async function loadDatabaseStatus() {
     console.log("[STATUS] Loading...");
@@ -225,6 +247,9 @@ async function loadDatabaseStatus() {
     if (dbCurrentYear) dbCurrentYear.textContent = currentYear;
     if (dbCurrentMonth) dbCurrentMonth.textContent = monthNames[new Date().getMonth()];
 
+    // ==================================
+    // LOCAL MODE
+    // ==================================
     if (LOCAL_MODE) {
         if (dbStatus) {
             dbStatus.textContent = "🟡 Local Storage";
@@ -238,6 +263,9 @@ async function loadDatabaseStatus() {
         return;
     }
 
+    // ==================================
+    // CLOUD MODE
+    // ==================================
     try {
         if (dbStatus) {
             dbStatus.textContent = "🟢 Connected";
@@ -278,13 +306,17 @@ async function loadDatabaseStatus() {
     }
 }
 
+// ==================================
+// AUTO REFRESH
+// ==================================
+
 setInterval(() => {
     loadDatabaseStatus();
 }, 30000);
 
 /* ==========================================
-    PART 3
-    RESET MONTH
+   PART 3
+   RESET MONTH
 ========================================== */
 
 async function resetMonth() {
@@ -348,8 +380,8 @@ async function resetMonth() {
 document.getElementById("resetMonthBtn")?.addEventListener("click", resetMonth);
 
 /* ==========================================
-    PART 4
-    RESET YEAR
+   PART 4
+   RESET YEAR
 ========================================== */
 
 async function resetYear() {
@@ -412,8 +444,8 @@ async function resetYear() {
 document.getElementById("resetYearBtn")?.addEventListener("click", resetYear);
 
 /* ==========================================
-    PART 5
-    BACKUP DATABASE
+   PART 5
+   BACKUP DATABASE
 ========================================== */
 
 async function backupDatabase() {
@@ -468,8 +500,8 @@ async function backupDatabase() {
 document.getElementById("backupBtn")?.addEventListener("click", backupDatabase);
 
 /* ==========================================
-    PART 6
-    RESTORE DATABASE
+   PART 6
+   RESTORE DATABASE
 ========================================== */
 
 async function restoreDatabase() {
@@ -564,8 +596,8 @@ async function restoreDatabase() {
 document.getElementById("restoreBtn")?.addEventListener("click", restoreDatabase);
 
 /* ==========================================
-    PART 7
-    DELETE EVERYTHING
+   PART 7
+   DELETE EVERYTHING
 ========================================== */
 
 async function deleteEverything() {

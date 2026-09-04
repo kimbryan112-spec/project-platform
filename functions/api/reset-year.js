@@ -1,78 +1,32 @@
 /* ==================================
-    RESET YEAR API
-    POST /api/reset-year
+   RESET YEAR API
+   POST /api/reset-year
 ================================== */
-
-import { clearCacheByPrefix, deleteCache } from "../lib/cache.js";
-import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
 
 export async function onRequestPost(context) {
     try {
-        const { request, env } = context;
-
-        if (!env.DB) {
-            return new Response(
-                JSON.stringify({
-                    success: false,
-                    message: "Database not connected."
-                }),
-                {
-                    status: 500,
-                    headers: DEFAULT_HEADERS.JSON
-                }
-            );
-        }
-
-        let body = {};
-        try {
-            body = await request.json();
-        } catch (e) {
-            body = {};
-        }
-
-        const year = Number(body.year);
-
-        if (!year) {
-            return new Response(
-                JSON.stringify({
-                    success: false,
-                    message: "Year is required."
-                }),
-                {
-                    status: 400,
-                    headers: DEFAULT_HEADERS.JSON
-                }
-            );
-        }
+        const { year } = await context.request.json();
 
         console.log(`[RESET YEAR] ${year}`);
 
-        const result = await env.DB.prepare(`
+        const result = await context.env.DB.prepare(`
             DELETE FROM projects
             WHERE project_year = ?
         `)
-        .bind(year)
+        .bind(
+            Number(year)
+        )
         .run();
 
-        // Para ma-clear din ang lahat ng buwan na naka-lock sa taon na ito:
-        await env.DB.prepare(`
+        // Opsyonal: Para ma-clear din ang lahat ng buwan na naka-lock sa taon na ito:
+        await context.env.DB.prepare(`
             DELETE FROM month_locks
             WHERE project_year = ?
         `)
-        .bind(year)
+        .bind(
+            Number(year)
+        )
         .run();
-
-        // Invalidate Workers KV Cache para sa buong taon at master list
-        const kv = env.CACHE;
-        if (kv) {
-            try {
-                // Burahin ang lahat ng buwan na nagsisimula sa taon na ito (e.g. projects_2026_)
-                await clearCacheByPrefix(kv, `${CACHE_PREFIXES.PROJECTS}_${year}_`);
-                await deleteCache(kv, `${CACHE_PREFIXES.PROJECTS}_all`);
-            } catch (kvDelErr) {
-                console.error("[KV RESET YEAR CACHE ERROR]:", kvDelErr);
-            }
-        }
 
         return new Response(
             JSON.stringify({
@@ -81,23 +35,26 @@ export async function onRequestPost(context) {
                 deleted: result.meta?.changes || 0
             }),
             {
-                status: 200,
-                headers: DEFAULT_HEADERS.NO_CACHE
+                headers: {
+                    "Content-Type": "application/json"
+                }
             }
         );
 
     }
     catch (err) {
-        console.error("[RESET YEAR ERROR]:", err.message);
+        console.error("[RESET YEAR]", err);
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: "Internal Server Error"
+                message: err.message
             }),
             {
                 status: 500,
-                headers: DEFAULT_HEADERS.JSON
+                headers: {
+                    "Content-Type": "application/json"
+                }
             }
         );
     }

@@ -1,166 +1,266 @@
-/* ==================================
-    PROJECTS API (Optimized & Fixed Parsing)
-================================== */
-
-import { getCache, setCache, deleteCache } from "../lib/cache.js";
-import { getCachedResponse, cacheResponse } from "../lib/edge-cache.js";
-import { CACHE_PREFIXES } from "../lib/constants.js";
-import { KV_CACHE_TTL } from "../lib/config.js";
-
-// Helper para i-convert ang month string (jan, feb, sep, etc.) patungong number (1-12)
-function parseMonthNumber(monthStr) {
-    if (!monthStr) return null;
-    if (!isNaN(monthStr)) return parseInt(monthStr, 10);
-    
-    const monthMap = {
-        jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
-        jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
-    };
-    return monthMap[monthStr.toLowerCase()] || null;
-}
-
 export async function onRequestGet(context) {
     try {
-        const { request, env } = context;
-        const db = env.DB;
-        const kv = env.CACHE;
+        const url = new URL(context.request.url);
+        const year = Number(url.searchParams.get("year")) || new Date().getFullYear();
+        const month = Number(url.searchParams.get("month")) || (new Date().getMonth() + 1);
 
-        if (!db) {
-            return new Response(JSON.stringify({ success: false, message: "Database not connected." }), {
-                status: 500,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
+        console.log(`[GET] ${year}-${month}`);
 
-        const url = new URL(request.url);
-        const year = url.searchParams.get("year");
-        const rawMonth = url.searchParams.get("month");
-        const month = parseMonthNumber(rawMonth);
+        // 1. Kunin ang projects para sa kasalukuyang buwan
+        const projectsQuery = context.env.DB.prepare(`
+            SELECT *
+            FROM projects
+            WHERE project_year = ?
+              AND project_month = ?
+            ORDER BY row_index ASC
+        `).bind(year, month);
 
-        let cacheKey = `${CACHE_PREFIXES.PROJECTS}_all`;
-        if (year && month) {
-            cacheKey = `${CACHE_PREFIXES.PROJECTS}_${year}_${month}`;
-        }
+        // 2. Kunin ang locked months
+        const locksQuery = context.env.DB.prepare(`
+            SELECT project_year, project_month, locked
+            FROM month_locks
+            WHERE locked = 1
+        `);
 
-        if (kv) {
-            const cachedData = await getCache(kv, cacheKey);
-            if (cachedData) {
-                return new Response(JSON.stringify({ success: true, projects: cachedData }), {
-                    headers: { "Content-Type": "application/json" }
-                });
+        // 3. Optimal check para sa hasDataMonths
+        const hasDataQuery = context.env.DB.prepare(`
+            SELECT DISTINCT project_month
+            FROM projects
+            WHERE project_year = ?
+              AND (
+                    TRIM(COALESCE(couple_name,'')) <> ''
+                 OR TRIM(COALESCE(raw_files,'')) <> ''
+              )
+        `).bind(year);
+
+        // Isagawa nang sabay-sabay (Parallel Execution) para mabawasan ang latency at DB overhead
+        const [projectsResult, locksResult, hasDataResult] = await Promise.all([
+            projectsQuery.all(),
+            locksQuery.all(),
+            hasDataQuery.all()
+        ]);
+
+        const results = projectsResult.results || [];
+        const lockRows = locksResult.results || [];
+        const hasDataRows = hasDataResult.results || [];
+
+        const monthLocks = {};
+        const monthNames = {
+            1: "jan", 2: "feb", 3: "mar", 4: "apr",
+            5: "may", 6: "jun", 7: "jul", 8: "aug",
+            9: "sep", 10: "oct", 11: "nov", 12: "dec"
+        };
+
+        lockRows.forEach(row => {
+            const monthName = monthNames[row.project_month];
+            if (monthName) {
+                monthLocks[`${row.project_year}_${monthName}`] = true;
             }
-        }
+        });
 
-        let query = "SELECT * FROM projects";
-        let params = [];
+        const hasDataMonths = {};
+        hasDataRows.forEach(row => {
+            const monthName = monthNames[row.project_month];
+            if (monthName) {
+                hasDataMonths[monthName] = true;
+            }
+        });
 
-        if (year && month) {
-            query += " WHERE project_year = ? AND project_month = ?";
-            params = [year, month];
-        }
-        query += " ORDER BY project_year DESC, project_month ASC, row_index ASC";
+        const data = results.map(row => ({
+            rowId: row.row_index,
+            coupleName: row.couple_name || "",
+            status: row.status || "PLANNED",
+            progress: row.progress || 0,
+            type: row.type || "NOT SET",
+            rawFiles: row.raw_files || "",
+            drone: row.drone || "",
+            instruction: row.instruction || "",
+            concerns: row.concerns || "",
+            watchLink: row.watch_link || "",
+            filesLink: row.files_link || "",
 
-        const stmt = db.prepare(query);
-        const { results } = params.length > 0 ? await stmt.bind(...params).all() : await stmt.all();
+            song1: {
+                title: row.song1_title || "",
+                link: row.song1_link || "",
+                status: row.song1_status || "",
+                notes: row.song1_notes || ""
+            },
+            song2: {
+                title: row.song2_title || "",
+                link: row.song2_link || "",
+                status: row.song2_status || "",
+                notes: row.song2_notes || ""
+            },
+            song3: {
+                title: row.song3_title || "",
+                link: row.song3_link || "",
+                status: row.song3_status || "",
+                notes: row.song3_notes || ""
+            },
+            teaserSong: {
+                title: row.teaser_title || "",
+                link: row.teaser_link || "",
+                status: row.teaser_status || "",
+                notes: row.teaser_notes || ""
+            },
 
-        const projects = results || [];
-
-        if (kv) {
-            await setCache(kv, cacheKey, projects, KV_CACHE_TTL.PROJECTS);
-        }
+            monthLocked: monthLocks[`${year}_${monthNames[month]}`] || false
+        }));
 
         return new Response(
-            JSON.stringify({ success: true, projects }),
-            { headers: { "Content-Type": "application/json" } }
+            JSON.stringify({
+                projects: data,
+                lockedMonths: monthLocks,
+                hasDataMonths
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "private, max-age=10"
+                }
+            }
         );
 
     } catch (err) {
-        console.error("[PROJECTS GET ERROR]:", err.message);
+        console.error(err);
         return new Response(
-            JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            JSON.stringify({
+                success: false,
+                message: err.message,
+                stack: err.stack
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
         );
     }
 }
 
 export async function onRequestPost(context) {
     try {
-        const { request, env } = context;
-        const db = env.DB;
-        const kv = env.CACHE;
+        const url = new URL(context.request.url);
+        const year = Number(url.searchParams.get("year")) || new Date().getFullYear();
+        const month = Number(url.searchParams.get("month")) || (new Date().getMonth() + 1);
 
-        if (!db) {
-            return new Response(JSON.stringify({ success: false, message: "Database not connected." }), {
-                status: 500,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
+        const projects = await context.request.json();
 
-        const url = new URL(request.url);
-        const queryYear = url.searchParams.get("year");
-        const queryMonth = parseMonthNumber(url.searchParams.get("month"));
+        console.log(`[POST] Saving ${projects.length} row(s) for ${year}-${month}`);
 
-        const body = await request.json();
-        
-        // Suportahan pareho ang direct array o object na may .rows
-        const rows = Array.isArray(body) ? body : (body.rows || []);
-        const year = body.year || queryYear;
-        const month = parseMonthNumber(body.month) || queryMonth;
-
-        if (!year || !month || !Array.isArray(rows)) {
-            return new Response(JSON.stringify({ success: false, message: "Invalid payload parameters." }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" }
-            });
-        }
-
-        const statements = rows.map((r, index) => {
-            const rowIndex = r.row_index !== undefined ? r.row_index : (r.rowId !== undefined ? r.rowId : index + 1);
-            return db.prepare(`
+        for (const row of projects) {
+            await context.env.DB.prepare(`
                 INSERT INTO projects (
-                    project_year, project_month, row_index, couple_name, status, progress, type,
+                    project_year, project_month, row_index,
+                    couple_name, status, progress, type,
                     raw_files, drone, instruction, concerns, watch_link, files_link,
                     song1_title, song1_link, song1_status, song1_notes,
                     song2_title, song2_link, song2_status, song2_notes,
                     song3_title, song3_link, song3_status, song3_notes,
-                    teaser_title, teaser_link, teaser_status, teaser_notes, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                ON CONFLICT(project_year, project_month, row_index) DO UPDATE SET
-                    couple_name=excluded.couple_name, status=excluded.status, progress=excluded.progress, type=excluded.type,
-                    raw_files=excluded.raw_files, drone=excluded.drone, instruction=excluded.instruction, concerns=excluded.concerns,
-                    watch_link=excluded.watch_link, files_link=excluded.files_link,
-                    song1_title=excluded.song1_title, song1_link=excluded.song1_link, song1_status=excluded.song1_status, song1_notes=excluded.song1_notes,
-                    song2_title=excluded.song2_title, song2_link=excluded.song2_link, song2_status=excluded.song2_status, song2_notes=excluded.song2_notes,
-                    song3_title=excluded.song3_title, song3_link=excluded.song3_link, song3_status=excluded.song3_status, song3_notes=excluded.song3_notes,
-                    teaser_title=excluded.teaser_title, teaser_link=excluded.teaser_link, teaser_status=excluded.teaser_status, teaser_notes=excluded.teaser_notes,
-                    updated_at=CURRENT_TIMESTAMP
-            `).bind(
-                year, month, rowIndex, r.coupleName || r.couple_name || "", r.status || "PLANNED", r.progress || 0, r.type || "NOT SET",
-                r.rawFiles || r.raw_files || "", r.drone || "", r.instruction || "", r.concerns || "", r.watchLink || r.watch_link || "", r.filesLink || r.files_link || "",
-                r.song1?.title || r.song1_title || "", r.song1?.link || r.song1_link || "", r.song1?.status || r.song1_status || "", r.song1?.notes || r.song1_notes || "",
-                r.song2?.title || r.song2_title || "", r.song2?.link || r.song2_link || "", r.song2?.status || r.song2_status || "", r.song2?.notes || r.song2_notes || "",
-                r.song3?.title || r.song3_title || "", r.song3?.link || r.song3_link || "", r.song3?.status || r.song3_status || "", r.song3?.notes || r.song3_notes || "",
-                r.teaserSong?.title || r.teaser_title || "", r.teaserSong?.link || r.teaser_link || "", r.teaserSong?.status || r.teaser_status || "", r.teaserSong?.notes || r.teaser_notes || ""
-            );
-        });
-
-        await db.batch(statements);
-
-        if (kv) {
-            await deleteCache(kv, `${CACHE_PREFIXES.PROJECTS}_${year}_${month}`);
-            await deleteCache(kv, `${CACHE_PREFIXES.PROJECTS}_all`);
+                    teaser_title, teaser_link, teaser_status, teaser_notes,
+                    updated_at
+                )
+                VALUES (
+                    ?, ?, ?,
+                    ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?,
+                    ?, ?, ?, ?,
+                    ?, ?, ?, ?,
+                    ?, ?, ?, ?,
+                    CURRENT_TIMESTAMP
+                )
+                ON CONFLICT(project_year, project_month, row_index)
+                DO UPDATE SET
+                    couple_name = excluded.couple_name,
+                    status = excluded.status,
+                    progress = excluded.progress,
+                    type = excluded.type,
+                    raw_files = excluded.raw_files,
+                    drone = excluded.drone,
+                    instruction = excluded.instruction,
+                    concerns = excluded.concerns,
+                    watch_link = excluded.watch_link,
+                    files_link = excluded.files_link,
+                    song1_title = excluded.song1_title,
+                    song1_link = excluded.song1_link,
+                    song1_status = excluded.song1_status,
+                    song1_notes = excluded.song1_notes,
+                    song2_title = excluded.song2_title,
+                    song2_link = excluded.song2_link,
+                    song2_status = excluded.song2_status,
+                    song2_notes = excluded.song2_notes,
+                    song3_title = excluded.song3_title,
+                    song3_link = excluded.song3_link,
+                    song3_status = excluded.song3_status,
+                    song3_notes = excluded.song3_notes,
+                    teaser_title = excluded.teaser_title,
+                    teaser_link = excluded.teaser_link,
+                    teaser_status = excluded.teaser_status,
+                    teaser_notes = excluded.teaser_notes,
+                    updated_at = CURRENT_TIMESTAMP
+            `)
+            .bind(
+                year,
+                month,
+                row.rowId,
+                row.coupleName || "",
+                row.status || "PLANNED",
+                row.progress || 0,
+                row.type || "NOT SET",
+                row.rawFiles || "",
+                row.drone || "",
+                row.instruction || "",
+                row.concerns || "",
+                row.watchLink || "",
+                row.filesLink || "",
+                row.song1?.title || "",
+                row.song1?.link || "",
+                row.song1?.status || "",
+                row.song1?.notes || "",
+                row.song2?.title || "",
+                row.song2?.link || "",
+                row.song2?.status || "",
+                row.song2?.notes || "",
+                row.song3?.title || "",
+                row.song3?.link || "",
+                row.song3?.status || "",
+                row.song3?.notes || "",
+                row.teaserSong?.title || "",
+                row.teaserSong?.link || "",
+                row.teaserSong?.status || "",
+                row.teaserSong?.notes || ""
+            )
+            .run();
         }
 
         return new Response(
-            JSON.stringify({ success: true, message: "Projects saved successfully." }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
+            JSON.stringify({ success: true }),
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
         );
 
     } catch (err) {
-        console.error("[PROJECTS POST ERROR]:", err.message);
+        console.error("[API-POST ERROR]");
+        console.error(err);
+        console.error(err.stack);
+
         return new Response(
-            JSON.stringify({ success: false, message: err.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
+            JSON.stringify({
+                success: false,
+                message: err.message,
+                stack: err.stack
+            }),
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
         );
     }
 }
