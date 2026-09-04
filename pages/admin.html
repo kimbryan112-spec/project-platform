@@ -42,8 +42,8 @@
 
         <div class="sidebar-footer">
             <div class="user-info">
-                <div class="user-name" id="userName">Kim Bryan Hernandez</div>
-                <div class="user-role" id="userRole">Administrator</div>
+                <div class="user-name">Kim Bryan Hernandez</div>
+                <div class="user-role">Administrator</div>
             </div>
 
             <div class="logout-wrapper">
@@ -71,37 +71,34 @@
                 </div>
 
                 <div class="year-header">
-                    <!-- 1. Notification Bell Icon -->
-                    <div class="notification-wrapper" style="position: relative; display: inline-block; margin-right: 12px; cursor: pointer; vertical-align: middle;">
-                        <div id="notificationBell" style="font-size: 20px; background: #f1f5f9; padding: 8px 12px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
-                            🔔
-                        </div>
-                        <span id="notificationBadge" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 50%; display: none;">0</span>
-                        
-                        <!-- Dropdown Panel para sa Logs -->
-                        <div id="notificationDropdown" style="display: none; position: absolute; left: 0; top: 45px; width: 340px; background: white; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden; border: 1px solid #e2e8f0;">
-                            <div style="background: #2563eb; color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-                                <span>Activity Center</span>
-                                <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
-                            </div>
-                            <div id="notificationList" style="max-height: 380px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
-                                <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. Live Calendar -->
                     <div class="live-calendar">
                         <div id="calendarMonth" class="calendar-month">AUG</div>
                         <div id="calendarDay" class="calendar-day">21</div>
                     </div>
-
-                    <!-- 3. Year Title -->
                     <h2><span id="currentYearTitle">2026</span> Wedding Highlights</h2>
                 </div>
             </div>
 
             <div class="topbar-right">
+                <!-- Notification Bell Icon -->
+                <div class="notification-wrapper" style="position: relative; display: inline-block; margin-right: 15px; cursor: pointer;">
+                    <div id="notificationBell" style="font-size: 20px; background: #f1f5f9; padding: 8px 12px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
+                        🔔
+                    </div>
+                    <span id="notificationBadge" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 50%; display: none;">0</span>
+                    
+                    <!-- Dropdown Panel para sa Logs -->
+                    <div id="notificationDropdown" style="display: none; position: absolute; right: 0; top: 45px; width: 340px; background: white; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden; border: 1px solid #e2e8f0;">
+                        <div style="background: #2563eb; color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Activity Center</span>
+                            <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
+                        </div>
+                        <div id="notificationList" style="max-height: 380px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
+                            <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <select id="yearSelect"></select>
                 <button class="next-year-btn btn-3d">+ Next Year</button>
                 <div class="profile">
@@ -164,6 +161,7 @@
                     </tr>
                 </thead>
                 <tbody id="projectTableBody">
+                    <!-- Template script para sa Rows 1 hanggang 6 -->
                     <script>
                         const droneOptionsHTML = `
                             <option value="NO DRONE">NO DRONE</option>
@@ -370,12 +368,11 @@
 </div>
 
 <script>
-// Authentication & Role Check
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 if (!currentUser) {
     window.location.href = "../login.html";
 }
-if ((currentUser.role || "").toLowerCase() !== "admin") {
+if (currentUser.role !== "admin") {
     alert("Access Denied.");
     window.location.href = "dashboard.html";
 }
@@ -385,8 +382,6 @@ const IS_ADMIN = true;
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>
-let activeLogFetchController = null;
-
 document.addEventListener("DOMContentLoaded", () => {
     const bell = document.getElementById("notificationBell");
     const dropdown = document.getElementById("notificationDropdown");
@@ -417,28 +412,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Single initial check instead of aggressive constant polling
+    setInterval(checkNewLogsCount, 3000);
     checkNewLogsCount();
-
-    // Browser visibility optimization: pause/resume background tasks when tab is hidden
-    document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) {
-            checkNewLogsCount();
-        }
-    });
 });
 
 async function fetchActivityLogs() {
     const listEl = document.getElementById("notificationList");
     const badgeEl = document.getElementById("notificationBadge");
     
-    if (activeLogFetchController) {
-        activeLogFetchController.abort();
-    }
-    activeLogFetchController = new AbortController();
-
     try {
-        const res = await fetch("/api/logs", { signal: activeLogFetchController.signal });
+        const res = await fetch("/api/logs");
         if (!res.ok) return;
         const data = await res.json();
         const logs = data.logs || [];
@@ -499,16 +482,11 @@ async function fetchActivityLogs() {
             listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
         }
     } catch (err) {
-        if (err.name !== 'AbortError') {
-            console.error("Error fetching logs:", err);
-        }
-    } finally {
-        activeLogFetchController = null;
+        console.error("Error fetching logs:", err);
     }
 }
 
 async function checkNewLogsCount() {
-    if (document.hidden) return; // Skip background checks if tab is hidden
     try {
         const res = await fetch("/api/logs");
         if (!res.ok) return;
@@ -542,7 +520,7 @@ async function checkNewLogsCount() {
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
+        navigator.serviceWorker.register("/service-worker.js")
             .then(reg => console.log("Service Worker registered:", reg.scope))
             .catch(err => console.error("Service Worker registration failed:", err));
     });

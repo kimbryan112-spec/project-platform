@@ -1,28 +1,13 @@
 /* ==================================
-    DELETE ALL API
-    DELETE /api/delete-all
+   DELETE ALL API
+   DELETE /api/delete-all
 ================================== */
 
 export async function onRequestDelete(context) {
     try {
-        const { env } = context;
+        console.log("[DELETE ALL] Clearing database...");
 
-        if (!env.DB) {
-            return new Response(
-                JSON.stringify({
-                    success: false,
-                    message: "Database not connected."
-                }),
-                {
-                    status: 500,
-                    headers: { "Content-Type": "application/json" }
-                }
-            );
-        }
-
-        console.log("[DELETE ALL] Clearing database (projects)...");
-
-        const result = await env.DB.prepare(`
+        const result = await context.env.DB.prepare(`
             DELETE FROM projects
         `).run();
 
@@ -33,21 +18,19 @@ export async function onRequestDelete(context) {
                 deleted: result.meta?.changes || 0
             }),
             {
-                status: 200,
                 headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store, no-cache, must-revalidate"
+                    "Content-Type": "application/json"
                 }
             }
         );
     }
     catch (err) {
-        console.error("[DELETE ALL ERROR]:", err.message);
+        console.error("[DELETE ALL]", err);
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: "Internal Server Error"
+                message: err.message
             }),
             {
                 status: 500,

@@ -1,44 +1,34 @@
-/* ==================================
-    OPENAI API HELPER
-================================== */
-
 export async function askOpenAI(prompt, apiKey) {
-    try {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "gpt-4o-mini", // O kaya ay "gpt-4o" depende sa gusto mo
+                model: "gpt-4o-mini", // O ang tamang production model na gagamitin mo
                 messages: [
                     {
                         role: "system",
-                        content: "You are a professional music director and wedding film assistant. Always return valid JSON only, without markdown code blocks if possible, or formatted cleanly."
+                        content: "You are the AI Music Director of KBHFILMS. Return ONLY valid JSON."
                     },
                     {
                         role: "user",
                         content: prompt
                     }
                 ],
-                temperature: 0.7,
-                response_format: { type: "json_object" }
+                response_format: { type: "json_object" },
+                temperature: 0.7
             })
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("[OPENAI API ERROR RESPONSE]:", errorText);
-            throw new Error(`OpenAI API failed with status ${response.status}`);
         }
+    );
 
-        const data = await response.json();
-        const content = data.choices?.[0]?.message?.content || "{}";
-
-        return JSON.parse(content);
-    } catch (err) {
-        console.error("[OPENAI HELPER ERROR]:", err.message);
-        throw err;
+    if (!response.ok) {
+        throw new Error(await response.text());
     }
+
+    const data = await response.json();
+    return JSON.parse(data.choices[0].message.content);
 }
