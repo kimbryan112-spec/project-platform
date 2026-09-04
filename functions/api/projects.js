@@ -1,13 +1,23 @@
 /* ==================================
-    PROJECTS API (Optimized with Edge Cache API & Workers KV Cache)
-    GET /api/projects?year=YYYY&month=M
-    POST /api/projects?year=YYYY&month=M
+    PROJECTS API (Optimized & Fixed Parsing)
 ================================== */
 
 import { getCache, setCache, deleteCache } from "../lib/cache.js";
 import { getCachedResponse, cacheResponse } from "../lib/edge-cache.js";
 import { CACHE_PREFIXES } from "../lib/constants.js";
 import { KV_CACHE_TTL } from "../lib/config.js";
+
+// Helper para i-convert ang month string (jan, feb, sep, etc.) patungong number (1-12)
+function parseMonthNumber(monthStr) {
+    if (!monthStr) return null;
+    if (!isNaN(monthStr)) return parseInt(monthStr, 10);
+    
+    const monthMap = {
+        jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+        jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+    };
+    return monthMap[monthStr.toLowerCase()] || null;
+}
 
 export async function onRequestGet(context) {
     try {
@@ -22,12 +32,10 @@ export async function onRequestGet(context) {
             });
         }
 
-        const edgeCached = await getCachedResponse(request);
-        if (edgeCached) return edgeCached;
-
         const url = new URL(request.url);
         const year = url.searchParams.get("year");
-        const month = url.searchParams.get("month");
+        const rawMonth = url.searchParams.get("month");
+        const month = parseMonthNumber(rawMonth);
 
         let cacheKey = `${CACHE_PREFIXES.PROJECTS}_all`;
         if (year && month) {
@@ -37,10 +45,9 @@ export async function onRequestGet(context) {
         if (kv) {
             const cachedData = await getCache(kv, cacheKey);
             if (cachedData) {
-                const response = new Response(JSON.stringify({ success: true, projects: cachedData }), {
+                return new Response(JSON.stringify({ success: true, projects: cachedData }), {
                     headers: { "Content-Type": "application/json" }
                 });
-                return await cacheResponse(request, response);
             }
         }
 
@@ -62,14 +69,10 @@ export async function onRequestGet(context) {
             await setCache(kv, cacheKey, projects, KV_CACHE_TTL.PROJECTS);
         }
 
-        const response = new Response(
+        return new Response(
             JSON.stringify({ success: true, projects }),
-            {
-                headers: { "Content-Type": "application/json" }
-            }
+            { headers: { "Content-Type": "application/json" } }
         );
-
-        return await cacheResponse(request, response);
 
     } catch (err) {
         console.error("[PROJECTS GET ERROR]:", err.message);
@@ -93,8 +96,16 @@ export async function onRequestPost(context) {
             });
         }
 
+        const url = new URL(request.url);
+        const queryYear = url.searchParams.get("year");
+        const queryMonth = parseMonthNumber(url.searchParams.get("month"));
+
         const body = await request.json();
-        const { year, month, rows } = body;
+        
+        // Suportahan pareho ang direct array o object na may .rows
+        const rows = Array.isArray(body) ? body : (body.rows || []);
+        const year = body.year || queryYear;
+        const month = parseMonthNumber(body.month) || queryMonth;
 
         if (!year || !month || !Array.isArray(rows)) {
             return new Response(JSON.stringify({ success: false, message: "Invalid payload parameters." }), {
@@ -103,7 +114,8 @@ export async function onRequestPost(context) {
             });
         }
 
-        const statements = rows.map((r) => {
+        const statements = rows.map((r, index) => {
+            const rowIndex = r.row_index !== undefined ? r.row_index : (r.rowId !== undefined ? r.rowId : index + 1);
             return db.prepare(`
                 INSERT INTO projects (
                     project_year, project_month, row_index, couple_name, status, progress, type,
@@ -123,12 +135,12 @@ export async function onRequestPost(context) {
                     teaser_title=excluded.teaser_title, teaser_link=excluded.teaser_link, teaser_status=excluded.teaser_status, teaser_notes=excluded.teaser_notes,
                     updated_at=CURRENT_TIMESTAMP
             `).bind(
-                year, month, r.row_index ?? 0, r.couple_name || "", r.status || "PLANNED", r.progress || 0, r.type || "NOT SET",
-                r.raw_files || "", r.drone || "", r.instruction || "", r.concerns || "", r.watch_link || "", r.files_link || "",
-                r.song1_title || "", r.song1_link || "", r.song1_status || "", r.song1_notes || "",
-                r.song2_title || "", r.song2_link || "", r.song2_status || "", r.song2_notes || "",
-                r.song3_title || "", r.song3_link || "", r.song3_status || "", r.song3_notes || "",
-                r.teaser_title || "", r.teaser_link || "", r.teaser_status || "", r.teaser_notes || ""
+                year, month, rowIndex, r.coupleName || r.couple_name || "", r.status || "PLANNED", r.progress || 0, r.type || "NOT SET",
+                r.rawFiles || r.raw_files || "", r.drone || "", r.instruction || "", r.concerns || "", r.watchLink || r.watch_link || "", r.filesLink || r.files_link || "",
+                r.song1?.title || r.song1_title || "", r.song1?.link || r.song1_link || "", r.song1?.status || r.song1_status || "", r.song1?.notes || r.song1_notes || "",
+                r.song2?.title || r.song2_title || "", r.song2?.link || r.song2_link || "", r.song2?.status || r.song2_status || "", r.song2?.notes || r.song2_notes || "",
+                r.song3?.title || r.song3_title || "", r.song3?.link || r.song3_link || "", r.song3?.status || r.song3_status || "", r.song3?.notes || r.song3_notes || "",
+                r.teaserSong?.title || r.teaser_title || "", r.teaserSong?.link || r.teaser_link || "", r.teaserSong?.status || r.teaser_status || "", r.teaserSong?.notes || r.teaser_notes || ""
             );
         });
 
