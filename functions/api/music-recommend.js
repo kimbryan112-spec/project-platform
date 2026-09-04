@@ -1,4 +1,32 @@
+/* ==================================
+    AI MUSIC RECOMMENDATION API
+    POST /api/music-recommendation
+================================== */
+
 import { askOpenAI } from "../lib/openai";
+import { getCache, setCache } from "../lib/cache.js";
+import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
+import { KV_CACHE_TTL } from "../lib/config.js";
+
+// Helper para gumawa ng maikling deterministic cache key batay sa project attributes
+async function generateCacheKey(project) {
+    const rawString = [
+        project.coupleName || "",
+        project.type || "",
+        project.status || "",
+        project.instruction || "",
+        project.concerns || "",
+        project.drone || "",
+        project.rawFiles || ""
+    ].join("_").toLowerCase();
+
+    const msgBuffer = new TextEncoder().encode(rawString);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+    return `${CACHE_PREFIXES.MUSIC}_${hashHex}`;
+}
 
 export async function onRequestPost(context) {
     try {
@@ -18,6 +46,32 @@ export async function onRequestPost(context) {
         if (!apiKey) {
             throw new Error("OPENAI_API_KEY is not configured in Cloudflare environment variables.");
         }
+
+        const kv = env.CACHE;
+
+        // 1. Suriin ang Workers KV Cache para iwas paulit-ulit na OpenAI API call
+        if (kv) {
+            try {
+                const cacheKey = await generateCacheKey(project);
+                const cachedRecommendation = await getCache(kv, cacheKey);
+                if (cachedRecommendation) {
+                    console.log("[CACHE HIT] Music recommendation retrieved from KV cache.");
+                    return new Response(
+                        JSON.stringify(cachedRecommendation),
+                        { 
+                            headers: { 
+                                "Content-Type": "application/json", 
+                                "Cache-Control": "private, max-age=60" 
+                            } 
+                        }
+                    );
+                }
+            } catch (kvReadErr) {
+                console.error("[KV CACHE READ ERROR]:", kvReadErr);
+            }
+        }
+
+        console.log("[CACHE MISS] Generating new AI music recommendation...");
 
         // Verified Musicbed Catalog Database
         const musicbedCatalog = [
@@ -118,18 +172,28 @@ Return ONLY a valid JSON object with this exact structure:
             projectInstruction !== "None" ? "✔ Custom Instructions Applied" : "✔ Standard Flow"
         ];
 
+        const finalResponsePayload = {
+            success: true,
+            analysis: analysisBadges,
+            songs: verifiedSongs,
+            whyText: String(aiResult.whyText || `Curated specifically for ${coupleName} matching professional wedding standards.`).trim()
+        };
+
+        // 2. I-save sa Workers KV Cache (7 Days TTL: 604800 seconds o nakabase sa config)
+        if (kv) {
+            try {
+                const cacheKey = await generateCacheKey(project);
+                await setCache(kv, cacheKey, finalResponsePayload, 604800);
+                console.log("[CACHE CREATED] Music recommendation cached in KV for 7 days.");
+            } catch (kvWriteErr) {
+                console.error("[KV CACHE WRITE ERROR]:", kvWriteErr);
+            }
+        }
+
         return new Response(
-            JSON.stringify({
-                success: true,
-                analysis: analysisBadges,
-                songs: verifiedSongs,
-                whyText: String(aiResult.whyText || `Curated specifically for ${coupleName} matching professional wedding standards.`).trim()
-            }),
+            JSON.stringify(finalResponsePayload),
             {
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store"
-                }
+                headers: DEFAULT_HEADERS.NO_CACHE
             }
         );
 
@@ -142,7 +206,7 @@ Return ONLY a valid JSON object with this exact structure:
             }),
             {
                 status: 500,
-                headers: { "Content-Type": "application/json" }
+                headers: DEFAULT_HEADERS.JSON
             }
         );
     }

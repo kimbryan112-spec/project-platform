@@ -375,6 +375,8 @@ console.log("Current User:", currentUser);
 console.log("Role:", currentUser.role);
 console.log("IS_ADMIN:", IS_ADMIN);
 
+let activeLogFetchController = null;
+
 if (!IS_ADMIN) {
     const adminMenu = document.getElementById("adminMenu");
     if (adminMenu) {
@@ -429,8 +431,15 @@ if (!IS_ADMIN) {
             });
         }
 
-        setInterval(checkNewLogsCount, 3000);
+        // Initial single check on startup instead of constant intervals
         checkNewLogsCount();
+
+        // Browser visibility optimization: pause background tasks when tab is hidden
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                checkNewLogsCount();
+            }
+        });
     });
 }
 
@@ -453,8 +462,13 @@ async function fetchActivityLogs() {
     const listEl = document.getElementById("notificationList");
     const badgeEl = document.getElementById("notificationBadge");
     
+    if (activeLogFetchController) {
+        activeLogFetchController.abort();
+    }
+    activeLogFetchController = new AbortController();
+
     try {
-        const res = await fetch("/api/logs");
+        const res = await fetch("/api/logs", { signal: activeLogFetchController.signal });
         if (!res.ok) return;
         const data = await res.json();
         const logs = data.logs || [];
@@ -515,11 +529,16 @@ async function fetchActivityLogs() {
             listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
         }
     } catch (err) {
-        console.error("Error fetching logs:", err);
+        if (err.name !== 'AbortError') {
+            console.error("Error fetching logs:", err);
+        }
+    } finally {
+        activeLogFetchController = null;
     }
 }
 
 async function checkNewLogsCount() {
+    if (document.hidden) return; // Skip background checks when tab is inactive
     try {
         const res = await fetch("/api/logs");
         if (!res.ok) return;
@@ -557,7 +576,7 @@ async function checkNewLogsCount() {
 <script>
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/service-worker.js")
+        navigator.serviceWorker.register("/sw.js")
             .then(reg => console.log("Service Worker registered:", reg.scope))
             .catch(err => console.error("Service Worker registration failed:", err));
     });

@@ -3,6 +3,9 @@
     POST /api/reset-year
 ================================== */
 
+import { clearCacheByPrefix, deleteCache } from "../lib/cache.js";
+import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
+
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
@@ -15,7 +18,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 500,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
@@ -37,7 +40,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 400,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
@@ -59,6 +62,18 @@ export async function onRequestPost(context) {
         .bind(year)
         .run();
 
+        // Invalidate Workers KV Cache para sa buong taon at master list
+        const kv = env.CACHE;
+        if (kv) {
+            try {
+                // Burahin ang lahat ng buwan na nagsisimula sa taon na ito (e.g. projects_2026_)
+                await clearCacheByPrefix(kv, `${CACHE_PREFIXES.PROJECTS}_${year}_`);
+                await deleteCache(kv, `${CACHE_PREFIXES.PROJECTS}_all`);
+            } catch (kvDelErr) {
+                console.error("[KV RESET YEAR CACHE ERROR]:", kvDelErr);
+            }
+        }
+
         return new Response(
             JSON.stringify({
                 success: true,
@@ -67,10 +82,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store, no-cache, must-revalidate"
-                }
+                headers: DEFAULT_HEADERS.NO_CACHE
             }
         );
 
@@ -85,9 +97,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: DEFAULT_HEADERS.JSON
             }
         );
     }

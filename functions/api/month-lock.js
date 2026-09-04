@@ -3,6 +3,8 @@
     POST /api/month-lock
 ================================== */
 
+import { DEFAULT_HEADERS } from "../lib/constants.js";
+
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
@@ -15,7 +17,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 500,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
@@ -39,7 +41,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 400,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
@@ -72,10 +74,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 200,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store, no-cache, must-revalidate"
-                }
+                headers: DEFAULT_HEADERS.NO_CACHE
             }
         );
 
@@ -89,9 +88,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: DEFAULT_HEADERS.JSON
             }
         );
     }

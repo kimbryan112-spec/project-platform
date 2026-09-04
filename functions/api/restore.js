@@ -3,6 +3,9 @@
     POST /api/restore
 ================================== */
 
+import { clearCacheByPrefix } from "../lib/cache.js";
+import { CACHE_PREFIXES, DEFAULT_HEADERS } from "../lib/constants.js";
+
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
@@ -15,7 +18,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 500,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
@@ -29,8 +32,11 @@ export async function onRequestPost(context) {
             backup = {};
         }
 
-        // 1. Siguraduhing tama ang format ng file at may 'data' object
-        if (!backup || !backup.data || typeof backup.data !== "object") {
+        // 1. Tanggapin ang parehong format: kung nagmula sa bagong backup.tables o lumang backup.data
+        const tablesData = backup.tables || backup.data;
+
+        // 2. Siguraduhing tama ang format ng file at may valid object data
+        if (!backup || !tablesData || typeof tablesData !== "object") {
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -38,23 +44,22 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 400,
-                    headers: { "Content-Type": "application/json" }
+                    headers: DEFAULT_HEADERS.JSON
                 }
             );
         }
 
-        const tablesData = backup.data;
         const tableNames = Object.keys(tablesData);
 
-        // 2. I-off muna ang foreign key checks para maiwasan ang conflict habang nagbubura at nagpapasok
+        // 3. I-off muna ang foreign key checks para maiwasan ang conflict habang nagbubura at nagpapasok
         await env.DB.prepare(`PRAGMA foreign_keys = OFF;`).run();
 
-        // 3. Linisin ang mga lumang laman ng bawat table
+        // 4. Linisin ang mga lumang laman ng bawat table
         for (const tableName of tableNames) {
             await env.DB.prepare(`DELETE FROM "${tableName}";`).run();
         }
 
-        // 4. I-insert pabalik ang mga records para sa bawat table
+        // 5. I-insert pabalik ang mga records para sa bawat table
         for (const tableName of tableNames) {
             const rows = tablesData[tableName];
             
@@ -75,8 +80,20 @@ export async function onRequestPost(context) {
             console.log(`[RESTORE] Restored ${rows.length} record(s) to table: ${tableName}`);
         }
 
-        // 5. I-on ulit ang foreign keys
+        // 6. I-on ulit ang foreign keys
         await env.DB.prepare(`PRAGMA foreign_keys = ON;`).run();
+
+        // 7. I-clear ang buong KV cache para matiyak na sariwa ang data pagka-restore
+        const kv = env.CACHE;
+        if (kv) {
+            try {
+                await clearCacheByPrefix(kv, CACHE_PREFIXES.PROJECTS);
+                await clearCacheByPrefix(kv, CACHE_PREFIXES.USERS);
+                await clearCacheByPrefix(kv, CACHE_PREFIXES.NOTIFICATIONS);
+            } catch (kvErr) {
+                console.error("[KV RESTORE CACHE CLEAR ERROR]:", kvErr);
+            }
+        }
 
         return new Response(
             JSON.stringify({
@@ -85,10 +102,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 200,
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-store, no-cache, must-revalidate"
-                }
+                headers: DEFAULT_HEADERS.NO_CACHE
             }
         );
 
@@ -108,7 +122,7 @@ export async function onRequestPost(context) {
             }),
             {
                 status: 500,
-                headers: { "Content-Type": "application/json" }
+                headers: DEFAULT_HEADERS.JSON
             }
         );
     }

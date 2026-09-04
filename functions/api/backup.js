@@ -1,84 +1,66 @@
-// ==================================
-// DYNAMIC BACKUP API (All Tables)
-// GET /api/backup
-// ==================================
+import { uploadFile } from "../lib/storage.js";
+import { R2_FOLDERS, DEFAULT_HEADERS } from "../lib/constants.js";
 
-export async function onRequestGet(context) {
+export async function onRequestPost(context) {
     try {
         const { env } = context;
+        const db = env.DB;
 
-        if (!env.DB) {
+        if (!db) {
             return new Response(
-                JSON.stringify({
-                    success: false,
-                    error: "Database not connected."
-                }),
-                {
-                    status: 500,
-                    headers: { "Content-Type": "application/json" }
-                }
+                JSON.stringify({ success: false, message: "Database not connected." }),
+                { status: 500, headers: DEFAULT_HEADERS.JSON }
             );
         }
 
-        console.log("[BACKUP] Starting full system backup...");
+        const users = await db.prepare("SELECT * FROM users").all();
+        const projects = await db.prepare("SELECT * FROM projects").all();
+        const monthLocks = await db.prepare("SELECT * FROM month_locks").all();
+        const mediaFiles = await db.prepare("SELECT * FROM media_files").all();
+        const notifications = await db.prepare("SELECT * FROM notifications").all();
 
-        // 1. Kunin ang lahat ng table names sa database nang awtomatiko
-        const tablesResult = await env.DB.prepare(`
-            SELECT name FROM sqlite_master 
-            WHERE type='table' 
-            AND name NOT LIKE 'sqlite_%' 
-            AND name NOT LIKE '_cf_%'
-        `).all();
-
-        const tables = tablesResult.results || [];
-        const backupData = {};
-
-        // 2. I-loop ang bawat table para makuha ang lahat ng records nito
-        for (const t of tables) {
-            const tableName = t.name;
-            const tableRecords = await env.DB.prepare(`SELECT * FROM "${tableName}"`).all();
-            const records = tableRecords.results || [];
-            
-            backupData[tableName] = records;
-            console.log(`[BACKUP] Exported ${records.length} record(s) from table: ${tableName}`);
-        }
-
-        const backup = {
-            version: "2.0",
-            exportedAt: new Date().toISOString(),
-            data: backupData
+        const backupData = {
+            version: "1.0.0",
+            timestamp: new Date().toISOString(),
+            tables: {
+                users: users.results || [],
+                projects: projects.results || [],
+                month_locks: monthLocks.results || [],
+                media_files: mediaFiles.results || [],
+                notifications: notifications.results || []
+            }
         };
 
-        // 3. I-download bilang JSON file
-        return new Response(
-            JSON.stringify(backup, null, 2),
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Content-Disposition": `attachment; filename="kbhfilms-full-backup-${Date.now()}.json"`,
-                    "Cache-Control": "no-cache, no-store, must-revalidate"
-                }
-            }
-        );
-    }
-    catch (err) {
-        console.error("[BACKUP] Error:", err.message);
+        const jsonString = JSON.stringify(backupData, null, 2);
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const backupFilename = `backup_${dateStr}_${Date.now()}.json`;
+        const r2Key = `${R2_FOLDERS.BACKUPS}/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${backupFilename}`;
 
-        return new Response(
-            JSON.stringify({
-                success: false,
-                error: "Internal Server Error"
-            }),
-            {
-                status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+        if (env.MEDIA_BUCKET) {
+            await uploadFile(env, r2Key, jsonString, {
+                contentType: "application/json",
+                customMetadata: { type: "system_backup" }
+            });
+        }
+
+        return new Response(jsonString, {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Disposition": `attachment; filename="${backupFilename}"`,
+                "Cache-Control": "no-store, no-cache, must-revalidate"
             }
+        });
+
+    } catch (err) {
+        console.error("[BACKUP API ERROR]:", err.message);
+        return new Response(
+            JSON.stringify({ success: false, message: err.message || "Internal Server Error during backup." }),
+            { status: 500, headers: DEFAULT_HEADERS.JSON }
         );
     }
 }
 
 export default {
-    onRequestGet
+    onRequestPost
 };
