@@ -1015,7 +1015,7 @@ select{
 }
 
 /* ==========================================
-    MONTH RIGHT-CLICK CONTEXT MENU
+    MONTH RIGHT-CLICK CONTEXT MENU (UNIFIED STYLE)
 ========================================== */
 
 .month-context-menu {
@@ -1023,27 +1023,32 @@ select{
     display: none;
     min-width: 180px;
     background: #ffffff;
-    border: 1px solid #dcdcdc;
+    border: 1px solid #dfe3ea;
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0,0,0,.15);
     overflow: hidden;
     z-index: 99999;
+    padding: 6px;
+    font-family: inherit;
 }
 
 .month-context-menu button {
     width: 100%;
     border: none;
     background: transparent;
-    padding: 12px 16px;
+    padding: 10px 14px;
     text-align: left;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background .2s ease;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: background .2s ease, color .2s ease;
+    font-family: inherit;
 }
 
 .month-context-menu button:hover {
-    background: #f3f4f6;
+    background: #f1f5f9;
+    color: #2563eb;
 }
 
 #lockMonthBtn {
@@ -1461,35 +1466,48 @@ select{
 }
 
 /* ==================================
-    WATCH CONTEXT MENU
+    WATCH CONTEXT MENU (UNIFIED STYLE)
 ================================== */
 
-#watchContextMenu{
+#watchContextMenu,
+#filesContextMenu{
     position:fixed;
     display:none;
     min-width:210px;
     background:#fff;
-    border:1px solid #dcdcdc;
-    border-radius:10px;
-    box-shadow:0 10px 25px rgba(0,0,0,.15);
+    border:1px solid #dfe3ea;
+    border-radius:12px;
+    padding:6px;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.15),
+        0 2px 8px rgba(0,0,0,.08);
     overflow:hidden;
     z-index:99999;
 }
 
-#watchContextMenu button{
+#watchContextMenu button,
+#filesContextMenu button{
     width:100%;
+    display:flex;
+    align-items:center;
+    gap:10px;
     border:none;
     background:transparent;
-    padding:12px 16px;
+    padding:10px 14px;
+    border-radius:8px;
     text-align:left;
     cursor:pointer;
-    font-size:14px;
+    font-size:13px;
     font-weight:600;
-    transition:.2s;
+    color:#222;
+    transition:.18s ease;
+    font-family: inherit;
 }
 
-#watchContextMenu button:hover{
-    background:#f3f4f6;
+#watchContextMenu button:hover,
+#filesContextMenu button:hover{
+    background:#f4f7fb;
+    color:#2563eb;
 }
 
 /* ==================================
@@ -2185,15 +2203,17 @@ input[type="url"]::placeholder{
     background:transparent;
     padding:10px 14px;
     border-radius:8px;
-    font-size:14px;
+    font-size:13px;
     font-weight:600;
     color:#222;
     cursor:pointer;
     transition:.18s ease;
+    font-family: inherit;
 }
 
 #songContextMenu button:hover{
     background:#f4f7fb;
+    color:#2563eb;
 }
 
 #songContextMenu button i{

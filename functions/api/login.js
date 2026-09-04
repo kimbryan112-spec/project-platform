@@ -1,30 +1,47 @@
 /* ==================================
-   LOGIN API
-   POST /api/login
+    LOGIN API
+    POST /api/login
 ================================== */
 
 export async function onRequestPost(context) {
-
     try {
+        let body = {};
+        try {
+            body = await context.request.json();
+        } catch (e) {
+            body = {};
+        }
 
-        const { email, password } =
-            await context.request.json();
+        const email = body.email || "";
+        const password = body.password || "";
 
-        const user =
-            await context.env.DB.prepare(`
-                SELECT
-                    id,
-                    fullname,
-                    email,
-                    password,
-                    role,
-                    active
-                FROM users
-                WHERE email = ?
-                LIMIT 1
-            `)
-            .bind(email.trim().toLowerCase())
-            .first();
+        if (!email.trim() || !password) {
+            return new Response(
+                JSON.stringify({
+                    success: false,
+                    message: "Email and password are required."
+                }),
+                {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
+        }
+
+        const user = await context.env.DB.prepare(`
+            SELECT
+                id,
+                fullname,
+                email,
+                password,
+                role,
+                active
+            FROM users
+            WHERE email = ?
+            LIMIT 1
+        `)
+        .bind(email.trim().toLowerCase())
+        .first();
 
         if (!user) {
             return new Response(
@@ -34,9 +51,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 401,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                    headers: { "Content-Type": "application/json" }
                 }
             );
         }
@@ -49,9 +64,7 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 403,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                    headers: { "Content-Type": "application/json" }
                 }
             );
         }
@@ -65,15 +78,12 @@ export async function onRequestPost(context) {
                 }),
                 {
                     status: 401,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+                    headers: { "Content-Type": "application/json" }
                 }
             );
         }
 
         const sessionId = crypto.randomUUID();
-
         const expires = new Date(
             Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toISOString();
@@ -104,9 +114,8 @@ export async function onRequestPost(context) {
                 }
             }),
             {
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                status: 200,
+                headers: { "Content-Type": "application/json" }
             }
         );
 
@@ -118,24 +127,19 @@ export async function onRequestPost(context) {
         return response;
 
     } catch (err) {
-
         console.error("[LOGIN ERROR]", err);
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message
+                message: err.message || "Internal Server Error"
             }),
             {
                 status: 500,
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                headers: { "Content-Type": "application/json" }
             }
         );
-
     }
-
 }
 
 export default {

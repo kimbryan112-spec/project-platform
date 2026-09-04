@@ -13,15 +13,15 @@ export async function onRequestPost(context) {
             throw new Error("OPENAI_API_KEY is not configured in Cloudflare environment variables.");
         }
 
-        // Verified Musicbed Catalog Database (Maaari itong palawakin o ilagay sa D1 sa susunod)
+        // Verified Musicbed Catalog Database
         const musicbedCatalog = [
-            { title: "Bloom", artist: "The Light The Heat", mood: "Romantic", url: "https://www.musicbed.com/songs/bloom-the-light-the-heat/28451" },
-            { title: "Forever", artist: "Leif Vollebekk", mood: "Emotional", url: "https://www.musicbed.com/songs/forever-leif-vollebekk/15234" },
-            { title: "Golden Sky", artist: "Salt Of The Sound", mood: "Cinematic", url: "https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821" },
-            { title: "Home", artist: "Tony Anderson", mood: "Luxury", url: "https://www.musicbed.com/songs/home-tony-anderson/10492" },
-            { title: "Anchor", artist: "Ryan Taubert", mood: "Elegant", url: "https://www.musicbed.com/songs/anchor-ryan-taubert/11203" },
-            { title: "Rise", artist: "The Hunts", mood: "Happy", url: "https://www.musicbed.com/songs/rise-the-hunts/14892" },
-            { title: "Wildflower", artist: "The Gray Havens", mood: "Romantic", url: "https://www.musicbed.com/songs/wildflower-the-gray-havens/22104" }
+            { title: "Bloom", artist: "The Light The Heat", mood: "Romantic", url: "[https://www.musicbed.com/songs/bloom-the-light-the-heat/28451](https://www.musicbed.com/songs/bloom-the-light-the-heat/28451)" },
+            { title: "Forever", artist: "Leif Vollebekk", mood: "Emotional", url: "[https://www.musicbed.com/songs/forever-leif-vollebekk/15234](https://www.musicbed.com/songs/forever-leif-vollebekk/15234)" },
+            { title: "Golden Sky", artist: "Salt Of The Sound", mood: "Cinematic", url: "[https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821](https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821)" },
+            { title: "Home", artist: "Tony Anderson", mood: "Luxury", url: "[https://www.musicbed.com/songs/home-tony-anderson/10492](https://www.musicbed.com/songs/home-tony-anderson/10492)" },
+            { title: "Anchor", artist: "Ryan Taubert", mood: "Elegant", url: "[https://www.musicbed.com/songs/anchor-ryan-taubert/11203](https://www.musicbed.com/songs/anchor-ryan-taubert/11203)" },
+            { title: "Rise", artist: "The Hunts", mood: "Happy", url: "[https://www.musicbed.com/songs/rise-the-hunts/14892](https://www.musicbed.com/songs/rise-the-hunts/14892)" },
+            { title: "Wildflower", artist: "The Gray Havens", mood: "Romantic", url: "[https://www.musicbed.com/songs/wildflower-the-gray-havens/22104](https://www.musicbed.com/songs/wildflower-the-gray-havens/22104)" }
         ];
 
         // Advanced Prompt para sa AI Music Director
@@ -72,31 +72,31 @@ Return ONLY a valid JSON object with this exact structure:
 }
 `;
 
-        // Tawagin ang ating askOpenAI helper function
-        const aiResult = await askOpenAI(prompt, apiKey);
+        // Tawagin ang askOpenAI helper function
+        const aiResult = await askOpenAI(prompt, apiKey) || {};
 
         const analysisData = aiResult.analysis || {};
-        const rawSongs = aiResult.songs || [];
+        const rawSongs = Array.isArray(aiResult.songs) ? aiResult.songs : [];
 
-        // I-verify at i-attach ang totoong Musicbed URL mula sa Catalog
+        // I-verify at i-attach ang totoong Musicbed URL mula sa Catalog o fallback link
         const verifiedSongs = rawSongs.map((song) => {
             const foundInCatalog = musicbedCatalog.find(
-                cat => cat.title.toLowerCase() === song.title.toLowerCase()
+                cat => cat.title.toLowerCase() === (song.title || "").toLowerCase()
             );
 
             return {
-                title: song.title,
-                artist: song.artist,
+                title: song.title || "Untitled",
+                artist: song.artist || "Unknown Artist",
                 mood: song.mood || "Cinematic",
                 energy: song.energy || "Medium",
                 scene: song.scene || "Highlight",
-                reason: song.reason,
+                reason: song.reason || "Matched with wedding production style.",
                 confidence: song.confidence || 95,
-                url: foundInCatalog ? foundInCatalog.url : "https://www.musicbed.com"
+                url: foundInCatalog ? foundInCatalog.url : "[https://www.musicbed.com](https://www.musicbed.com)"
             };
         });
 
-        // Bumuo ng badges para sa UI analysis section base sa analysis object ng AI
+        // Bumuo ng badges para sa UI analysis section
         const analysisBadges = [
             `✔ ${analysisData.style || project.type || "Cinematic Wedding"}`,
             `✔ Editing: ${analysisData.editingStyle || "Professional"}`,
@@ -112,7 +112,10 @@ Return ONLY a valid JSON object with this exact structure:
                 whyText: aiResult.whyText || `Curated specifically for ${project.coupleName || "this project"} matching professional wedding standards.`
             }),
             {
-                headers: { "Content-Type": "application/json" }
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-store"
+                }
             }
         );
 
@@ -121,7 +124,7 @@ Return ONLY a valid JSON object with this exact structure:
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message
+                message: err.message || "Internal Server Error"
             }),
             {
                 status: 500,

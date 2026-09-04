@@ -1,4 +1,4 @@
-// =========================
+// =================================-
 // STORAGE MODE
 // true = localStorage
 // false = Cloudflare API
@@ -12,15 +12,8 @@ console.log("Host:", location.hostname);
 console.log("LOCAL_MODE:", LOCAL_MODE);
 console.log("================================");
 
-let currentYear = new Date().getFullYear().toString();
-
-let currentMonth =
-    document.querySelector(".month-btn.active")?.dataset.month || "sep";
-let currentMonthLocked = false;
-let cachedHasDataMonths = {};
-
 // =========================
-// MONTH MAP
+// MONTH MAP & NAMES
 // =========================
 const monthMap = {
     jan: 1,
@@ -51,6 +44,20 @@ const monthNames = [
     "nov",
     "dec"
 ];
+
+// =========================================
+// URL & LOCALSTORAGE STATE RESTORATION (ADMIN ROLE SYNC)
+// =========================================
+const urlParams = new URLSearchParams(window.location.search);
+const paramYear = urlParams.get("year");
+const paramMonth = urlParams.get("month");
+
+let currentYear = paramYear || localStorage.getItem("kb_selected_year") || new Date().getFullYear().toString();
+let currentMonth = paramMonth || localStorage.getItem("kb_selected_month") || monthNames[new Date().getMonth()];
+
+let currentMonthLocked = false;
+let cachedHasDataMonths = {};
+let monthLocks = {};
 
 // ===========================
 // LIVE CALENDAR
@@ -86,7 +93,6 @@ async function getClientDeviceInfo() {
 
     const ua = navigator.userAgent || navigator.vendor || window.opera;
 
-    // Modern User-Agent Data check (para sa mga bagong Android/iOS browsers)
     if (navigator.userAgentData) {
         try {
             const hints = await navigator.userAgentData.getHighEntropyValues([
@@ -98,7 +104,7 @@ async function getClientDeviceInfo() {
             
             if (hints.mobile || hints.platform === "Android" || hints.platform === "iOS") {
                 if (hints.model && hints.model !== "") {
-                    device = hints.model; // Halimbawa: "iPhone", "Samsung Galaxy", etc.
+                    device = hints.model;
                 } else {
                     device = hints.platform === "iOS" ? "iPhone" : "Android Phone";
                 }
@@ -107,7 +113,6 @@ async function getClientDeviceInfo() {
         } catch (e) {}
     }
 
-    // Fallback/Deep Regex kung sakaling hindi pumasok sa userAgentData (Gaya ng Linux armv81 sa phone)
     if (device === "Desktop" || device === "Unknown OS") {
         if (/iphone|ipod/i.test(ua)) {
             device = "iPhone";
@@ -122,7 +127,6 @@ async function getClientDeviceInfo() {
             device = "Mobile Phone";
             os = "Mobile OS";
         } else {
-            // Pure Desktop
             if (/macintosh|mac os x/i.test(ua)) {
                 device = "Mac";
                 os = "macOS";
@@ -136,7 +140,6 @@ async function getClientDeviceInfo() {
         }
     }
 
-    // Browser Detection
     if (/chrome|crios/i.test(ua) && !/edge|opr/i.test(ua)) browser = "Chrome";
     else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) browser = "Safari";
     else if (/firefox|fxios/i.test(ua)) browser = "Firefox";
@@ -151,7 +154,6 @@ async function recordActivity(action, details = "") {
         const currentUser = JSON.parse(localStorage.getItem("currentUser")) || {};
         const userName = currentUser.name || currentUser.username || currentUser.full_name || "Kim Bryan Hernandez";
         
-        // Tawagin ang async device detector para makuha ang tamang device/OS/browser info
         const clientInfo = await getClientDeviceInfo();
 
         await fetch("/api/logs", {
@@ -185,12 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsBtn = document.getElementById("settingsMenu");
 
     if (settingsBtn) {
-        settingsBtn.style.display = IS_ADMIN ? "" : "none";
+        settingsBtn.style.display = (typeof IS_ADMIN !== "undefined" && IS_ADMIN) ? "" : "none";
     }
 
     const dashboardMenu = document.getElementById("dashboardMenu");
 
-    if (dashboardMenu && !IS_ADMIN) {
+    if (dashboardMenu && typeof IS_ADMIN !== "undefined" && !IS_ADMIN) {
         dashboardMenu.removeAttribute("href");
         dashboardMenu.style.pointerEvents = "none";
         dashboardMenu.style.cursor = "default";
@@ -198,8 +200,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log('[INIT] Page loaded, starting data load...');
 
-    currentYear = new Date().getFullYear().toString();
-    currentMonth = monthNames[new Date().getMonth()];
+    // ==========================================
+    // ADMIN SIDEBAR NAVIGATION LINK INTERCEPTION
+    // ==========================================
+    if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
+        const adminSidebarLinks = document.querySelectorAll('.sidebar nav a');
+        adminSidebarLinks.forEach(link => {
+            const rawHref = link.getAttribute('href');
+            if (rawHref && !rawHref.startsWith('http') && !rawHref.startsWith('#')) {
+                const basePage = rawHref.split('?')[0];
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.setItem('kb_selected_year', currentYear);
+                    localStorage.setItem('kb_selected_month', currentMonth);
+                    window.location.href = `${basePage}?year=${currentYear}&month=${currentMonth}`;
+                });
+            }
+        });
+    }
+
+    localStorage.setItem("kb_selected_year", currentYear);
+    localStorage.setItem("kb_selected_month", currentMonth);
 
     document.querySelectorAll(".month-btn").forEach(btn => {
         btn.classList.remove("active");
@@ -223,21 +244,26 @@ document.addEventListener('DOMContentLoaded', () => {
             option.value = y;
             option.textContent = y;
 
-            if (y === current) {
+            if (String(y) === currentYear) {
                 option.selected = true;
             }
 
             yearSelect.appendChild(option);
         }
 
-        currentYear = String(current);
-        document.getElementById("currentYearTitle").textContent = currentYear;
+        yearSelect.value = currentYear;
+        const yearTitleEl = document.getElementById("currentYearTitle");
+        if (yearTitleEl) yearTitleEl.textContent = currentYear;
 
         yearSelect.addEventListener("change", async () => {
             currentYear = yearSelect.value;
-            document.getElementById("currentYearTitle").textContent = currentYear;
+            const yearTitleEl = document.getElementById("currentYearTitle");
+            if (yearTitleEl) yearTitleEl.textContent = currentYear;
+
+            localStorage.setItem("kb_selected_year", currentYear);
 
             currentMonth = "jan"; 
+            localStorage.setItem("kb_selected_month", currentMonth);
             
             document.querySelectorAll(".month-btn").forEach(btn => {
                 btn.classList.toggle("active", btn.dataset.month === currentMonth);
@@ -265,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 option => option.value === nextYear
             );
 
-            if (!exists) {
+            if (!exists && yearSelect) {
                 const option = document.createElement("option");
                 option.value = nextYear;
                 option.textContent = nextYear;
@@ -273,8 +299,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             currentYear = nextYear;
-            yearSelect.value = currentYear;
-            document.getElementById("currentYearTitle").textContent = currentYear;
+            if (yearSelect) yearSelect.value = currentYear;
+            localStorage.setItem("kb_selected_year", currentYear);
+            
+            const yearTitleEl = document.getElementById("currentYearTitle");
+            if (yearTitleEl) yearTitleEl.textContent = currentYear;
 
             loadProjects();
             recordActivity("Added/Selected Next Year", `Year: ${currentYear}`);
@@ -286,12 +315,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tableBody) {
         tableBody.addEventListener('input', () => {
             saveProjects();
-            updateCurrentMonthHasData(); // Awtomatikong mag-green kapag may tinype
+            updateCurrentMonthHasData(); 
         });
 
         tableBody.addEventListener('change', (e) => {
             saveProjects();
-            updateCurrentMonthHasData(); // Awtomatikong mag-green kapag nagpalit ng dropdown o select
+            updateCurrentMonthHasData(); 
 
             if (e.target.classList.contains('status-select')) {
                 updateStatusColor(e.target);
@@ -326,7 +355,13 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.getItem("watchPlayerState")
     );
 
-    if (savedPlayer?.open) {
+    const watchModal = document.getElementById("watchModal");
+    const watchFrame = document.getElementById("watchFrame");
+    const watchPlayer = document.getElementById("watchBox");
+    const minimizeWatch = document.getElementById("minimizeWatchBtn");
+    const maximizeWatch = document.getElementById("maximizeWatchBtn");
+
+    if (savedPlayer?.open && watchModal && watchFrame && watchPlayer) {
         watchFrame.src = savedPlayer.link;
         watchModal.classList.add("show");
 
@@ -342,12 +377,11 @@ document.addEventListener('DOMContentLoaded', () => {
             watchModal.style.pointerEvents = "none";
             watchPlayer.style.pointerEvents = "auto";
 
-            minimizeWatch.style.display = "none";
-            maximizeWatch.style.display = "inline-flex";
+            if (minimizeWatch) minimizeWatch.style.display = "none";
+            if (maximizeWatch) maximizeWatch.style.display = "inline-flex";
         }
     }
 
-    // Siguraduhing ma-apply ang kulay sa lahat ng type-select pagka-load ng page
     document.querySelectorAll(".type-select").forEach(select => {
         updateTypeColor(select);
     });
@@ -699,7 +733,7 @@ async function loadProjects() {
         document.querySelectorAll(".month-btn").forEach(btn => {
             const key = getMonthKey(currentYear, btn.dataset.month);
             const locked = !!monthLocks[key];
-            if (IS_ADMIN) {
+            if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
                 btn.classList.toggle("locked", locked);
             } else {
                 btn.classList.remove("locked");
@@ -720,7 +754,7 @@ async function loadProjects() {
 }
 
 // ==================================
-// ONLINE & LOCAL SAVE FUNCTIONS
+// ONLINE & LOCAL SAVE FUNCTIONS (Optimized Debounce)
 // ==================================
 let localSaveTimeout;
 let apiSaveTimeout;
@@ -771,7 +805,7 @@ function saveProjects() {
         } catch (e) {
             console.error("[SAVE] Error saving projects to Cloudflare backend:", e);
         }
-    }, 500);
+    }, 1000);
 }
 
 function saveProjectsLocal() {
@@ -796,14 +830,12 @@ function saveProjectsLocal() {
 
         updateCurrentMonthHasData();
 
-    }, 300);
+    }, 400);
 }
 
 // ==================================
 // MONTH HELPERS
 // ==================================
-let monthLocks = {};
-
 function getMonthLocks() {
     return monthLocks;
 }
@@ -860,7 +892,6 @@ async function updateMonthHasDataUI(hasDataMonths = null) {
         const key = `projects_${currentYear}_${monthName}`;
         let hasData = false;
 
-        // 1. Suriin ang Local Storage para sa bawat buwan
         const saved = localStorage.getItem(key);
         if (saved) {
             try {
@@ -886,13 +917,11 @@ async function updateMonthHasDataUI(hasDataMonths = null) {
             }
         }
 
-        // 2. Suriin din ang server-side cache (kung online mode)
         const months = hasDataMonths ?? cachedHasDataMonths ?? {};
         if (!LOCAL_MODE && months[monthName] === true) {
             hasData = true;
         }
 
-        // 3. Kung ito ang active month at may temporary changes sa DOM ngayon
         if (monthName === currentMonth && monthHasData()) {
             hasData = true;
         }
@@ -963,7 +992,7 @@ function updateMonthLockUI() {
         const key = getMonthKey(currentYear, btn.dataset.month);
         const locked = !!monthLocks[key];
 
-        if (IS_ADMIN) {
+        if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
             btn.classList.toggle("locked", locked);
         } else {
             btn.classList.remove("locked");
@@ -1024,14 +1053,12 @@ function updateStatusColor(select) {
 function updateTypeColor(select) {
     if (!select) return;
 
-    // Alisin muna ang mga lumang classes
     select.classList.remove(
         "type-basic", "type-romantic", "type-upbeat",
         "type-slow", "type-normal", "type-fast", "type-not-set",
         "type-proposal", "type-montage", "type-pre-wedding", "type-pre_wedding"
     );
 
-    // I-reset ang inline styles
     select.style.backgroundColor = "";
     select.style.color = "";
 
@@ -1135,12 +1162,14 @@ document.querySelectorAll(".month-btn").forEach(button => {
         document.querySelectorAll(".month-btn").forEach(btn => btn.classList.remove("active"));
         button.classList.add("active");
         currentMonth = button.dataset.month;
+        localStorage.setItem("kb_selected_month", currentMonth);
 
         await loadProjects();
         recordActivity("Switched Month", `Month: ${currentMonth.toUpperCase()}`);
     });
 
     button.addEventListener("contextmenu", (e) => {
+        if (typeof IS_ADMIN === "undefined" || !IS_ADMIN) return;
         e.preventDefault();
         const selectedMonth = button.dataset.month;
 
@@ -1150,17 +1179,19 @@ document.querySelectorAll(".month-btn").forEach(button => {
         const locked = !!getMonthLocks()[key];
 
         if (locked) {
-            lockBtn.style.display = "none";
-            unlockBtn.style.display = "flex";
+            if (lockBtn) lockBtn.style.display = "none";
+            if (unlockBtn) unlockBtn.style.display = "flex";
         } else {
-            lockBtn.style.display = "flex";
-            unlockBtn.style.display = "none";
+            if (lockBtn) lockBtn.style.display = "flex";
+            if (unlockBtn) unlockBtn.style.display = "none";
         }
 
-        monthContextMenu.dataset.month = selectedMonth;
-        monthContextMenu.style.display = "block";
-        monthContextMenu.style.left = `${e.pageX}px`;
-        monthContextMenu.style.top = `${e.pageY}px`;
+        if (monthContextMenu) {
+            monthContextMenu.dataset.month = selectedMonth;
+            monthContextMenu.style.display = "block";
+            monthContextMenu.style.left = `${e.pageX}px`;
+            monthContextMenu.style.top = `${e.pageY}px`;
+        }
     });
 });
 
@@ -1221,9 +1252,11 @@ document.addEventListener("contextmenu", (e) => {
     activeSongInput = input;
     const rect = input.getBoundingClientRect();
 
-    songContextMenu.style.display = "block";
-    songContextMenu.style.left = `${window.scrollX + rect.left}px`;
-    songContextMenu.style.top = `${window.scrollY + rect.top - songContextMenu.offsetHeight - 8}px`;
+    if (songContextMenu) {
+        songContextMenu.style.display = "block";
+        songContextMenu.style.left = `${window.scrollX + rect.left}px`;
+        songContextMenu.style.top = `${window.scrollY + rect.top - songContextMenu.offsetHeight - 8}px`;
+    }
 });
 
 const songLinkModal = document.getElementById("songLinkModal");
@@ -1271,9 +1304,8 @@ document.querySelectorAll(".watch-btn").forEach(button => {
             return;
         }
 
-        watchFrame.src = "";
-        watchFrame.src = link;
-        watchModal.classList.add("show");
+        if (watchFrame) watchFrame.src = link;
+        if (watchModal) watchModal.classList.add("show");
 
         localStorage.setItem("watchPlayerState", JSON.stringify({
             open: true,
@@ -1284,14 +1316,17 @@ document.querySelectorAll(".watch-btn").forEach(button => {
     });
 
     button.addEventListener("contextmenu", (e) => {
+        if (typeof IS_ADMIN === "undefined" || !IS_ADMIN) return;
         e.preventDefault();
         e.stopPropagation();
 
         activeWatchButton = button;
-        watchContextMenu.style.display = "block";
-        watchContextMenu.style.position = "fixed";
-        watchContextMenu.style.left = `${e.clientX}px`;
-        watchContextMenu.style.top = `${e.clientY}px`;
+        if (watchContextMenu) {
+            watchContextMenu.style.display = "block";
+            watchContextMenu.style.position = "fixed";
+            watchContextMenu.style.left = `${e.clientX}px`;
+            watchContextMenu.style.top = `${e.clientY}px`;
+        }
     });
 });
 
@@ -1307,14 +1342,17 @@ document.querySelectorAll(".get-files-btn").forEach(button => {
     });
 
     button.addEventListener("contextmenu", (e) => {
+        if (typeof IS_ADMIN === "undefined" || !IS_ADMIN) return;
         e.preventDefault();
         e.stopPropagation();
 
         activeFilesButton = button;
-        filesContextMenu.style.display = "block";
-        filesContextMenu.style.position = "fixed";
-        filesContextMenu.style.left = `${e.clientX}px`;
-        filesContextMenu.style.top = `${e.clientY}px`;
+        if (filesContextMenu) {
+            filesContextMenu.style.display = "block";
+            filesContextMenu.style.position = "fixed";
+            filesContextMenu.style.left = `${e.clientX}px`;
+            filesContextMenu.style.top = `${e.clientY}px`;
+        }
     });
 });
 
@@ -1331,27 +1369,33 @@ document.addEventListener("click", (e) => {
 });
 
 document.getElementById("closeWatchModal")?.addEventListener("click", () => {
-    watchModal.classList.remove("show");
-    watchPlayer.classList.remove("mini-player");
-    watchPlayer.style.left = "50%";
-    watchPlayer.style.top = "50%";
-    watchPlayer.style.right = "auto";
-    watchPlayer.style.bottom = "auto";
-    watchPlayer.style.transform = "translate(-50%, -50%)";
+    if (watchModal) watchModal.classList.remove("show");
+    const watchPlayer = document.getElementById("watchBox");
+    const minimizeWatch = document.getElementById("minimizeWatchBtn");
+    const maximizeWatch = document.getElementById("maximizeWatchBtn");
 
-    minimizeWatch.style.display = "inline-flex";
-    maximizeWatch.style.display = "none";
-    watchFrame.src = "";
+    if (watchPlayer) {
+        watchPlayer.classList.remove("mini-player");
+        watchPlayer.style.left = "50%";
+        watchPlayer.style.top = "50%";
+        watchPlayer.style.right = "auto";
+        watchPlayer.style.bottom = "auto";
+        watchPlayer.style.transform = "translate(-50%, -50%)";
+    }
+
+    if (minimizeWatch) minimizeWatch.style.display = "inline-flex";
+    if (maximizeWatch) maximizeWatch.style.display = "none";
+    if (watchFrame) watchFrame.src = "";
     localStorage.removeItem("watchPlayerState");
 });
 
 document.getElementById("attachWatchLinkBtn")?.addEventListener("click", () => {
     if (!activeWatchButton) return;
 
-    watchContextMenu.style.display = "none";
-    watchLinkInput.value = activeWatchButton.dataset.watchLink || "";
-    watchLinkModal.classList.add("show");
-    watchLinkInput.focus();
+    if (watchContextMenu) watchContextMenu.style.display = "none";
+    if (watchLinkInput) watchLinkInput.value = activeWatchButton.dataset.watchLink || "";
+    if (watchLinkModal) watchLinkModal.classList.add("show");
+    if (watchLinkInput) watchLinkInput.focus();
 });
 
 watchLinkInput?.addEventListener("input", () => {
@@ -1360,21 +1404,27 @@ watchLinkInput?.addEventListener("input", () => {
     activeWatchButton.dataset.watchLink = watchLinkInput.value.trim();
     activeWatchButton.querySelector(".play-icon")?.classList.toggle("has-link", watchLinkInput.value.trim() !== "");
     saveProjects();
-    updateCurrentMonthHasData(); // Mag-green pag may in-attach na watch link
+    updateCurrentMonthHasData(); 
     recordActivity("Attached Watch Link", "Updated video link");
 });
 
 closeWatchLinkModal?.addEventListener("click", () => {
-    watchLinkModal.classList.remove("show");
+    watchLinkModal?.classList.remove("show");
+});
+
+watchLinkModal?.addEventListener("click", (e) => {
+    if (e.target === watchLinkModal) {
+        watchLinkModal.classList.remove("show");
+    }
 });
 
 document.getElementById("attachFilesLinkBtn")?.addEventListener("click", () => {
     if (!activeFilesButton) return;
 
-    filesContextMenu.style.display = "none";
-    filesLinkInput.value = activeFilesButton.dataset.filesLink || "";
-    filesLinkModal.classList.add("show");
-    filesLinkInput.focus();
+    if (filesContextMenu) filesContextMenu.style.display = "none";
+    if (filesLinkInput) filesLinkInput.value = activeFilesButton.dataset.filesLink || "";
+    if (filesLinkModal) filesLinkModal.classList.add("show");
+    if (filesLinkInput) filesLinkInput.focus();
 });
 
 filesLinkInput?.addEventListener("input", () => {
@@ -1383,22 +1433,28 @@ filesLinkInput?.addEventListener("input", () => {
     activeFilesButton.dataset.filesLink = filesLinkInput.value.trim();
     activeFilesButton.classList.toggle("has-link", filesLinkInput.value.trim() !== "");
     saveProjects();
-    updateCurrentMonthHasData(); // Mag-green pag may in-attach na files link
+    updateCurrentMonthHasData(); 
     recordActivity("Attached Files Link", "Updated raw files link");
 });
 
 closeFilesLinkModal?.addEventListener("click", () => {
-    filesLinkModal.classList.remove("show");
+    filesLinkModal?.classList.remove("show");
+});
+
+filesLinkModal?.addEventListener("click", (e) => {
+    if (e.target === filesLinkModal) {
+        filesLinkModal.classList.remove("show");
+    }
 });
 
 document.getElementById("attachSongLinkBtn")?.addEventListener("click", () => {
     if (!activeSongInput) return;
 
-    songContextMenu.style.display = "none";
-    songTitleInput.value = activeSongInput.value || "";
-    songLinkInput.value = activeSongInput.dataset.songLink || "";
-    songLinkModal.classList.add("show");
-    songTitleInput.focus();
+    if (songContextMenu) songContextMenu.style.display = "none";
+    if (songTitleInput) songTitleInput.value = activeSongInput.value || "";
+    if (songLinkInput) songLinkInput.value = activeSongInput.dataset.songLink || "";
+    if (songLinkModal) songLinkModal.classList.add("show");
+    if (songTitleInput) songTitleInput.focus();
 });
 
 songLinkInput?.addEventListener("input", () => {
@@ -1407,7 +1463,7 @@ songLinkInput?.addEventListener("input", () => {
     activeSongInput.dataset.songLink = songLinkInput.value.trim();
     updateSongLinkStyle(activeSongInput);
     saveProjects();
-    updateCurrentMonthHasData(); // Mag-green pag may in-attach na song link
+    updateCurrentMonthHasData(); 
     recordActivity("Attached Song Link", "Updated song link");
 });
 
@@ -1421,12 +1477,18 @@ songTitleInput?.addEventListener("input", () => {
 });
 
 closeSongLinkModal?.addEventListener("click", () => {
-    songLinkModal.classList.remove("show");
+    songLinkModal?.classList.remove("show");
 });
 
-// ===============================
+songLinkModal?.addEventListener("click", (e) => {
+    if (e.target === songLinkModal) {
+        songLinkModal.classList.remove("show");
+    }
+});
+
+/* ===============================
 // SPECIAL INSTRUCTIONS & COMMENTS MODALS
-// ===============================
+// =============================== */
 let activeCoupleRow = null;
 let activeNotesButton = null;
 
@@ -1434,38 +1496,36 @@ const instructionModal = document.getElementById("instructionModal");
 const instructionTextarea = document.getElementById("instructionTextarea");
 const closeInstructionModal = document.getElementById("closeInstructionModal");
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".instruction-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-            activeCoupleRow = button.closest("tr");
-            const instructionBtn = activeCoupleRow.querySelector(".instruction-btn");
-
-            instructionTextarea.value = instructionBtn.dataset.notes || "";
-            instructionModal.classList.add("show");
-            instructionTextarea.focus();
-        });
-    });
-
-    closeInstructionModal?.addEventListener("click", () => {
-        instructionModal.classList.remove("show");
-    });
-
-    instructionModal?.addEventListener("click", (e) => {
-        if (e.target === instructionModal) {
-            instructionModal.classList.remove("show");
-        }
-    });
-
-    instructionTextarea?.addEventListener("input", () => {
-        if (!activeCoupleRow) return;
-
+document.querySelectorAll(".instruction-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+        activeCoupleRow = button.closest("tr");
         const instructionBtn = activeCoupleRow.querySelector(".instruction-btn");
-        instructionBtn.dataset.notes = instructionTextarea.value;
-        instructionBtn.style.background = instructionTextarea.value.trim() ? "#22c55e" : "#ff7a1a";
-        saveProjects();
-        updateCurrentMonthHasData();
-        recordActivity("Updated Special Instructions", "Edited instruction notes");
+
+        if (instructionTextarea) instructionTextarea.value = instructionBtn.dataset.notes || "";
+        if (instructionModal) instructionModal.classList.add("show");
+        if (instructionTextarea) instructionTextarea.focus();
     });
+});
+
+closeInstructionModal?.addEventListener("click", () => {
+    instructionModal?.classList.remove("show");
+});
+
+instructionModal?.addEventListener("click", (e) => {
+    if (e.target === instructionModal) {
+        instructionModal.classList.remove("show");
+    }
+});
+
+instructionTextarea?.addEventListener("input", () => {
+    if (!activeCoupleRow) return;
+
+    const instructionBtn = activeCoupleRow.querySelector(".instruction-btn");
+    instructionBtn.dataset.notes = instructionTextarea.value;
+    instructionBtn.style.background = instructionTextarea.value.trim() ? "#22c55e" : "#ff7a1a";
+    saveProjects();
+    updateCurrentMonthHasData();
+    recordActivity("Updated Special Instructions", "Edited instruction notes");
 });
 
 const commentsModal = document.getElementById("commentsModal");
@@ -1477,21 +1537,24 @@ document.addEventListener("click", (e) => {
     if (!button) return;
 
     activeNotesButton = button;
-    commentsTextarea.value = button.dataset.notes || "";
+    if (commentsTextarea) commentsTextarea.value = button.dataset.notes || "";
 
-    if (button.classList.contains("concerns-btn")) {
-        commentsModal.classList.add("concerns-mode");
-    } else {
-        commentsModal.classList.remove("concerns-mode");
+    if (commentsModal) {
+        if (button.classList.contains("concerns-btn")) {
+            commentsModal.classList.add("concerns-mode");
+        } else {
+            commentsModal.classList.remove("concerns-mode");
+        }
+        commentsModal.classList.add("show");
     }
-
-    commentsModal.classList.add("show");
-    commentsTextarea.focus();
+    if (commentsTextarea) commentsTextarea.focus();
 });
 
 closeCommentsModal?.addEventListener("click", () => {
-    commentsModal.classList.remove("show");
-    commentsModal.classList.remove("concerns-mode");
+    if (commentsModal) {
+        commentsModal.classList.remove("show");
+        commentsModal.classList.remove("concerns-mode");
+    }
 });
 
 commentsModal?.addEventListener("click", (e) => {
@@ -1519,16 +1582,15 @@ const watchHeader = document.getElementById("watchHeader");
 const minimizeWatch = document.getElementById("minimizeWatchBtn");
 const maximizeWatch = document.getElementById("maximizeWatchBtn");
 
-let watchDragging = false;
-let watchOffsetX = 0;
-let watchOffsetY = 0;
-
 if (watchPlayer && watchHeader && watchFrame && minimizeWatch && maximizeWatch) {
     watchPlayer.style.position = "fixed";
     watchPlayer.style.left = "50%";
     watchPlayer.style.top = "50%";
     watchPlayer.style.transform = "translate(-50%, -50%)";
 
+    let watchDragging = false;
+    let watchOffsetX = 0;
+    let watchOffsetY = 0;
     let dragRAF = null;
     let dragX = 0;
     let dragY = 0;
@@ -1581,8 +1643,10 @@ if (watchPlayer && watchHeader && watchFrame && minimizeWatch && maximizeWatch) 
         watchPlayer.style.bottom = "30px";
         watchPlayer.style.transform = "none";
 
-        watchModal.style.background = "transparent";
-        watchModal.style.pointerEvents = "none";
+        if (watchModal) {
+            watchModal.style.background = "transparent";
+            watchModal.style.pointerEvents = "none";
+        }
         watchPlayer.style.pointerEvents = "auto";
 
         minimizeWatch.style.display = "none";
@@ -1599,6 +1663,11 @@ if (watchPlayer && watchHeader && watchFrame && minimizeWatch && maximizeWatch) 
         watchPlayer.style.bottom = "auto";
         watchPlayer.style.transform = "translate(-50%, -50%)";
 
+        if (watchModal) {
+            watchModal.style.background = "";
+            watchModal.style.pointerEvents = "";
+        }
+
         maximizeWatch.style.display = "none";
         minimizeWatch.style.display = "inline-flex";
 
@@ -1612,9 +1681,9 @@ if (watchPlayer && watchHeader && watchFrame && minimizeWatch && maximizeWatch) 
     maximizeWatch.style.display = "none";
 }
 
-// ===============================
+/* ===============================
 // LOGOUT
-// ===============================
+// =============================== */
 const logoutBtn = document.getElementById("logoutBtn");
 const logoutConfirm = document.getElementById("logoutConfirm");
 const confirmLogout = document.getElementById("confirmLogout");
@@ -1623,14 +1692,14 @@ const cancelLogout = document.getElementById("cancelLogout");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        logoutConfirm.classList.toggle("show");
+        logoutConfirm?.classList.toggle("show");
     });
 }
 
 if (cancelLogout) {
     cancelLogout.addEventListener("click", (e) => {
         e.stopPropagation();
-        logoutConfirm.classList.remove("show");
+        logoutConfirm?.classList.remove("show");
     });
 }
 
