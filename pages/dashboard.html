@@ -70,25 +70,6 @@
                 </div>
 
                 <div class="year-header">
-                    <!-- Notification Bell Icon (Makikita lang kung Admin) -->
-                    <div id="dashboardNotificationWrapper" class="notification-wrapper" style="position: relative; display: inline-block; margin-right: 12px; cursor: pointer; vertical-align: middle;">
-                        <div id="notificationBell" style="font-size: 20px; background: #f1f5f9; padding: 8px 12px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
-                            🔔
-                        </div>
-                        <span id="notificationBadge" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 50%; display: none;">0</span>
-                        
-                        <!-- Dropdown Panel para sa Logs -->
-                        <div id="notificationDropdown" style="display: none; position: absolute; left: 0; top: 45px; width: 340px; background: white; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden; border: 1px solid #e2e8f0;">
-                            <div style="background: #2563eb; color: white; padding: 12px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-                                <span>Activity Center</span>
-                                <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;">Live</span>
-                            </div>
-                            <div id="notificationList" style="max-height: 380px; overflow-y: auto; padding: 10px; font-size: 13px; color: #334151;">
-                                <p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="live-calendar">
                         <div id="calendarMonth" class="calendar-month">AUG</div>
                         <div id="calendarDay" class="calendar-day">21</div>
@@ -330,47 +311,6 @@ if (!IS_ADMIN) {
     if (adminMenu) {
         adminMenu.style.display = "none";
     }
-    
-    // Itatago ang notification bell wrapper kung hindi admin (Manager role)
-    const notifWrapper = document.getElementById("dashboardNotificationWrapper");
-    if (notifWrapper) {
-        notifWrapper.style.display = "none";
-    }
-} else {
-    // Kung admin, isasama ang logic para sa pag-fetch ng activity logs ng bell
-    document.addEventListener("DOMContentLoaded", () => {
-        const bell = document.getElementById("notificationBell");
-        const dropdown = document.getElementById("notificationDropdown");
-
-        if (bell && dropdown) {
-            bell.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const isOpen = dropdown.style.display === "block";
-                
-                if (!isOpen) {
-                    fetchActivityLogs();
-                    dropdown.style.display = "block";
-                    const badgeEl = document.getElementById("notificationBadge");
-                    if (badgeEl) badgeEl.style.display = "none";
-                } else {
-                    localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
-                    dropdown.style.display = "none";
-                    checkNewLogsCount();
-                }
-            });
-
-            document.addEventListener("click", (e) => {
-                if (dropdown.style.display === "block" && !dropdown.contains(e.target) && !bell.contains(e.target)) {
-                    localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
-                    dropdown.style.display = "none";
-                    checkNewLogsCount();
-                }
-            });
-        }
-
-        setInterval(checkNewLogsCount, 3000);
-        checkNewLogsCount();
-    });
 }
 
 const userName = document.getElementById("userName");
@@ -386,108 +326,6 @@ const roleMap = {
 const userRole = document.getElementById("userRole");
 if (userRole) {
     userRole.textContent = roleMap[currentUser.role] || currentUser.role;
-}
-
-async function fetchActivityLogs() {
-    const listEl = document.getElementById("notificationList");
-    const badgeEl = document.getElementById("notificationBadge");
-    
-    try {
-        const res = await fetch("/api/logs");
-        if (!res.ok) return;
-        const data = await res.json();
-        const logs = data.logs || [];
-
-        const lastSeen = localStorage.getItem("kbh_last_seen_log");
-        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
-
-        const filteredLogs = logs.filter(log => {
-            const name = (log.user_name || "").toLowerCase();
-            return !name.includes("admin") && !name.includes("kim bryan hernandez");
-        });
-
-        if (filteredLogs.length > 0) {
-            badgeEl.style.display = "none";
-
-            listEl.innerHTML = filteredLogs.slice(0, 15).map(log => {
-                let logDate;
-                if (log.created_at) {
-                    let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
-                    logDate = new Date(dStr);
-                } else {
-                    logDate = new Date();
-                }
-
-                const logTime = logDate.getTime();
-                const isNew = logTime > lastSeenTime;
-                
-                const cardBackground = isNew ? "background: #f0f7ff; border-left: 4px solid #2563eb;" : "background: #ffffff; border-left: 4px solid transparent;";
-
-                const timeString = logDate.toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-                const dateString = logDate.toLocaleDateString('en-PH', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' });
-
-                const device = log.device || "Desktop";
-                const os = log.os || "Windows";
-                const browser = log.browser || "Browser";
-
-                const isPhone = /iphone|android|ipad|mobile/i.test(device);
-                const deviceIcon = isPhone ? "📱" : "💻";
-                const badgeColor = isPhone ? "background: #dcfce7; color: #15803d;" : "background: #e0f2fe; color: #0369a1;";
-
-                return `
-                    <div style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; ${cardBackground} display: flex; flex-direction: column; gap: 4px; transition: background 0.3s;">
-                        <div style="font-weight: 600; color: #1e293b; display: flex; justify-content: space-between; align-items: center;">
-                            <span>👤 ${log.user_name}</span>
-                            <span style="font-size: 10px; ${badgeColor} padding: 2px 6px; border-radius: 4px; font-weight: 500;">${deviceIcon} ${device}</span>
-                        </div>
-                        <div style="color: #2563eb; font-weight: 500; font-size: 12px;">⚡ ${log.action}</div>
-                        <div style="color: #64748b; font-size: 11px; background: rgba(0,0,0,0.02); padding: 4px 6px; border-radius: 4px;">📝 ${log.details || 'No additional details'}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px; font-size: 10px; color: #94a3b8;">
-                            <span>🌐 ${browser} • ${os}</span>
-                            <span>📅 ${dateString} • ${timeString}</span>
-                        </div>
-                    </div>
-                `;
-            }).join("");
-        } else {
-            badgeEl.style.display = "none";
-            listEl.innerHTML = '<p style="text-align: center; color: #94a3b8; padding: 20px;">Wala pang activity logs.</p>';
-        }
-    } catch (err) {
-        console.error("Error fetching logs:", err);
-    }
-}
-
-async function checkNewLogsCount() {
-    try {
-        const res = await fetch("/api/logs");
-        if (!res.ok) return;
-        const data = await res.json();
-        const logs = data.logs || [];
-        const badgeEl = document.getElementById("notificationBadge");
-        const dropdown = document.getElementById("notificationDropdown");
-
-        const lastSeen = localStorage.getItem("kbh_last_seen_log");
-        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
-
-        const newLogs = logs.filter(log => {
-            const name = (log.user_name || "").toLowerCase();
-            if (name.includes("admin") || name.includes("kim bryan hernandez")) return false;
-
-            if (log.created_at) {
-                let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
-                return new Date(dStr).getTime() > lastSeenTime;
-            }
-            return false;
-        });
-
-        if (newLogs.length > 0 && dropdown.style.display !== "block") {
-            badgeEl.textContent = newLogs.length;
-            badgeEl.style.display = "inline-block";
-        } else {
-            badgeEl.style.display = "none";
-        }
-    } catch (e) {}
 }
 </script>
 

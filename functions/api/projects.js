@@ -6,43 +6,24 @@ export async function onRequestGet(context) {
 
         console.log(`[GET] ${year}-${month}`);
 
-        // 1. Kunin ang projects para sa kasalukuyang buwan
-        const projectsQuery = context.env.DB.prepare(`
+        const { results } = await context.env.DB.prepare(`
             SELECT *
             FROM projects
             WHERE project_year = ?
               AND project_month = ?
             ORDER BY row_index ASC
-        `).bind(year, month);
+        `)
+        .bind(year, month)
+        .all();
 
-        // 2. Kunin ang locked months
-        const locksQuery = context.env.DB.prepare(`
+        // ========================================
+        // LOAD ALL LOCKED MONTHS
+        // ========================================
+        const { results: lockRows } = await context.env.DB.prepare(`
             SELECT project_year, project_month, locked
             FROM month_locks
             WHERE locked = 1
-        `);
-
-        // 3. Optimal check para sa hasDataMonths
-        const hasDataQuery = context.env.DB.prepare(`
-            SELECT DISTINCT project_month
-            FROM projects
-            WHERE project_year = ?
-              AND (
-                    TRIM(COALESCE(couple_name,'')) <> ''
-                 OR TRIM(COALESCE(raw_files,'')) <> ''
-              )
-        `).bind(year);
-
-        // Isagawa nang sabay-sabay (Parallel Execution) para mabawasan ang latency at DB overhead
-        const [projectsResult, locksResult, hasDataResult] = await Promise.all([
-            projectsQuery.all(),
-            locksQuery.all(),
-            hasDataQuery.all()
-        ]);
-
-        const results = projectsResult.results || [];
-        const lockRows = locksResult.results || [];
-        const hasDataRows = hasDataResult.results || [];
+        `).all();
 
         const monthLocks = {};
         const monthNames = {
@@ -53,10 +34,24 @@ export async function onRequestGet(context) {
 
         lockRows.forEach(row => {
             const monthName = monthNames[row.project_month];
-            if (monthName) {
-                monthLocks[`${row.project_year}_${monthName}`] = true;
-            }
+            monthLocks[`${row.project_year}_${monthName}`] = true;
         });
+
+        // ========================================
+        // LOAD MONTHS WITH DATA
+        // ========================================
+        const { results: hasDataRows } = await context.env.DB.prepare(`
+            SELECT project_month
+            FROM projects
+            WHERE project_year = ?
+              AND (
+                    TRIM(COALESCE(couple_name,'')) <> ''
+                 OR TRIM(COALESCE(raw_files,'')) <> ''
+              )
+            GROUP BY project_month
+        `)
+        .bind(year)
+        .all();
 
         const hasDataMonths = {};
         hasDataRows.forEach(row => {
@@ -116,7 +111,7 @@ export async function onRequestGet(context) {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "Cache-Control": "private, max-age=10"
+                    "Cache-Control": "no-store"
                 }
             }
         );

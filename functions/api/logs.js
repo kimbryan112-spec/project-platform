@@ -1,14 +1,7 @@
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
-        
-        let body = {};
-        try {
-            body = await request.json();
-        } catch (e) {
-            // Kung sakaling hindi valid o walang laman ang JSON body
-            body = {};
-        }
+        const body = await request.json();
         
         const { user_name, action, details, browser, os, device } = body;
 
@@ -54,17 +47,13 @@ export async function onRequestGet(context) {
             });
         }
 
-        // Kunin ang huling 50 logs nang mabilis at episyente
         const { results } = await env.DB.prepare(`
             SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 50
         `).all();
 
         return new Response(JSON.stringify({ logs: results || [] }), {
             status: 200,
-            headers: { 
-                "Content-Type": "application/json",
-                "Cache-Control": "no-store, no-cache, must-revalidate"
-            }
+            headers: { "Content-Type": "application/json" }
         });
     } catch (err) {
         return new Response(JSON.stringify({ error: err.message }), {

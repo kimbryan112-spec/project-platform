@@ -139,14 +139,14 @@ function initializeLogout() {
     const confirmLogout = document.getElementById("confirmLogout");
     const cancelLogout = document.getElementById("cancelLogout");
 
-    if (logoutBtn && logoutConfirm) {
+    if (logoutBtn) {
         logoutBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             logoutConfirm.classList.toggle("show");
         });
     }
 
-    if (cancelLogout && logoutConfirm) {
+    if (cancelLogout) {
         cancelLogout.addEventListener("click", (e) => {
             e.stopPropagation();
             logoutConfirm.classList.remove("show");
@@ -163,7 +163,6 @@ function initializeLogout() {
     document.addEventListener("click", (e) => {
         if (
             logoutConfirm &&
-            logoutBtn &&
             !logoutConfirm.contains(e.target) &&
             !logoutBtn.contains(e.target)
         ) {
@@ -193,6 +192,13 @@ document.addEventListener("DOMContentLoaded", () => {
    DATABASE STATUS
 ================================== */
 
+const dbStatus = document.getElementById("dbStatus");
+const dbTotalRecords = document.getElementById("dbTotalRecords");
+const dbCurrentYear = document.getElementById("dbCurrentYear");
+const dbCurrentMonth = document.getElementById("dbCurrentMonth");
+const dbSize = document.getElementById("dbSize");
+const dbLastBackup = document.getElementById("dbLastBackup");
+
 // ==================================
 // LOCAL STORAGE RECORD COUNT
 // ==================================
@@ -201,7 +207,7 @@ function countLocalRecords() {
     let total = 0;
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (!key || !key.startsWith("projects_")) continue;
+        if (!key.startsWith("projects_")) continue;
 
         try {
             const data = JSON.parse(localStorage.getItem(key));
@@ -223,7 +229,6 @@ function getLocalStorageSize() {
     let total = 0;
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (!key) continue;
         const value = localStorage.getItem(key) || "";
         total += key.length + value.length;
     }
@@ -236,13 +241,6 @@ function getLocalStorageSize() {
 
 async function loadDatabaseStatus() {
     console.log("[STATUS] Loading...");
-
-    const dbStatus = document.getElementById("dbStatus");
-    const dbTotalRecords = document.getElementById("dbTotalRecords");
-    const dbCurrentYear = document.getElementById("dbCurrentYear");
-    const dbCurrentMonth = document.getElementById("dbCurrentMonth");
-    const dbSize = document.getElementById("dbSize");
-    const dbLastBackup = document.getElementById("dbLastBackup");
 
     if (dbCurrentYear) dbCurrentYear.textContent = currentYear;
     if (dbCurrentMonth) dbCurrentMonth.textContent = monthNames[new Date().getMonth()];
@@ -280,6 +278,7 @@ async function loadDatabaseStatus() {
         if (!response.ok) throw new Error(response.status);
 
         const data = await response.json();
+
         const projectsArray = data.projects || (Array.isArray(data) ? data : []);
 
         if (dbTotalRecords) {
@@ -320,13 +319,8 @@ setInterval(() => {
 ========================================== */
 
 async function resetMonth() {
-    const monthSelect = document.getElementById("resetMonth");
-    const yearSelect = document.getElementById("resetMonthYear");
-
-    if (!monthSelect || !yearSelect) return;
-
-    const month = Number(monthSelect.value);
-    const year = Number(yearSelect.value);
+    const month = Number(document.getElementById("resetMonth").value);
+    const year = Number(document.getElementById("resetMonthYear").value);
 
     if (!month || !year) {
         alert("Please select both month and year.");
@@ -385,10 +379,7 @@ document.getElementById("resetMonthBtn")?.addEventListener("click", resetMonth);
 ========================================== */
 
 async function resetYear() {
-    const yearSelect = document.getElementById("resetYear");
-    if (!yearSelect) return;
-
-    const year = Number(yearSelect.value);
+    const year = Number(document.getElementById("resetYear").value);
 
     if (!year) {
         alert("Please select a year.");
@@ -456,9 +447,7 @@ async function backupDatabase() {
             const backupData = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key) {
-                    backupData[key] = localStorage.getItem(key);
-                }
+                backupData[key] = localStorage.getItem(key);
             }
             blob = new Blob(
                 [JSON.stringify(backupData, null, 2)],
@@ -507,7 +496,7 @@ document.getElementById("backupBtn")?.addEventListener("click", backupDatabase);
 async function restoreDatabase() {
     const fileInput = document.getElementById("restoreFile");
 
-    if (!fileInput || !fileInput.files.length) {
+    if (!fileInput.files.length) {
         alert("Please select a backup file.");
         return;
     }
@@ -524,7 +513,7 @@ async function restoreDatabase() {
         const backupData = JSON.parse(text);
 
         const isNewDynamicBackup = backupData && backupData.data && typeof backupData.data === "object";
-        const isCloudBackup = backupData && Array.isArray(backupData.projects);
+        const isCloudBackup = Array.isArray(backupData.projects);
         const isLocalBackup = backupData && typeof backupData === "object" && !Array.isArray(backupData) && !backupData.data;
 
         if (!isNewDynamicBackup && !isCloudBackup && !isLocalBackup) {
