@@ -1009,7 +1009,7 @@ select{
 .month-legend{
     display:flex;
     gap:20px;
-    margin-bottom:5px;
+    margin-bottom:0;
     font-size:14px;
     color:#666;
 }
@@ -2887,25 +2887,39 @@ input[type="url"]::placeholder{
     }
 }
 
-/* Status Indicator Styling */
-.system-status-indicator {
-    margin-top: 1rem;
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    border-radius: 6px;
-    text-align: center;
+/* ==================================
+   STATUS & LEGEND CONTAINER STYLING
+================================== */
+.status-legend-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0 15px 0;
+    padding: 0 5px;
+}
+
+/* Status Indicator Styling */
+.system-status-indicator {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-weight: 500;
     transition: all 0.3s ease;
+    margin-left: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 .status-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     display: inline-block;
+    flex-shrink: 0;
 }
 .status-online { color: #065f46; background-color: #ecfdf5; border: 1px solid #a7f3d0; }
 .status-online .status-dot { background-color: #10b981; box-shadow: 0 0 8px #10b981; }

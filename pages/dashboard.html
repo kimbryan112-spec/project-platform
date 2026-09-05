@@ -29,14 +29,16 @@
             gap: 6px;
             font-weight: 500;
             transition: all 0.3s ease;
-            vertical-align: middle;
-            margin-left: 10px;
+            margin-left: 0;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             display: inline-block;
+            flex-shrink: 0;
         }
         .status-online { color: #065f46; background-color: #ecfdf5; border: 1px solid #a7f3d0; }
         .status-online .status-dot { background-color: #10b981; box-shadow: 0 0 6px #10b981; }
@@ -123,12 +125,6 @@
                         <div id="calendarDay" class="calendar-day">21</div>
                     </div>
                     <h2><span id="currentYearTitle">2026</span> Wedding Highlights</h2>
-
-                    <!-- System Status Indicator (Naka-embed sa Topbar) -->
-                    <div id="systemStatusBanner" class="system-status-indicator status-online">
-                        <span class="status-dot"></span>
-                        <span id="systemStatusText">System Online (Cloud Connected)</span>
-                    </div>
                 </div>
             </div>
 
@@ -173,9 +169,18 @@
             </div>
         </div>
 
-        <div class="month-legend">
-            <span>🔵 No data yet</span>
-            <span>🟢 Has data</span>
+        <!-- Legend at System Status Indicator (Magkatabi sa Kaliwa) -->
+        <div id="adminIndicatorContainer" style="display: flex; align-items: center; gap: 20px; margin: 10px 0 15px 0; padding: 0 5px;">
+            <div class="month-legend" style="margin: 0; display: flex; gap: 15px;">
+                <span>🔵 No data yet</span>
+                <span>🟢 Has data</span>
+            </div>
+            
+            <!-- System Status Indicator -->
+            <div id="systemStatusBanner" class="system-status-indicator status-online">
+                <span class="status-dot"></span>
+                <span id="systemStatusText">System Online (Cloud Connected)</span>
+            </div>
         </div>
 
         <!-- Table -->
