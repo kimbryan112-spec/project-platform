@@ -12,6 +12,91 @@ console.log("Host:", location.hostname);
 console.log("LOCAL_MODE:", LOCAL_MODE);
 console.log("================================");
 
+// =========================================
+// PHASE 9 — MEMORY CACHE MANAGER
+// Caches: Projects, Settings, Dropdowns, Users, Music types, Month list, Year list, Permissions, Current user
+// =========================================
+class AppMemoryCache {
+    constructor() {
+        this.store = new Map();
+    }
+
+    set(key, value) {
+        this.store.set(key, {
+            data: value,
+            timestamp: Date.now()
+        });
+        console.log(`[CACHE SET] ${key}`);
+    }
+
+    get(key) {
+        const item = this.store.get(key);
+        if (!item) return null;
+        console.log(`[CACHE HIT] ${key}`);
+        return item.data;
+    }
+
+    invalidate(keyOrPrefix) {
+        if (!keyOrPrefix) {
+            this.store.clear();
+            console.log("[CACHE CLEARED ALL]");
+            return;
+        }
+        for (const key of this.store.keys()) {
+            if (key === keyOrPrefix || key.startsWith(keyOrPrefix)) {
+                this.store.delete(key);
+                console.log(`[CACHE INVALIDATED] ${key}`);
+            }
+        }
+    }
+}
+
+const AppCache = new AppMemoryCache();
+
+// =========================================
+// PHASE 10 — REQUEST DEDUPLICATOR
+// Prevents duplicate in-flight requests from rapid clicks, tab switching, focus/blur events.
+// Ensures only one request per endpoint and reuses active promises.
+// =========================================
+class RequestDeduplicator {
+    constructor() {
+        this.inFlightRequests = new Map();
+    }
+
+    async fetch(url, options = {}) {
+        const method = (options.method || 'GET').toUpperCase();
+        
+        // Huwag i-deduplicate ang POST, PUT, DELETE para ligtas ang data mutations
+        if (method !== 'GET') {
+            return window.fetch(url, options);
+        }
+
+        const cacheKey = url;
+
+        // Kung may active request na kapareho, i-reuse ang promise na iyon
+        if (this.inFlightRequests.has(cacheKey)) {
+            console.log(`[DEDUPLICATE] Reusing active request for: ${url}`);
+            const response = await this.inFlightRequests.get(cacheKey);
+            return response.clone();
+        }
+
+        // Lumikha ng bagong request promise
+        const requestPromise = window.fetch(url, options).finally(() => {
+            this.inFlightRequests.delete(cacheKey);
+        });
+
+        this.inFlightRequests.set(cacheKey, requestPromise);
+
+        const response = await requestPromise;
+        return response.clone();
+    }
+}
+
+const DeduplicatedFetch = new RequestDeduplicator();
+
+// Legacy compatibility para sa mga umiiral na function
+const projectsMemoryCache = {};
+
 // =========================
 // MONTH MAP & NAMES
 // =========================
@@ -667,12 +752,24 @@ function loadProjectsLocal() {
 }
 
 // ==================================
-// ONLINE LOAD FUNCTION
+// ONLINE LOAD FUNCTION (Optimized with AppCache & Phase 10 Request Deduplication)
 // ==================================
 async function loadProjects() {
     console.log("========== LOAD START ==========");
     console.log("currentYear :", currentYear);
     console.log("currentMonth:", currentMonth);
+
+    const cacheKey = `projects_${currentYear}_${currentMonth}`;
+
+    // Reusing memory cache via AppCache
+    const cachedPayload = AppCache.get(cacheKey) || projectsMemoryCache[cacheKey];
+    if (cachedPayload) {
+        console.log(`[LOAD] Using memory cache for ${cacheKey}`);
+        monthLocks = cachedPayload.lockedMonths || {};
+        cachedHasDataMonths = cachedPayload.hasDataMonths || {};
+        renderProjectsData(cachedPayload.projects, monthLocks, cachedHasDataMonths);
+        return;
+    }
 
     if (LOCAL_MODE) {
         const restored = restoreProjectsLocal(currentYear, currentMonth);
@@ -685,7 +782,7 @@ async function loadProjects() {
     }
 
     try {
-        const response = await fetch(
+        const response = await DeduplicatedFetch.fetch(
             `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
             {
                 cache: "no-store",
@@ -704,47 +801,60 @@ async function loadProjects() {
         monthLocks = responseData.lockedMonths || {};
         cachedHasDataMonths = responseData.hasDataMonths || {};
 
-        await updateMonthHasDataUI(cachedHasDataMonths);
+        const payloadToCache = {
+            projects: projectsData,
+            lockedMonths: monthLocks,
+            hasDataMonths: cachedHasDataMonths
+        };
 
-        if (!projectsData.length) {
-            clearProjectTable();
-        }
+        AppCache.set(cacheKey, payloadToCache);
+        projectsMemoryCache[cacheKey] = payloadToCache;
 
-        const rows = document.querySelectorAll(".project-table tbody tr");
-
-        if (Array.isArray(projectsData) && projectsData.length > 0) {
-            let matchedCount = 0;
-
-            rows.forEach((row) => {
-                const rowId = parseInt(row.getAttribute("data-row-id"), 10);
-                const data = projectsData.find(p => p.rowId === rowId);
-
-                if (data) {
-                    populateRow(row, data);
-                    matchedCount++;
-                }
-            });
-
-            updateMonthLockUI();
-            await updateMonthHasDataUI(cachedHasDataMonths);
-            console.log(`[LOAD] Successfully matched ${matchedCount} rows`);
-        }
-
-        document.querySelectorAll(".month-btn").forEach(btn => {
-            const key = getMonthKey(currentYear, btn.dataset.month);
-            const locked = !!monthLocks[key];
-            if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
-                btn.classList.toggle("locked", locked);
-            } else {
-                btn.classList.remove("locked");
-            }
-        });
-
-        updateMonthLockUI();
+        renderProjectsData(projectsData, monthLocks, cachedHasDataMonths);
 
     } catch (e) {
         console.error("[LOAD] Error loading projects:", e);
     }
+}
+
+async function renderProjectsData(projectsData, monthLocksMap, hasDataMonthsMap) {
+    await updateMonthHasDataUI(hasDataMonthsMap);
+
+    if (!projectsData.length) {
+        clearProjectTable();
+    }
+
+    const rows = document.querySelectorAll(".project-table tbody tr");
+
+    if (Array.isArray(projectsData) && projectsData.length > 0) {
+        let matchedCount = 0;
+
+        rows.forEach((row) => {
+            const rowId = parseInt(row.getAttribute("data-row-id"), 10);
+            const data = projectsData.find(p => p.rowId === rowId);
+
+            if (data) {
+                populateRow(row, data);
+                matchedCount++;
+            }
+        });
+
+        updateMonthLockUI();
+        updateMonthHasDataUI(hasDataMonthsMap);
+        console.log(`[LOAD] Successfully matched ${matchedCount} rows`);
+    }
+
+    document.querySelectorAll(".month-btn").forEach(btn => {
+        const key = getMonthKey(currentYear, btn.dataset.month);
+        const locked = !!monthLocksMap[key];
+        if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
+            btn.classList.toggle("locked", locked);
+        } else {
+            btn.classList.remove("locked");
+        }
+    });
+
+    updateMonthLockUI();
 
     document.querySelectorAll(".status-select").forEach(updateStatusColor);
     document.querySelectorAll(".type-select").forEach(updateTypeColor);
@@ -754,13 +864,16 @@ async function loadProjects() {
 }
 
 // ==================================
-// ONLINE & LOCAL SAVE FUNCTIONS (Optimized Debounce)
+// ONLINE & LOCAL SAVE FUNCTIONS (PHASE 12: BATCH UPDATES & DEBOUNCE)
 // ==================================
 let localSaveTimeout;
 let apiSaveTimeout;
 
 function saveProjects() {
     saveProjectsLocal();
+
+    const cacheKey = `projects_${currentYear}_${currentMonth}`;
+    AppCache.invalidate(cacheKey);
 
     if (LOCAL_MODE) {
         return;
@@ -771,6 +884,7 @@ function saveProjects() {
 
     clearTimeout(apiSaveTimeout);
 
+    // BATCH UPDATE: Nagpapadala lamang ng ISANG POST request pagkatapos ng 1 segundong debounce
     apiSaveTimeout = setTimeout(async () => {
         const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
@@ -782,6 +896,14 @@ function saveProjects() {
                 projectsData.push(rowData);
             }
         });
+
+        const updatedPayload = {
+            projects: projectsData,
+            lockedMonths: monthLocks,
+            hasDataMonths: cachedHasDataMonths
+        };
+        AppCache.set(cacheKey, updatedPayload);
+        projectsMemoryCache[cacheKey] = updatedPayload;
 
         try {
             const response = await fetch(
@@ -883,6 +1005,11 @@ function updateCurrentMonthHasData() {
 
     if (!LOCAL_MODE) {
         cachedHasDataMonths[currentMonth] = hasData;
+        const cacheKey = `projects_${currentYear}_${currentMonth}`;
+        const cached = AppCache.get(cacheKey) || projectsMemoryCache[cacheKey];
+        if (cached) {
+            cached.hasDataMonths = cachedHasDataMonths;
+        }
     }
 }
 
@@ -1145,6 +1272,8 @@ async function saveMonthLock(year, monthName, locked) {
     if (LOCAL_MODE) return;
 
     const monthNumber = monthMap[monthName];
+
+    AppCache.invalidate(`projects_${year}_${monthName}`);
 
     try {
         await fetch("/api/month-lock", {
@@ -1707,6 +1836,7 @@ if (confirmLogout) {
     confirmLogout.addEventListener("click", () => {
         recordActivity("Logged Out", "User signed out");
         localStorage.removeItem("currentUser");
+        AppCache.invalidate();
         window.location.href = "../login.html";
     });
 }
@@ -1859,7 +1989,7 @@ volumeIcon?.addEventListener("click", () => {
 });
 
 /* ==================================
-    SONG LINK STYLE & DRONE AUTOCOMPLETE
+    SONG LINK STYLE & DRONE AUTOCOMPLETE (PHASE 11: DEBOUNCE APPLIED)
 ================================== */
 function updateSongLinkStyle(input) {
     if (!input) return;
@@ -1896,37 +2026,44 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
 
     updateDroneColor(select);
 
+    let droneDebounceTimer = null;
+
     search.addEventListener("input", () => {
-        const keyword = search.value.trim().toUpperCase();
-        suggestions.innerHTML = "";
+        clearTimeout(droneDebounceTimer);
+        
+        // PHASE 11: 300ms debounce para sa autocomplete/search para hindi mag-query sa bawat keystroke
+        droneDebounceTimer = setTimeout(() => {
+            const keyword = search.value.trim().toUpperCase();
+            suggestions.innerHTML = "";
 
-        if (!keyword) {
-            suggestions.classList.remove("show");
-            return;
-        }
-
-        [...select.options].forEach(option => {
-            if (option.value === "NO DRONE" || !option.text.toUpperCase().includes(keyword)) return;
-
-            const item = document.createElement("div");
-            item.className = "drone-suggestion";
-            item.innerHTML = option.text.replace(new RegExp(keyword, "ig"), match => `<b>${match}</b>`);
-
-            item.addEventListener("click", () => {
-                select.value = option.value;
-                updateDroneColor(select);
-                search.value = "";
-                suggestions.innerHTML = "";
+            if (!keyword) {
                 suggestions.classList.remove("show");
-                saveProjects();
-                updateCurrentMonthHasData();
-                recordActivity("Selected Drone via Search", `Drone -> ${option.value}`);
+                return;
+            }
+
+            [...select.options].forEach(option => {
+                if (option.value === "NO DRONE" || !option.text.toUpperCase().includes(keyword)) return;
+
+                const item = document.createElement("div");
+                item.className = "drone-suggestion";
+                item.innerHTML = option.text.replace(new RegExp(keyword, "ig"), match => `<b>${match}</b>`);
+
+                item.addEventListener("click", () => {
+                    select.value = option.value;
+                    updateDroneColor(select);
+                    search.value = "";
+                    suggestions.innerHTML = "";
+                    suggestions.classList.remove("show");
+                    saveProjects();
+                    updateCurrentMonthHasData();
+                    recordActivity("Selected Drone via Search", `Drone -> ${option.value}`);
+                });
+
+                suggestions.appendChild(item);
             });
 
-            suggestions.appendChild(item);
-        });
-
-        suggestions.classList.toggle("show", suggestions.children.length > 0);
+            suggestions.classList.toggle("show", suggestions.children.length > 0);
+        }, 300);
     });
 
     select.addEventListener("change", () => {

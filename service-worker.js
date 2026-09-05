@@ -39,7 +39,7 @@ self.addEventListener("fetch", event => {
 
     const url = new URL(event.request.url);
 
-    // ITINAMA: Huwag i-cache ang mga API requests para laging sariwa ang data galing sa D1 Database
+    // Huwag i-cache ang mga API requests para laging sariwa ang data galing sa D1 Database
     if (url.pathname.startsWith("/api/")) {
         event.respondWith(fetch(event.request));
         return;

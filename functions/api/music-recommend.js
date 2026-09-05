@@ -1,5 +1,24 @@
 import { askOpenAI } from "../lib/openai";
 
+// Helper para gumawa ng unique cache key base sa project details
+async function generateCacheKey(project) {
+    const rawString = JSON.stringify({
+        couple: (project.coupleName || "").trim().toLowerCase(),
+        type: (project.type || "").trim().toLowerCase(),
+        status: (project.status || "").trim().toLowerCase(),
+        instruction: (project.instruction || "").trim().toLowerCase(),
+        concerns: (project.concerns || "").trim().toLowerCase(),
+        drone: (project.drone || "NO DRONE").trim().toLowerCase(),
+        rawFiles: (project.rawFiles || "").trim().toLowerCase()
+    });
+    
+    // Gumamit ng SubtleCrypto para sa MD5/SHA-256 hash kung kinakailangan o simpleng string key
+    const msgBuffer = new TextEncoder().encode(rawString);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export async function onRequestPost(context) {
     try {
         const { request, env } = context;
@@ -13,15 +32,40 @@ export async function onRequestPost(context) {
             throw new Error("OPENAI_API_KEY is not configured in Cloudflare environment variables.");
         }
 
+        // 1. I-check ang Cache kung mayroon nang database (env.DB)
+        const cacheKey = await generateCacheKey(project);
+        let cachedResult = null;
+
+        if (env.DB) {
+            // Siguraduhing may table na music_cache (key TEXT PRIMARY KEY, response TEXT)
+            const cachedRow = await env.DB.prepare(
+                `SELECT response FROM music_cache WHERE cache_key = ?`
+            ).bind(cacheKey).first();
+
+            if (cachedRow && cachedRow.response) {
+                console.log("[AI MUSIC CACHE HIT]", cacheKey);
+                cachedResult = JSON.parse(cachedRow.response);
+                return new Response(
+                    JSON.stringify(cachedResult),
+                    {
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Cache-Control": "public, max-age=86400"
+                        }
+                    }
+                );
+            }
+        }
+
         // Verified Musicbed Catalog Database
         const musicbedCatalog = [
-            { title: "Bloom", artist: "The Light The Heat", mood: "Romantic", url: "[https://www.musicbed.com/songs/bloom-the-light-the-heat/28451](https://www.musicbed.com/songs/bloom-the-light-the-heat/28451)" },
-            { title: "Forever", artist: "Leif Vollebekk", mood: "Emotional", url: "[https://www.musicbed.com/songs/forever-leif-vollebekk/15234](https://www.musicbed.com/songs/forever-leif-vollebekk/15234)" },
-            { title: "Golden Sky", artist: "Salt Of The Sound", mood: "Cinematic", url: "[https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821](https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821)" },
-            { title: "Home", artist: "Tony Anderson", mood: "Luxury", url: "[https://www.musicbed.com/songs/home-tony-anderson/10492](https://www.musicbed.com/songs/home-tony-anderson/10492)" },
-            { title: "Anchor", artist: "Ryan Taubert", mood: "Elegant", url: "[https://www.musicbed.com/songs/anchor-ryan-taubert/11203](https://www.musicbed.com/songs/anchor-ryan-taubert/11203)" },
-            { title: "Rise", artist: "The Hunts", mood: "Happy", url: "[https://www.musicbed.com/songs/rise-the-hunts/14892](https://www.musicbed.com/songs/rise-the-hunts/14892)" },
-            { title: "Wildflower", artist: "The Gray Havens", mood: "Romantic", url: "[https://www.musicbed.com/songs/wildflower-the-gray-havens/22104](https://www.musicbed.com/songs/wildflower-the-gray-havens/22104)" }
+            { title: "Bloom", artist: "The Light The Heat", mood: "Romantic", url: "https://www.musicbed.com/songs/bloom-the-light-the-heat/28451" },
+            { title: "Forever", artist: "Leif Vollebekk", mood: "Emotional", url: "https://www.musicbed.com/songs/forever-leif-vollebekk/15234" },
+            { title: "Golden Sky", artist: "Salt Of The Sound", mood: "Cinematic", url: "https://www.musicbed.com/songs/golden-sky-salt-of-the-sound/19821" },
+            { title: "Home", artist: "Tony Anderson", mood: "Luxury", url: "https://www.musicbed.com/songs/home-tony-anderson/10492" },
+            { title: "Anchor", artist: "Ryan Taubert", mood: "Elegant", url: "https://www.musicbed.com/songs/anchor-ryan-taubert/11203" },
+            { title: "Rise", artist: "The Hunts", mood: "Happy", url: "https://www.musicbed.com/songs/rise-the-hunts/14892" },
+            { title: "Wildflower", artist: "The Gray Havens", mood: "Romantic", url: "https://www.musicbed.com/songs/wildflower-the-gray-havens/22104" }
         ];
 
         // Advanced Prompt para sa AI Music Director
@@ -92,7 +136,7 @@ Return ONLY a valid JSON object with this exact structure:
                 scene: song.scene || "Highlight",
                 reason: song.reason || "Matched with wedding production style.",
                 confidence: song.confidence || 95,
-                url: foundInCatalog ? foundInCatalog.url : "[https://www.musicbed.com](https://www.musicbed.com)"
+                url: foundInCatalog ? foundInCatalog.url : "https://www.musicbed.com"
             };
         });
 
@@ -104,13 +148,28 @@ Return ONLY a valid JSON object with this exact structure:
             project.instruction ? "✔ Custom Instructions Applied" : "✔ Standard Flow"
         ];
 
+        const finalResponseData = {
+            success: true,
+            analysis: analysisBadges,
+            songs: verifiedSongs,
+            whyText: aiResult.whyText || `Curated specifically for ${project.coupleName || "this project"} matching professional wedding standards.`
+        };
+
+        // 2. I-save sa cache kung naka-configure ang env.DB
+        if (env.DB) {
+            try {
+                await env.DB.prepare(`
+                    INSERT INTO music_cache (cache_key, response, created_at)
+                    VALUES (?, ?, datetime('now'))
+                    ON CONFLICT(cache_key) DO UPDATE SET response = excluded.response
+                `).bind(cacheKey, JSON.stringify(finalResponseData)).run();
+            } catch (cacheErr) {
+                console.error("[AI MUSIC CACHE SAVE ERROR]", cacheErr);
+            }
+        }
+
         return new Response(
-            JSON.stringify({
-                success: true,
-                analysis: analysisBadges,
-                songs: verifiedSongs,
-                whyText: aiResult.whyText || `Curated specifically for ${project.coupleName || "this project"} matching professional wedding standards.`
-            }),
+            JSON.stringify(finalResponseData),
             {
                 headers: { 
                     "Content-Type": "application/json",
