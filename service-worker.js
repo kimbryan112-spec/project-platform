@@ -1,12 +1,27 @@
-const CACHE_NAME = "kbhfilms-v3";
+const CACHE_NAME = "kbhfilms-v4";
 
 const FILES_TO_CACHE = [
     "/",
     "/index.html",
+    "/login.html",
+    "/admin/admin.html",
+    "/admin/dashboard.html",
+    "/admin/settings.html",
     "/manifest.json",
     "/css/style.css",
     "/js/script.js",
     "/js/login.js",
+    "/js/settings.js",
+    // === MGA BAGONG OFFLINE & PRODUCTION MODULES ===
+    "/js/logger.js",
+    "/js/error-manager.js",
+    "/js/local-db.js",
+    "/js/sync-queue.js",
+    "/js/conflict-manager.js",
+    "/js/sync-engine.js",
+    "/js/offline-controller.js",
+    "/js/hybrid-auth.js",
+    // === ASSETS ===
     "/assets/icons/favicon.ico",
     "/assets/icons/icon-192.png",
     "/assets/icons/icon-512.png"

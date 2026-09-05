@@ -54,9 +54,9 @@ class AppMemoryCache {
 const AppCache = new AppMemoryCache();
 
 // =========================================
-// PHASE 10 — REQUEST DEDUPLICATOR
+// PHASE 10 — REQUEST DEDUPLICATOR (HYBRID / OFFLINE-AWARE)
 // Prevents duplicate in-flight requests from rapid clicks, tab switching, focus/blur events.
-// Ensures only one request per endpoint and reuses active promises.
+// Updated to integrate with Offline Controller and Queue when cloud fails.
 // =========================================
 class RequestDeduplicator {
     constructor() {
@@ -80,8 +80,18 @@ class RequestDeduplicator {
             return response.clone();
         }
 
-        // Lumikha ng bagong request promise
-        const requestPromise = window.fetch(url, options).finally(() => {
+        // Lumikha ng bagong request promise na may offline fallback handling
+        const requestPromise = window.fetch(url, options).then(response => {
+            if (!response.ok && window.KBErrorManager) {
+                window.KBErrorManager.captureApiError(url, response.status, "API responded with non-OK status");
+            }
+            return response;
+        }).catch(err => {
+            if (window.KBErrorManager) {
+                window.KBErrorManager.captureApiError(url, 0, err.message);
+            }
+            throw err;
+        }).finally(() => {
             this.inFlightRequests.delete(cacheKey);
         });
 
@@ -241,17 +251,25 @@ async function recordActivity(action, details = "") {
         
         const clientInfo = await getClientDeviceInfo();
 
+        const payload = {
+            user_name: userName,
+            action: action,
+            details: details,
+            browser: clientInfo.browser,
+            os: clientInfo.os,
+            device: clientInfo.device
+        };
+
+        // INTEGRATION HOOK: Kung offline o naka-local mode, pwede rin i-queue sakaling kailanganin
+        if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
+            await window.KBSyncQueue.addQueueItem('LOGS', '/api/logs', 'POST', payload);
+            return;
+        }
+
         await fetch("/api/logs", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                user_name: userName,
-                action: action,
-                details: details,
-                browser: clientInfo.browser,
-                os: clientInfo.os,
-                device: clientInfo.device
-            })
+            body: JSON.stringify(payload)
         });
     } catch (err) {
         console.error("Error recording activity:", err);
@@ -752,7 +770,7 @@ function loadProjectsLocal() {
 }
 
 // ==================================
-// ONLINE LOAD FUNCTION (Optimized with AppCache & Phase 10 Request Deduplication)
+// ONLINE LOAD FUNCTION (Optimized with AppCache & Offline Controller Hook)
 // ==================================
 async function loadProjects() {
     console.log("========== LOAD START ==========");
@@ -771,7 +789,7 @@ async function loadProjects() {
         return;
     }
 
-    if (LOCAL_MODE) {
+    if (LOCAL_MODE || (window.KBOfflineController && window.KBOfflineController.isOfflineMode())) {
         const restored = restoreProjectsLocal(currentYear, currentMonth);
         if (!restored) {
             clearProjectTable();
@@ -792,6 +810,8 @@ async function loadProjects() {
 
         if (!response.ok) {
             console.error("[LOAD] API returned error:", response.status);
+            // Fallback sa local sakaling magka-error o ma-exceed ang quota
+            restoreProjectsLocal(currentYear, currentMonth);
             return;
         }
 
@@ -813,7 +833,8 @@ async function loadProjects() {
         renderProjectsData(projectsData, monthLocks, cachedHasDataMonths);
 
     } catch (e) {
-        console.error("[LOAD] Error loading projects:", e);
+        console.error("[LOAD] Error loading projects (falling back to local):", e);
+        restoreProjectsLocal(currentYear, currentMonth);
     }
 }
 
@@ -864,7 +885,7 @@ async function renderProjectsData(projectsData, monthLocksMap, hasDataMonthsMap)
 }
 
 // ==================================
-// ONLINE & LOCAL SAVE FUNCTIONS (PHASE 12: BATCH UPDATES & DEBOUNCE)
+// ONLINE & LOCAL SAVE FUNCTIONS (INTEGRATED WITH SYNC QUEUE HOOKS)
 // ==================================
 let localSaveTimeout;
 let apiSaveTimeout;
@@ -884,7 +905,7 @@ function saveProjects() {
 
     clearTimeout(apiSaveTimeout);
 
-    // BATCH UPDATE: Nagpapadala lamang ng ISANG POST request pagkatapos ng 1 segundong debounce
+    // BATCH UPDATE & QUEUE HOOK: Kung offline, isasama agad sa KBSyncQueue nang hindi nawawala ang data
     apiSaveTimeout = setTimeout(async () => {
         const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
@@ -905,6 +926,18 @@ function saveProjects() {
         AppCache.set(cacheKey, updatedPayload);
         projectsMemoryCache[cacheKey] = updatedPayload;
 
+        // INTEGRATION HOOK: Kung offline mode, direktang i-queue sa IndexedDB via KBSyncQueue
+        if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
+            await window.KBSyncQueue.addQueueItem(
+                'UPDATE_PROJECT',
+                `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
+                'POST',
+                projectsData
+            );
+            console.log("[OFFLINE] Changes captured in local pending queue.");
+            return;
+        }
+
         try {
             const response = await fetch(
                 `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
@@ -923,9 +956,26 @@ function saveProjects() {
                 recordActivity("Saved Projects", `Year: ${saveYear}, Month: ${saveMonth.toUpperCase()}`);
             } else {
                 console.error("[SAVE] API error:", response.status);
+                // Kung nagka-error o na-hit ang limit, i-queue na rin bilang safety fallback
+                if (window.KBSyncQueue) {
+                    await window.KBSyncQueue.addQueueItem(
+                        'UPDATE_PROJECT',
+                        `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
+                        'POST',
+                        projectsData
+                    );
+                }
             }
         } catch (e) {
-            console.error("[SAVE] Error saving projects to Cloudflare backend:", e);
+            console.error("[SAVE] Error saving projects, adding to pending queue:", e);
+            if (window.KBSyncQueue) {
+                await window.KBSyncQueue.addQueueItem(
+                    'UPDATE_PROJECT',
+                    `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
+                    'POST',
+                    projectsData
+                );
+            }
         }
     }, 1000);
 }
@@ -1275,6 +1325,12 @@ async function saveMonthLock(year, monthName, locked) {
 
     AppCache.invalidate(`projects_${year}_${monthName}`);
 
+    // INTEGRATION HOOK: Kung offline, i-queue ang month lock
+    if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
+        await window.KBSyncQueue.addQueueItem('MONTH_LOCK', '/api/month-lock', 'POST', { year: year, month: monthNumber, locked: locked });
+        return;
+    }
+
     try {
         await fetch("/api/month-lock", {
             method: "POST",
@@ -1283,6 +1339,9 @@ async function saveMonthLock(year, monthName, locked) {
         });
     } catch (err) {
         console.error("[MONTH LOCK ERROR]", err);
+        if (window.KBSyncQueue) {
+            await window.KBSyncQueue.addQueueItem('MONTH_LOCK', '/api/month-lock', 'POST', { year: year, month: monthNumber, locked: locked });
+        }
     }
 }
 
@@ -1833,7 +1892,19 @@ if (cancelLogout) {
 }
 
 if (confirmLogout) {
-    confirmLogout.addEventListener("click", () => {
+    confirmLogout.addEventListener("click", async () => {
+        // Queue Protection check bago tuluyang mag-logout
+        if (window.KBHybridAuth && typeof window.KBHybridAuth.canSafelyLogout === 'function') {
+            const safe = await window.KBHybridAuth.canSafelyLogout();
+            if (!safe) {
+                if (!confirm("You have unsynchronized offline changes. Logging out may risk pending data. Proceed anyway?")) {
+                    logoutConfirm?.classList.remove("show");
+                    return;
+                }
+            }
+            await window.KBHybridAuth.clearSession();
+        }
+
         recordActivity("Logged Out", "User signed out");
         localStorage.removeItem("currentUser");
         AppCache.invalidate();

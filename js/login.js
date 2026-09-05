@@ -22,7 +22,7 @@ if (loginForm) {
             errorText.textContent = "";
         }
 
-        // OFFLINE / LOCAL TESTING FALLBACK
+        // 1. OFFLINE / LOCAL TESTING FALLBACK (Mula sa iyong orihinal na code)
         if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
             if (email === "adminyang@kbhfilms.com" && password === "Yangyang#12") {
                 const offlineUser = {
@@ -46,16 +46,12 @@ if (loginForm) {
                 localStorage.setItem("currentUser", JSON.stringify(offlineUser));
                 window.location.href = "pages/dashboard.html"; 
                 return;
-            } else {
-                if (errorText) {
-                    errorText.textContent = "Invalid email or password.";
-                }
-                return;
             }
         }
 
-        // ONLINE CLOUDFLARE / PRODUCTION API REQUEST
+        // 2. ONLINE CLOUDFLARE / PRODUCTION API REQUEST WITH OFFLINE HYBRID FALLBACK
         try {
+            // Subukan muna ang Cloudflare API kapag online
             const response = await fetch("/api/login", {
                 method: "POST",
                 headers: {
@@ -67,6 +63,15 @@ if (loginForm) {
             const data = await response.json();
 
             if (!response.ok || !data.success) {
+                // Kung nag-fail ang API pero baka sakaling offline credentials ang gamit, subukan natin ang Hybrid Auth
+                if (window.KBHybridAuth) {
+                    const offlineLoginResult = await window.KBHybridAuth.verifyOfflineLogin(email, password);
+                    if (offlineLoginResult.success) {
+                        handleSuccessfulLogin(offlineLoginResult.user);
+                        return;
+                    }
+                }
+
                 if (errorText) {
                     errorText.textContent = data.message || "Invalid email or password.";
                 }
@@ -74,34 +79,54 @@ if (loginForm) {
             }
 
             const loggedInUser = data.user || {};
-            if (!loggedInUser.name && loggedInUser.fullname) {
-                loggedInUser.name = loggedInUser.fullname;
-            } else if (!loggedInUser.name && loggedInUser.email === "yongzhi@kbhfilms.com") {
-                loggedInUser.name = "Yong Zhi Ng";
-            }
-
-            if (loggedInUser.role === "manager") {
-                loggedInUser.role = "Manager";
-            }
-
-            localStorage.setItem(
-                "currentUser",
-                JSON.stringify(loggedInUser)
-            );
-
-            if (loggedInUser.role === "admin" || loggedInUser.role === "Admin") {
-                window.location.href = "pages/admin.html";
-            } else {
-                window.location.href = "pages/dashboard.html";
-            }
+            handleSuccessfulLogin(loggedInUser);
 
         } catch (err) {
-            console.error("Login error:", err);
+            console.warn("API login failed (Likely offline). Attempting Hybrid/Offline Authentication...", err);
+
+            // 3. OFFLINE FALLBACK: Kapag walang internet o nag-timeout ang fetch, gamitin ang Hybrid Auth module
+            if (window.KBHybridAuth) {
+                try {
+                    const offlineLoginResult = await window.KBHybridAuth.verifyOfflineLogin(email, password);
+                    if (offlineLoginResult.success) {
+                        handleSuccessfulLogin(offlineLoginResult.user);
+                        return;
+                    }
+                } catch (offlineErr) {
+                    console.error("Offline login error:", offlineErr);
+                }
+            }
+
             if (errorText) {
-                errorText.textContent = "A connection error occurred. Please try again.";
+                errorText.textContent = "You are offline and no local credentials matched. Please check your connection.";
             }
         }
     });
+}
+
+// Helper function para sa redirect pagkatapos mag-login
+function handleSuccessfulLogin(loggedInUser) {
+    if (!loggedInUser.name && loggedInUser.fullname) {
+        loggedInUser.name = loggedInUser.fullname;
+    } else if (!loggedInUser.name && loggedInUser.email === "yongzhi@kbhfilms.com") {
+        loggedInUser.name = "Yong Zhi Ng";
+    }
+
+    if (loggedInUser.role === "manager") {
+        loggedInUser.role = "Manager";
+    }
+
+    localStorage.setItem(
+        "currentUser",
+        JSON.stringify(loggedInUser)
+    );
+
+    const userRole = (loggedInUser.role || "").toLowerCase();
+    if (userRole === "admin") {
+        window.location.href = "pages/admin.html";
+    } else {
+        window.location.href = "pages/dashboard.html";
+    }
 }
 
 // ===============================
