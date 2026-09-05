@@ -82,6 +82,9 @@ class RequestDeduplicator {
 
         // Lumikha ng bagong request promise na may offline fallback handling
         const requestPromise = window.fetch(url, options).then(response => {
+            if (response.status === 429) {
+                window.isQuotaExceeded = true;
+            }
             if (!response.ok && window.KBErrorManager) {
                 window.KBErrorManager.captureApiError(url, response.status, "API responded with non-OK status");
             }
@@ -260,7 +263,6 @@ async function recordActivity(action, details = "") {
             device: clientInfo.device
         };
 
-        // INTEGRATION HOOK: Kung offline o naka-local mode, pwede rin i-queue sakaling kailanganin
         if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
             await window.KBSyncQueue.addQueueItem('LOGS', '/api/logs', 'POST', payload);
             return;
@@ -490,9 +492,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-/* ==================================
-    CORE LOGIC: SAVE & LOAD (REST API)
-================================== */
+// ==================================
+// CORE LOGIC: SAVE & LOAD (REST API)
+// ==================================
 
 function collectRowData(row) {
     try {
@@ -779,7 +781,6 @@ async function loadProjects() {
 
     const cacheKey = `projects_${currentYear}_${currentMonth}`;
 
-    // Reusing memory cache via AppCache
     const cachedPayload = AppCache.get(cacheKey) || projectsMemoryCache[cacheKey];
     if (cachedPayload) {
         console.log(`[LOAD] Using memory cache for ${cacheKey}`);
@@ -808,9 +809,12 @@ async function loadProjects() {
             }
         );
 
+        if (response.status === 429) {
+            window.isQuotaExceeded = true;
+        }
+
         if (!response.ok) {
             console.error("[LOAD] API returned error:", response.status);
-            // Fallback sa local sakaling magka-error o ma-exceed ang quota
             restoreProjectsLocal(currentYear, currentMonth);
             return;
         }
@@ -905,7 +909,6 @@ function saveProjects() {
 
     clearTimeout(apiSaveTimeout);
 
-    // BATCH UPDATE & QUEUE HOOK: Kung offline, isasama agad sa KBSyncQueue nang hindi nawawala ang data
     apiSaveTimeout = setTimeout(async () => {
         const rows = document.querySelectorAll(".project-table tbody tr");
         const projectsData = [];
@@ -926,7 +929,6 @@ function saveProjects() {
         AppCache.set(cacheKey, updatedPayload);
         projectsMemoryCache[cacheKey] = updatedPayload;
 
-        // INTEGRATION HOOK: Kung offline mode, direktang i-queue sa IndexedDB via KBSyncQueue
         if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
             await window.KBSyncQueue.addQueueItem(
                 'UPDATE_PROJECT',
@@ -948,6 +950,10 @@ function saveProjects() {
                 }
             );
 
+            if (response.status === 429) {
+                window.isQuotaExceeded = true;
+            }
+
             if (response.ok) {
                 localStorage.setItem(
                     `projects_${saveYear}_${saveMonth}`,
@@ -956,7 +962,6 @@ function saveProjects() {
                 recordActivity("Saved Projects", `Year: ${saveYear}, Month: ${saveMonth.toUpperCase()}`);
             } else {
                 console.error("[SAVE] API error:", response.status);
-                // Kung nagka-error o na-hit ang limit, i-queue na rin bilang safety fallback
                 if (window.KBSyncQueue) {
                     await window.KBSyncQueue.addQueueItem(
                         'UPDATE_PROJECT',
@@ -1325,18 +1330,20 @@ async function saveMonthLock(year, monthName, locked) {
 
     AppCache.invalidate(`projects_${year}_${monthName}`);
 
-    // INTEGRATION HOOK: Kung offline, i-queue ang month lock
     if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
         await window.KBSyncQueue.addQueueItem('MONTH_LOCK', '/api/month-lock', 'POST', { year: year, month: monthNumber, locked: locked });
         return;
     }
 
     try {
-        await fetch("/api/month-lock", {
+        const resp = await fetch("/api/month-lock", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ year: year, month: monthNumber, locked: locked })
         });
+        if (resp.status === 429) {
+            window.isQuotaExceeded = true;
+        }
     } catch (err) {
         console.error("[MONTH LOCK ERROR]", err);
         if (window.KBSyncQueue) {
@@ -1893,7 +1900,6 @@ if (cancelLogout) {
 
 if (confirmLogout) {
     confirmLogout.addEventListener("click", async () => {
-        // Queue Protection check bago tuluyang mag-logout
         if (window.KBHybridAuth && typeof window.KBHybridAuth.canSafelyLogout === 'function') {
             const safe = await window.KBHybridAuth.canSafelyLogout();
             if (!safe) {
@@ -2102,7 +2108,6 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
     search.addEventListener("input", () => {
         clearTimeout(droneDebounceTimer);
         
-        // PHASE 11: 300ms debounce para sa autocomplete/search para hindi mag-query sa bawat keystroke
         droneDebounceTimer = setTimeout(() => {
             const keyword = search.value.trim().toUpperCase();
             suggestions.innerHTML = "";

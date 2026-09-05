@@ -1,6 +1,6 @@
 // ===============================
 // PROJECT PLATFORM
-// SERVER LOGIN (Offline & API Supported)
+// SERVER LOGIN (Offline, API, & Quota Exceeded Supported)
 // ===============================
 
 const loginForm = document.getElementById("loginForm");
@@ -22,7 +22,11 @@ if (loginForm) {
             errorText.textContent = "";
         }
 
-        // 1. OFFLINE / LOCAL TESTING FALLBACK (Mula sa iyong orihinal na code)
+        // I-reset muna ang global quota flag tuwing susubok mag-login
+        window.isQuotaExceeded = false;
+        triggerStatusUpdate();
+
+        // 1. OFFLINE / LOCAL TESTING FALLBACK
         if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
             if (email === "adminyang@kbhfilms.com" && password === "Yangyang#12") {
                 const offlineUser = {
@@ -49,9 +53,8 @@ if (loginForm) {
             }
         }
 
-        // 2. ONLINE CLOUDFLARE / PRODUCTION API REQUEST WITH OFFLINE HYBRID FALLBACK
+        // 2. ONLINE CLOUDFLARE / PRODUCTION API REQUEST WITH HYBRID FALLBACK
         try {
-            // Subukan muna ang Cloudflare API kapag online
             const response = await fetch("/api/login", {
                 method: "POST",
                 headers: {
@@ -62,8 +65,14 @@ if (loginForm) {
 
             const data = await response.json();
 
+            // Sakaling ma-exceed ang API limits (429) o QUOTA_EXCEEDED type
+            if (response.status === 429 || data.errorType === "QUOTA_EXCEEDED") {
+                window.isQuotaExceeded = true;
+                triggerStatusUpdate();
+            }
+
             if (!response.ok || !data.success) {
-                // Kung nag-fail ang API pero baka sakaling offline credentials ang gamit, subukan natin ang Hybrid Auth
+                // Kung nag-fail ang API pero baka sakaling offline credentials ang gamit, subukan ang Hybrid Auth
                 if (window.KBHybridAuth) {
                     const offlineLoginResult = await window.KBHybridAuth.verifyOfflineLogin(email, password);
                     if (offlineLoginResult.success) {
@@ -84,7 +93,7 @@ if (loginForm) {
         } catch (err) {
             console.warn("API login failed (Likely offline). Attempting Hybrid/Offline Authentication...", err);
 
-            // 3. OFFLINE FALLBACK: Kapag walang internet o nag-timeout ang fetch, gamitin ang Hybrid Auth module
+            // 3. OFFLINE FALLBACK: Kapag walang internet o nag-timeout ang fetch
             if (window.KBHybridAuth) {
                 try {
                     const offlineLoginResult = await window.KBHybridAuth.verifyOfflineLogin(email, password);
@@ -102,6 +111,11 @@ if (loginForm) {
             }
         }
     });
+}
+
+// Helper function para i-refresh ang UI status indicator
+function triggerStatusUpdate() {
+    window.dispatchEvent(new Event('online')); // Mag-a-update ito batay sa state sa login.html
 }
 
 // Helper function para sa redirect pagkatapos mag-login

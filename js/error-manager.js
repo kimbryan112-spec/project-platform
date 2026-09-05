@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * KBHFILMS PROJECT PLATFORM — STAGE 4: CENTRAL ERROR MANAGER (Phase 1)
+ * KBHFILMS PROJECT PLATFORM — STAGE 4: CENTRAL ERROR MANAGER (Phase 1 Optimized)
  * ============================================================================
  */
 (function (window) {
@@ -40,6 +40,20 @@
                 url: window.location.href
             };
 
+            // Suriin kung ito ay patungkol sa Quota o Rate Limit (Status 429 o limit exceeded)
+            const detailsStr = JSON.stringify(errorDetails).toLowerCase();
+            if (
+                detailsStr.includes('quota') || 
+                detailsStr.includes('limit') || 
+                detailsStr.includes('exceeded') || 
+                detailsStr.includes('429') ||
+                errorDetails.status === 429
+            ) {
+                window.isQuotaExceeded = true;
+                // I-trigger ang event para mag-update ang status indicator sa UI
+                window.dispatchEvent(new Event('offline')); // o custom status check event
+            }
+
             // I-log gamit ang ating Production Logger
             if (this.logger && typeof this.logger.error === 'function') {
                 this.logger.error(`[ErrorManager] Captured ${category}:`, errorPayload);
@@ -52,6 +66,9 @@
         }
 
         captureApiError(endpoint, status, error) {
+            if (status === 429) {
+                window.isQuotaExceeded = true;
+            }
             return this.handleError('API_FAILURE', { endpoint, status, error });
         }
 

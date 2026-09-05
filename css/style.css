@@ -2886,3 +2886,32 @@ input[type="url"]::placeholder{
         height: 50px;
     }
 }
+
+/* Status Indicator Styling */
+.system-status-indicator {
+    margin-top: 1rem;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-online { color: #065f46; background-color: #ecfdf5; border: 1px solid #a7f3d0; }
+.status-online .status-dot { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
+
+.status-offline { color: #78350f; background-color: #fffbeb; border: 1px solid #fde68a; }
+.status-offline .status-dot { background-color: #f59e0b; }
+
+.status-exceeded { color: #7f1d1d; background-color: #fef2f2; border: 1px solid #fecaca; }
+.status-exceeded .status-dot { background-color: #ef4444; box-shadow: 0 0 8px #ef4444; }

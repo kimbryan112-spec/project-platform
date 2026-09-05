@@ -37,8 +37,20 @@ export async function onRequestGet(context) {
             }
         });
     } catch (err) {
-        return new Response(JSON.stringify({ error: err.message }), {
-            status: 500,
+        console.error("[LOGS GET ERROR]", err);
+
+        const errorMessage = err.message || "Internal Server Error";
+        const isQuotaError = errorMessage.toLowerCase().includes("quota") || 
+                             errorMessage.toLowerCase().includes("limit") ||
+                             errorMessage.toLowerCase().includes("exceeded") ||
+                             errorMessage.toLowerCase().includes("too many requests");
+
+        return new Response(JSON.stringify({ 
+            success: false,
+            error: errorMessage,
+            errorType: isQuotaError ? "QUOTA_EXCEEDED" : "SERVER_ERROR"
+        }), {
+            status: isQuotaError ? 429 : 500,
             headers: { "Content-Type": "application/json" }
         });
     }

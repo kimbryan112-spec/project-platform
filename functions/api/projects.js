@@ -128,15 +128,23 @@ export async function onRequestGet(context) {
         );
 
     } catch (err) {
-        console.error(err);
+        console.error("[PROJECTS GET ERROR]", err);
+
+        const errorMessage = err.message || "Internal Server Error";
+        const isQuotaError = errorMessage.toLowerCase().includes("quota") || 
+                             errorMessage.toLowerCase().includes("limit") ||
+                             errorMessage.toLowerCase().includes("exceeded") ||
+                             errorMessage.toLowerCase().includes("too many requests");
+
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message,
+                message: errorMessage,
+                errorType: isQuotaError ? "QUOTA_EXCEEDED" : "SERVER_ERROR",
                 stack: err.stack
             }),
             {
-                status: 500,
+                status: isQuotaError ? 429 : 500,
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -254,18 +262,23 @@ export async function onRequestPost(context) {
         );
 
     } catch (err) {
-        console.error("[API-POST ERROR]");
-        console.error(err);
-        console.error(err.stack);
+        console.error("[PROJECTS POST ERROR]", err);
+
+        const errorMessage = err.message || "Internal Server Error";
+        const isQuotaError = errorMessage.toLowerCase().includes("quota") || 
+                             errorMessage.toLowerCase().includes("limit") ||
+                             errorMessage.toLowerCase().includes("exceeded") ||
+                             errorMessage.toLowerCase().includes("too many requests");
 
         return new Response(
             JSON.stringify({
                 success: false,
-                message: err.message,
+                message: errorMessage,
+                errorType: isQuotaError ? "QUOTA_EXCEEDED" : "SERVER_ERROR",
                 stack: err.stack
             }),
             {
-                status: 500,
+                status: isQuotaError ? 429 : 500,
                 headers: {
                     "Content-Type": "application/json"
                 }
