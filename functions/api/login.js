@@ -1,5 +1,5 @@
 /* ==================================
-    LOGIN API (Optimized & Error-Handled)
+    LOGIN API
     POST /api/login
 ================================== */
 
@@ -28,12 +28,6 @@ export async function onRequestPost(context) {
             );
         }
 
-        // Tiyaking may D1 database binding ang context
-        if (!context.env || !context.env.DB) {
-            throw new Error("Database binding (DB) is missing.");
-        }
-
-        // Optimized query with specific columns and LIMIT 1
         const user = await context.env.DB.prepare(`
             SELECT
                 id,
@@ -75,7 +69,7 @@ export async function onRequestPost(context) {
             );
         }
 
-        // Plain text comparison
+        // Plain text comparison gamit ang password column
         if (user.password !== password) {
             return new Response(
                 JSON.stringify({
@@ -94,7 +88,6 @@ export async function onRequestPost(context) {
             Date.now() + 7 * 24 * 60 * 60 * 1000
         ).toISOString();
 
-        // Optimized session creation using prepared statement
         await context.env.DB.prepare(`
             INSERT INTO sessions (
                 id,
@@ -136,20 +129,13 @@ export async function onRequestPost(context) {
     } catch (err) {
         console.error("[LOGIN ERROR]", err);
 
-        // Suriin kung ang error ay tungkol sa quota o limit exceeded
-        const errorMessage = err.message || "Internal Server Error";
-        const isQuotaError = errorMessage.toLowerCase().includes("quota") || 
-                             errorMessage.toLowerCase().includes("limit") ||
-                             errorMessage.toLowerCase().includes("exceeded");
-
         return new Response(
             JSON.stringify({
                 success: false,
-                message: errorMessage,
-                errorType: isQuotaError ? "QUOTA_EXCEEDED" : "SERVER_ERROR"
+                message: err.message || "Internal Server Error"
             }),
             {
-                status: isQuotaError ? 429 : 500,
+                status: 500,
                 headers: { "Content-Type": "application/json" }
             }
         );

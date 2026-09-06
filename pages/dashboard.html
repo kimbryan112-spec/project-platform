@@ -18,35 +18,6 @@
     <link rel="manifest" href="/manifest.json">
 
     <link rel="stylesheet" href="../css/style.css">
-    <style>
-        /* System Status Indicator Styling */
-        .system-status-indicator {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            vertical-align: middle;
-            margin-left: 10px;
-        }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .status-online { color: #065f46; background-color: #ecfdf5; border: 1px solid #a7f3d0; }
-        .status-online .status-dot { background-color: #10b981; box-shadow: 0 0 6px #10b981; }
-        
-        .status-offline { color: #78350f; background-color: #fffbeb; border: 1px solid #fde68a; }
-        .status-offline .status-dot { background-color: #f59e0b; }
-
-        .status-exceeded { color: #7f1d1d; background-color: #fef2f2; border: 1px solid #fecaca; }
-        .status-exceeded .status-dot { background-color: #ef4444; box-shadow: 0 0 6px #ef4444; }
-    </style>
 </head>
 
 <body>
@@ -123,12 +94,6 @@
                         <div id="calendarDay" class="calendar-day">21</div>
                     </div>
                     <h2><span id="currentYearTitle">2026</span> Wedding Highlights</h2>
-
-                    <!-- System Status Indicator (Naka-embed sa Topbar) -->
-                    <div id="systemStatusBanner" class="system-status-indicator status-online">
-                        <span class="status-dot"></span>
-                        <span id="systemStatusText">System Online (Cloud Connected)</span>
-                    </div>
                 </div>
             </div>
 
@@ -303,7 +268,7 @@
     </main>
 </div>
 
-<!-- All Context Menus & Modals -->
+<!-- All Context Menus & Modals (Para sa Admin) -->
 <div id="monthContextMenu" class="month-context-menu">
     <button id="lockMonthBtn">🔒 Lock Month</button>
     <button id="unlockMonthBtn">🔓 Unlock Month</button>
@@ -404,7 +369,11 @@ if (userRoleLower !== "admin" && userRoleLower !== "dashboard" && userRoleLower 
     window.location.href = "../login.html";
 }
 
-const IS_ADMIN = userRoleLower === "admin";
+const IS_ADMIN = currentUser.role === "admin";
+
+console.log("Current User:", currentUser);
+console.log("Role:", currentUser.role);
+console.log("IS_ADMIN:", IS_ADMIN);
 
 if (!IS_ADMIN) {
     const adminMenu = document.getElementById("adminMenu");
@@ -412,17 +381,20 @@ if (!IS_ADMIN) {
         adminMenu.style.display = "none";
     }
     
+    // Itatago ang notification bell wrapper kung hindi admin (Manager role)
     const notifWrapper = document.getElementById("dashboardNotificationWrapper");
     if (notifWrapper) {
         notifWrapper.style.display = "none";
     }
 
+    // Harangin o alisin ang mga Context Menu para sa Manager role para walang access sa link attachments at month lock
     document.addEventListener("DOMContentLoaded", () => {
         ['monthContextMenu', 'watchContextMenu', 'filesContextMenu', 'songContextMenu'].forEach(id => {
             const menu = document.getElementById(id);
             if (menu) menu.remove();
         });
 
+        // Harangan ang right click sa mga elements na may kinalaman dito
         document.addEventListener("contextmenu", (e) => {
             if (!IS_ADMIN) {
                 e.preventDefault();
@@ -430,6 +402,7 @@ if (!IS_ADMIN) {
         });
     });
 } else {
+    // Kung admin, isasama ang logic para sa pag-fetch ng activity logs ng bell
     document.addEventListener("DOMContentLoaded", () => {
         const bell = document.getElementById("notificationBell");
         const dropdown = document.getElementById("notificationDropdown");
@@ -445,6 +418,7 @@ if (!IS_ADMIN) {
                     const badgeEl = document.getElementById("notificationBadge");
                     if (badgeEl) badgeEl.style.display = "none";
                 } else {
+                    localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
                     dropdown.style.display = "none";
                     checkNewLogsCount();
                 }
@@ -452,6 +426,7 @@ if (!IS_ADMIN) {
 
             document.addEventListener("click", (e) => {
                 if (dropdown.style.display === "block" && !dropdown.contains(e.target) && !bell.contains(e.target)) {
+                    localStorage.setItem("kbh_last_seen_log", new Date().toISOString());
                     dropdown.style.display = "none";
                     checkNewLogsCount();
                 }
@@ -470,93 +445,26 @@ if (userName) {
 
 const roleMap = {
     admin: "Administrator",
-    dashboard: "Manager",
-    manager: "Manager"
+    dashboard: "Manager"
 };
 
 const userRole = document.getElementById("userRole");
 if (userRole) {
-    userRole.textContent = roleMap[userRoleLower] || currentUser.role;
+    userRole.textContent = roleMap[currentUser.role] || currentUser.role;
 }
 
-// System Status Indicator Dynamic Checker
-document.addEventListener("DOMContentLoaded", () => {
-    const banner = document.getElementById("systemStatusBanner");
-    const text = document.getElementById("systemStatusText");
-
-    function updateDashboardStatus() {
-        if (!banner || !text) return;
-        const isOffline = !navigator.onLine;
-        const quotaExceeded = window.isQuotaExceeded || false;
-
-        banner.className = "system-status-indicator";
-
-        if (quotaExceeded) {
-            banner.classList.add("status-exceeded");
-            text.textContent = "API Limit / Quota Exceeded";
-        } else if (isOffline) {
-            banner.classList.add("status-offline");
-            text.textContent = "Local Mode Active (Offline)";
-        } else {
-            banner.classList.add("status-online");
-            text.textContent = "System Online (Cloud Connected)";
-        }
-    }
-
-    window.addEventListener("online", updateDashboardStatus);
-    window.addEventListener("offline", updateDashboardStatus);
-    updateDashboardStatus();
-});
-
-// Phase 7 Optimized: Kumukuha lamang ng unread count para hindi bumigat ang background polling sa dashboard
-async function checkNewLogsCount() {
-    if (!IS_ADMIN) return;
-    try {
-        const res = await fetch("/api/logs?count=true");
-        if (res.status === 429) window.isQuotaExceeded = true;
-        if (!res.ok) return;
-        const data = await res.json();
-        const totalLogsCount = data.count || 0;
-        
-        const badgeEl = document.getElementById("notificationBadge");
-        const dropdown = document.getElementById("notificationDropdown");
-        if (!badgeEl) return;
-
-        if (dropdown && dropdown.style.display === "block") {
-            badgeEl.style.display = "none";
-            return;
-        }
-
-        const lastSeenCount = parseInt(localStorage.getItem("kbh_last_seen_count") || "0", 10);
-        
-        if (totalLogsCount > lastSeenCount) {
-            const diff = totalLogsCount - lastSeenCount;
-            badgeEl.textContent = diff;
-            badgeEl.style.display = "inline-block";
-        } else {
-            badgeEl.style.display = "none";
-        }
-    } catch (e) {}
-}
-
-// Kinukuha lamang ang buong listahan kapag binuksan ang Notification Center sa Dashboard
 async function fetchActivityLogs() {
     const listEl = document.getElementById("notificationList");
     const badgeEl = document.getElementById("notificationBadge");
-    if (!listEl) return;
     
     try {
-        const res = await fetch("/api/logs?limit=20&offset=0");
-        if (res.status === 429) window.isQuotaExceeded = true;
+        const res = await fetch("/api/logs");
         if (!res.ok) return;
         const data = await res.json();
         const logs = data.logs || [];
 
-        const countRes = await fetch("/api/logs?count=true");
-        if (countRes.ok) {
-            const countData = await countRes.json();
-            localStorage.setItem("kbh_last_seen_count", countData.count || 0);
-        }
+        const lastSeen = localStorage.getItem("kbh_last_seen_log");
+        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
 
         const filteredLogs = logs.filter(log => {
             const name = (log.user_name || "").toLowerCase();
@@ -566,8 +474,20 @@ async function fetchActivityLogs() {
         if (filteredLogs.length > 0) {
             badgeEl.style.display = "none";
 
-            listEl.innerHTML = filteredLogs.map(log => {
-                let logDate = log.created_at ? new Date(log.created_at.replace(" ", "T") + "Z") : new Date();
+            listEl.innerHTML = filteredLogs.slice(0, 15).map(log => {
+                let logDate;
+                if (log.created_at) {
+                    let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
+                    logDate = new Date(dStr);
+                } else {
+                    logDate = new Date();
+                }
+
+                const logTime = logDate.getTime();
+                const isNew = logTime > lastSeenTime;
+                
+                const cardBackground = isNew ? "background: #f0f7ff; border-left: 4px solid #2563eb;" : "background: #ffffff; border-left: 4px solid transparent;";
+
                 const timeString = logDate.toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
                 const dateString = logDate.toLocaleDateString('en-PH', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -580,7 +500,7 @@ async function fetchActivityLogs() {
                 const badgeColor = isPhone ? "background: #dcfce7; color: #15803d;" : "background: #e0f2fe; color: #0369a1;";
 
                 return `
-                    <div style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; background: #ffffff; display: flex; flex-direction: column; gap: 4px;">
+                    <div style="padding: 10px 12px; border-bottom: 1px solid #f1f5f9; ${cardBackground} display: flex; flex-direction: column; gap: 4px; transition: background 0.3s;">
                         <div style="font-weight: 600; color: #1e293b; display: flex; justify-content: space-between; align-items: center;">
                             <span>👤 ${log.user_name}</span>
                             <span style="font-size: 10px; ${badgeColor} padding: 2px 6px; border-radius: 4px; font-weight: 500;">${deviceIcon} ${device}</span>
@@ -602,19 +522,40 @@ async function fetchActivityLogs() {
         console.error("Error fetching logs:", err);
     }
 }
+
+async function checkNewLogsCount() {
+    try {
+        const res = await fetch("/api/logs");
+        if (!res.ok) return;
+        const data = await res.json();
+        const logs = data.logs || [];
+        const badgeEl = document.getElementById("notificationBadge");
+        const dropdown = document.getElementById("notificationDropdown");
+
+        const lastSeen = localStorage.getItem("kbh_last_seen_log");
+        const lastSeenTime = lastSeen ? new Date(lastSeen).getTime() : 0;
+
+        const newLogs = logs.filter(log => {
+            const name = (log.user_name || "").toLowerCase();
+            if (name.includes("admin") || name.includes("kim bryan hernandez")) return false;
+
+            if (log.created_at) {
+                let dStr = log.created_at.includes("Z") || log.created_at.includes("+") ? log.created_at : log.created_at.replace(" ", "T") + "Z";
+                return new Date(dStr).getTime() > lastSeenTime;
+            }
+            return false;
+        });
+
+        if (newLogs.length > 0 && dropdown.style.display !== "block") {
+            badgeEl.textContent = newLogs.length;
+            badgeEl.style.display = "inline-block";
+        } else {
+            badgeEl.style.display = "none";
+        }
+    } catch (e) {}
+}
 </script>
 
-<!-- === OFFLINE-FIRST & PRODUCTION MODULES === -->
-<script src="../js/logger.js"></script>
-<script src="../js/error-manager.js"></script>
-<script src="../js/local-db.js"></script>
-<script src="../js/sync-queue.js"></script>
-<script src="../js/conflict-manager.js"></script>
-<script src="../js/sync-engine.js"></script>
-<script src="../js/offline-controller.js"></script>
-<script src="../js/hybrid-auth.js"></script>
-
-<!-- Existing Core Script -->
 <script src="../js/script.js?v=20260823-1"></script>
 
 <script>

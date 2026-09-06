@@ -1,5 +1,5 @@
 // ==================================
-// DYNAMIC RESTORE API (All Tables & Cloud Backup Supported)
+// DYNAMIC RESTORE API (All Tables)
 // POST /api/restore
 // ==================================
 
@@ -9,22 +9,8 @@ export async function onRequestPost(context) {
 
         const backup = await context.request.json();
 
-        // 1. Suriin kung valid ang backup data (suportahan ang parehong format)
-        let tablesData = null;
-
-        if (backup && backup.data && typeof backup.data === "object") {
-            // New dynamic multi-table format
-            tablesData = backup.data;
-        } else if (backup && Array.isArray(backup.projects)) {
-            // Classic cloud backup format (projects array lamang)
-            tablesData = { projects: backup.projects };
-        } else if (backup && typeof backup === "object" && !Array.isArray(backup)) {
-            // LocalStorage / Key-Value backup format na ginawang object
-            // Kung may mga keys na nagsisimula sa table o projects, maaari nating i-map
-            tablesData = backup;
-        }
-
-        if (!tablesData || typeof tablesData !== "object" || Object.keys(tablesData).length === 0) {
+        // 1. Siguraduhing tama ang format ng file at may 'data' object
+        if (!backup || !backup.data || typeof backup.data !== "object") {
             return new Response(
                 JSON.stringify({
                     success: false,
@@ -37,57 +23,36 @@ export async function onRequestPost(context) {
             );
         }
 
+        const tablesData = backup.data;
         const tableNames = Object.keys(tablesData);
 
         // 2. I-off muna ang foreign key checks para maiwasan ang conflict habang nagbubura at nagpapasok
         await context.env.DB.prepare(`PRAGMA foreign_keys = OFF;`).run();
 
-        // 3. Linisin ang mga lumang laman ng bawat table kung ito ay valid tables sa D1
+        // 3. Linisin ang mga lumang laman ng bawat table (baliktad o diretso)
         for (const tableName of tableNames) {
-            // Huwag pansinin ang mga Non-table metadata keys kung galing sa LocalStorage backup
-            if (tableName.startsWith("projects_") || tableName === "currentUser" || tableName === "monthLocks" || tableName === "lastBackup") {
-                continue;
-            }
-
-            try {
-                await context.env.DB.prepare(`DELETE FROM "${tableName}";`).run();
-            } catch (tableErr) {
-                console.warn(`[RESTORE] Skipping delete for non-database key: ${tableName}`);
-            }
+            await context.env.DB.prepare(`DELETE FROM "${tableName}";`).run();
         }
 
         // 4. I-insert pabalik ang mga records para sa bawat table
         for (const tableName of tableNames) {
             const rows = tablesData[tableName];
             
-            // Kung ito ay LocalStorage key-value pairs kaysa sa database table rows, i-handle nang maayos
-            if (tableName.startsWith("projects_") || tableName === "monthLocks") {
-                continue; // Ang mga ito ay client-side storage, hindi D1 tables
-            }
-
             if (!Array.isArray(rows) || rows.length === 0) continue;
 
             for (const row of rows) {
-                if (!row || typeof row !== "object") continue;
-
                 const columns = Object.keys(row);
                 const values = Object.values(row);
                 
-                if (columns.length === 0) continue;
-
                 // Gumawa ng dynamic placeholders (?, ?, ?) base sa dami ng columns
                 const placeholders = columns.map(() => "?").join(", ");
                 const quotedColumns = columns.map(col => `"${col}"`).join(", ");
 
                 const query = `INSERT INTO "${tableName}" (${quotedColumns}) VALUES (${placeholders})`;
                 
-                try {
-                    await context.env.DB.prepare(query).bind(...values).run();
-                } catch (insertErr) {
-                    console.error(`[RESTORE] Error inserting into ${tableName}:`, insertErr.message);
-                }
+                await context.env.DB.prepare(query).bind(...values).run();
             }
-            console.log(`[RESTORE] Restored record(s) to table/section: ${tableName}`);
+            console.log(`[RESTORE] Restored ${rows.length} record(s) to table: ${tableName}`);
         }
 
         // 5. I-on ulit ang foreign keys

@@ -12,104 +12,6 @@ console.log("Host:", location.hostname);
 console.log("LOCAL_MODE:", LOCAL_MODE);
 console.log("================================");
 
-// =========================================
-// PHASE 9 — MEMORY CACHE MANAGER
-// Caches: Projects, Settings, Dropdowns, Users, Music types, Month list, Year list, Permissions, Current user
-// =========================================
-class AppMemoryCache {
-    constructor() {
-        this.store = new Map();
-    }
-
-    set(key, value) {
-        this.store.set(key, {
-            data: value,
-            timestamp: Date.now()
-        });
-        console.log(`[CACHE SET] ${key}`);
-    }
-
-    get(key) {
-        const item = this.store.get(key);
-        if (!item) return null;
-        console.log(`[CACHE HIT] ${key}`);
-        return item.data;
-    }
-
-    invalidate(keyOrPrefix) {
-        if (!keyOrPrefix) {
-            this.store.clear();
-            console.log("[CACHE CLEARED ALL]");
-            return;
-        }
-        for (const key of this.store.keys()) {
-            if (key === keyOrPrefix || key.startsWith(keyOrPrefix)) {
-                this.store.delete(key);
-                console.log(`[CACHE INVALIDATED] ${key}`);
-            }
-        }
-    }
-}
-
-const AppCache = new AppMemoryCache();
-
-// =========================================
-// PHASE 10 — REQUEST DEDUPLICATOR (HYBRID / OFFLINE-AWARE)
-// Prevents duplicate in-flight requests from rapid clicks, tab switching, focus/blur events.
-// Updated to integrate with Offline Controller and Queue when cloud fails.
-// =========================================
-class RequestDeduplicator {
-    constructor() {
-        this.inFlightRequests = new Map();
-    }
-
-    async fetch(url, options = {}) {
-        const method = (options.method || 'GET').toUpperCase();
-        
-        // Huwag i-deduplicate ang POST, PUT, DELETE para ligtas ang data mutations
-        if (method !== 'GET') {
-            return window.fetch(url, options);
-        }
-
-        const cacheKey = url;
-
-        // Kung may active request na kapareho, i-reuse ang promise na iyon
-        if (this.inFlightRequests.has(cacheKey)) {
-            console.log(`[DEDUPLICATE] Reusing active request for: ${url}`);
-            const response = await this.inFlightRequests.get(cacheKey);
-            return response.clone();
-        }
-
-        // Lumikha ng bagong request promise na may offline fallback handling
-        const requestPromise = window.fetch(url, options).then(response => {
-            if (response.status === 429) {
-                window.isQuotaExceeded = true;
-            }
-            if (!response.ok && window.KBErrorManager) {
-                window.KBErrorManager.captureApiError(url, response.status, "API responded with non-OK status");
-            }
-            return response;
-        }).catch(err => {
-            if (window.KBErrorManager) {
-                window.KBErrorManager.captureApiError(url, 0, err.message);
-            }
-            throw err;
-        }).finally(() => {
-            this.inFlightRequests.delete(cacheKey);
-        });
-
-        this.inFlightRequests.set(cacheKey, requestPromise);
-
-        const response = await requestPromise;
-        return response.clone();
-    }
-}
-
-const DeduplicatedFetch = new RequestDeduplicator();
-
-// Legacy compatibility para sa mga umiiral na function
-const projectsMemoryCache = {};
-
 // =========================
 // MONTH MAP & NAMES
 // =========================
@@ -254,24 +156,17 @@ async function recordActivity(action, details = "") {
         
         const clientInfo = await getClientDeviceInfo();
 
-        const payload = {
-            user_name: userName,
-            action: action,
-            details: details,
-            browser: clientInfo.browser,
-            os: clientInfo.os,
-            device: clientInfo.device
-        };
-
-        if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
-            await window.KBSyncQueue.addQueueItem('LOGS', '/api/logs', 'POST', payload);
-            return;
-        }
-
         await fetch("/api/logs", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                user_name: userName,
+                action: action,
+                details: details,
+                browser: clientInfo.browser,
+                os: clientInfo.os,
+                device: clientInfo.device
+            })
         });
     } catch (err) {
         console.error("Error recording activity:", err);
@@ -492,9 +387,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ==================================
-// CORE LOGIC: SAVE & LOAD (REST API)
-// ==================================
+/* ==================================
+    CORE LOGIC: SAVE & LOAD (REST API)
+================================== */
 
 function collectRowData(row) {
     try {
@@ -772,25 +667,14 @@ function loadProjectsLocal() {
 }
 
 // ==================================
-// ONLINE LOAD FUNCTION (Optimized with AppCache & Offline Controller Hook)
+// ONLINE LOAD FUNCTION
 // ==================================
 async function loadProjects() {
     console.log("========== LOAD START ==========");
     console.log("currentYear :", currentYear);
     console.log("currentMonth:", currentMonth);
 
-    const cacheKey = `projects_${currentYear}_${currentMonth}`;
-
-    const cachedPayload = AppCache.get(cacheKey) || projectsMemoryCache[cacheKey];
-    if (cachedPayload) {
-        console.log(`[LOAD] Using memory cache for ${cacheKey}`);
-        monthLocks = cachedPayload.lockedMonths || {};
-        cachedHasDataMonths = cachedPayload.hasDataMonths || {};
-        renderProjectsData(cachedPayload.projects, monthLocks, cachedHasDataMonths);
-        return;
-    }
-
-    if (LOCAL_MODE || (window.KBOfflineController && window.KBOfflineController.isOfflineMode())) {
+    if (LOCAL_MODE) {
         const restored = restoreProjectsLocal(currentYear, currentMonth);
         if (!restored) {
             clearProjectTable();
@@ -801,7 +685,7 @@ async function loadProjects() {
     }
 
     try {
-        const response = await DeduplicatedFetch.fetch(
+        const response = await fetch(
             `/api/projects?year=${currentYear}&month=${monthMap[currentMonth]}&t=${Date.now()}`,
             {
                 cache: "no-store",
@@ -809,13 +693,8 @@ async function loadProjects() {
             }
         );
 
-        if (response.status === 429) {
-            window.isQuotaExceeded = true;
-        }
-
         if (!response.ok) {
             console.error("[LOAD] API returned error:", response.status);
-            restoreProjectsLocal(currentYear, currentMonth);
             return;
         }
 
@@ -825,61 +704,47 @@ async function loadProjects() {
         monthLocks = responseData.lockedMonths || {};
         cachedHasDataMonths = responseData.hasDataMonths || {};
 
-        const payloadToCache = {
-            projects: projectsData,
-            lockedMonths: monthLocks,
-            hasDataMonths: cachedHasDataMonths
-        };
+        await updateMonthHasDataUI(cachedHasDataMonths);
 
-        AppCache.set(cacheKey, payloadToCache);
-        projectsMemoryCache[cacheKey] = payloadToCache;
+        if (!projectsData.length) {
+            clearProjectTable();
+        }
 
-        renderProjectsData(projectsData, monthLocks, cachedHasDataMonths);
+        const rows = document.querySelectorAll(".project-table tbody tr");
 
-    } catch (e) {
-        console.error("[LOAD] Error loading projects (falling back to local):", e);
-        restoreProjectsLocal(currentYear, currentMonth);
-    }
-}
+        if (Array.isArray(projectsData) && projectsData.length > 0) {
+            let matchedCount = 0;
 
-async function renderProjectsData(projectsData, monthLocksMap, hasDataMonthsMap) {
-    await updateMonthHasDataUI(hasDataMonthsMap);
+            rows.forEach((row) => {
+                const rowId = parseInt(row.getAttribute("data-row-id"), 10);
+                const data = projectsData.find(p => p.rowId === rowId);
 
-    if (!projectsData.length) {
-        clearProjectTable();
-    }
+                if (data) {
+                    populateRow(row, data);
+                    matchedCount++;
+                }
+            });
 
-    const rows = document.querySelectorAll(".project-table tbody tr");
+            updateMonthLockUI();
+            await updateMonthHasDataUI(cachedHasDataMonths);
+            console.log(`[LOAD] Successfully matched ${matchedCount} rows`);
+        }
 
-    if (Array.isArray(projectsData) && projectsData.length > 0) {
-        let matchedCount = 0;
-
-        rows.forEach((row) => {
-            const rowId = parseInt(row.getAttribute("data-row-id"), 10);
-            const data = projectsData.find(p => p.rowId === rowId);
-
-            if (data) {
-                populateRow(row, data);
-                matchedCount++;
+        document.querySelectorAll(".month-btn").forEach(btn => {
+            const key = getMonthKey(currentYear, btn.dataset.month);
+            const locked = !!monthLocks[key];
+            if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
+                btn.classList.toggle("locked", locked);
+            } else {
+                btn.classList.remove("locked");
             }
         });
 
         updateMonthLockUI();
-        updateMonthHasDataUI(hasDataMonthsMap);
-        console.log(`[LOAD] Successfully matched ${matchedCount} rows`);
+
+    } catch (e) {
+        console.error("[LOAD] Error loading projects:", e);
     }
-
-    document.querySelectorAll(".month-btn").forEach(btn => {
-        const key = getMonthKey(currentYear, btn.dataset.month);
-        const locked = !!monthLocksMap[key];
-        if (typeof IS_ADMIN !== "undefined" && IS_ADMIN) {
-            btn.classList.toggle("locked", locked);
-        } else {
-            btn.classList.remove("locked");
-        }
-    });
-
-    updateMonthLockUI();
 
     document.querySelectorAll(".status-select").forEach(updateStatusColor);
     document.querySelectorAll(".type-select").forEach(updateTypeColor);
@@ -889,16 +754,13 @@ async function renderProjectsData(projectsData, monthLocksMap, hasDataMonthsMap)
 }
 
 // ==================================
-// ONLINE & LOCAL SAVE FUNCTIONS (INTEGRATED WITH SYNC QUEUE HOOKS)
+// ONLINE & LOCAL SAVE FUNCTIONS (Optimized Debounce)
 // ==================================
 let localSaveTimeout;
 let apiSaveTimeout;
 
 function saveProjects() {
     saveProjectsLocal();
-
-    const cacheKey = `projects_${currentYear}_${currentMonth}`;
-    AppCache.invalidate(cacheKey);
 
     if (LOCAL_MODE) {
         return;
@@ -921,25 +783,6 @@ function saveProjects() {
             }
         });
 
-        const updatedPayload = {
-            projects: projectsData,
-            lockedMonths: monthLocks,
-            hasDataMonths: cachedHasDataMonths
-        };
-        AppCache.set(cacheKey, updatedPayload);
-        projectsMemoryCache[cacheKey] = updatedPayload;
-
-        if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
-            await window.KBSyncQueue.addQueueItem(
-                'UPDATE_PROJECT',
-                `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
-                'POST',
-                projectsData
-            );
-            console.log("[OFFLINE] Changes captured in local pending queue.");
-            return;
-        }
-
         try {
             const response = await fetch(
                 `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
@@ -950,10 +793,6 @@ function saveProjects() {
                 }
             );
 
-            if (response.status === 429) {
-                window.isQuotaExceeded = true;
-            }
-
             if (response.ok) {
                 localStorage.setItem(
                     `projects_${saveYear}_${saveMonth}`,
@@ -962,25 +801,9 @@ function saveProjects() {
                 recordActivity("Saved Projects", `Year: ${saveYear}, Month: ${saveMonth.toUpperCase()}`);
             } else {
                 console.error("[SAVE] API error:", response.status);
-                if (window.KBSyncQueue) {
-                    await window.KBSyncQueue.addQueueItem(
-                        'UPDATE_PROJECT',
-                        `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
-                        'POST',
-                        projectsData
-                    );
-                }
             }
         } catch (e) {
-            console.error("[SAVE] Error saving projects, adding to pending queue:", e);
-            if (window.KBSyncQueue) {
-                await window.KBSyncQueue.addQueueItem(
-                    'UPDATE_PROJECT',
-                    `/api/projects?year=${saveYear}&month=${monthMap[saveMonth]}`,
-                    'POST',
-                    projectsData
-                );
-            }
+            console.error("[SAVE] Error saving projects to Cloudflare backend:", e);
         }
     }, 1000);
 }
@@ -1060,11 +883,6 @@ function updateCurrentMonthHasData() {
 
     if (!LOCAL_MODE) {
         cachedHasDataMonths[currentMonth] = hasData;
-        const cacheKey = `projects_${currentYear}_${currentMonth}`;
-        const cached = AppCache.get(cacheKey) || projectsMemoryCache[cacheKey];
-        if (cached) {
-            cached.hasDataMonths = cachedHasDataMonths;
-        }
     }
 }
 
@@ -1328,27 +1146,14 @@ async function saveMonthLock(year, monthName, locked) {
 
     const monthNumber = monthMap[monthName];
 
-    AppCache.invalidate(`projects_${year}_${monthName}`);
-
-    if (window.KBOfflineController && window.KBOfflineController.isOfflineMode() && window.KBSyncQueue) {
-        await window.KBSyncQueue.addQueueItem('MONTH_LOCK', '/api/month-lock', 'POST', { year: year, month: monthNumber, locked: locked });
-        return;
-    }
-
     try {
-        const resp = await fetch("/api/month-lock", {
+        await fetch("/api/month-lock", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ year: year, month: monthNumber, locked: locked })
         });
-        if (resp.status === 429) {
-            window.isQuotaExceeded = true;
-        }
     } catch (err) {
         console.error("[MONTH LOCK ERROR]", err);
-        if (window.KBSyncQueue) {
-            await window.KBSyncQueue.addQueueItem('MONTH_LOCK', '/api/month-lock', 'POST', { year: year, month: monthNumber, locked: locked });
-        }
     }
 }
 
@@ -1899,21 +1704,9 @@ if (cancelLogout) {
 }
 
 if (confirmLogout) {
-    confirmLogout.addEventListener("click", async () => {
-        if (window.KBHybridAuth && typeof window.KBHybridAuth.canSafelyLogout === 'function') {
-            const safe = await window.KBHybridAuth.canSafelyLogout();
-            if (!safe) {
-                if (!confirm("You have unsynchronized offline changes. Logging out may risk pending data. Proceed anyway?")) {
-                    logoutConfirm?.classList.remove("show");
-                    return;
-                }
-            }
-            await window.KBHybridAuth.clearSession();
-        }
-
+    confirmLogout.addEventListener("click", () => {
         recordActivity("Logged Out", "User signed out");
         localStorage.removeItem("currentUser");
-        AppCache.invalidate();
         window.location.href = "../login.html";
     });
 }
@@ -2066,7 +1859,7 @@ volumeIcon?.addEventListener("click", () => {
 });
 
 /* ==================================
-    SONG LINK STYLE & DRONE AUTOCOMPLETE (PHASE 11: DEBOUNCE APPLIED)
+    SONG LINK STYLE & DRONE AUTOCOMPLETE
 ================================== */
 function updateSongLinkStyle(input) {
     if (!input) return;
@@ -2103,43 +1896,37 @@ document.querySelectorAll(".drone-cell").forEach(cell => {
 
     updateDroneColor(select);
 
-    let droneDebounceTimer = null;
-
     search.addEventListener("input", () => {
-        clearTimeout(droneDebounceTimer);
-        
-        droneDebounceTimer = setTimeout(() => {
-            const keyword = search.value.trim().toUpperCase();
-            suggestions.innerHTML = "";
+        const keyword = search.value.trim().toUpperCase();
+        suggestions.innerHTML = "";
 
-            if (!keyword) {
+        if (!keyword) {
+            suggestions.classList.remove("show");
+            return;
+        }
+
+        [...select.options].forEach(option => {
+            if (option.value === "NO DRONE" || !option.text.toUpperCase().includes(keyword)) return;
+
+            const item = document.createElement("div");
+            item.className = "drone-suggestion";
+            item.innerHTML = option.text.replace(new RegExp(keyword, "ig"), match => `<b>${match}</b>`);
+
+            item.addEventListener("click", () => {
+                select.value = option.value;
+                updateDroneColor(select);
+                search.value = "";
+                suggestions.innerHTML = "";
                 suggestions.classList.remove("show");
-                return;
-            }
-
-            [...select.options].forEach(option => {
-                if (option.value === "NO DRONE" || !option.text.toUpperCase().includes(keyword)) return;
-
-                const item = document.createElement("div");
-                item.className = "drone-suggestion";
-                item.innerHTML = option.text.replace(new RegExp(keyword, "ig"), match => `<b>${match}</b>`);
-
-                item.addEventListener("click", () => {
-                    select.value = option.value;
-                    updateDroneColor(select);
-                    search.value = "";
-                    suggestions.innerHTML = "";
-                    suggestions.classList.remove("show");
-                    saveProjects();
-                    updateCurrentMonthHasData();
-                    recordActivity("Selected Drone via Search", `Drone -> ${option.value}`);
-                });
-
-                suggestions.appendChild(item);
+                saveProjects();
+                updateCurrentMonthHasData();
+                recordActivity("Selected Drone via Search", `Drone -> ${option.value}`);
             });
 
-            suggestions.classList.toggle("show", suggestions.children.length > 0);
-        }, 300);
+            suggestions.appendChild(item);
+        });
+
+        suggestions.classList.toggle("show", suggestions.children.length > 0);
     });
 
     select.addEventListener("change", () => {
